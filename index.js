@@ -193,7 +193,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
   logToBotLogChannel(`User ${interaction.user.id} attempted to use the /${interaction.commandName} command.`, client);
   try {
     console.log(`Executing command: ${interaction.commandName}`);
-    await command.execute(interaction, client);
+    if (interaction.commandName === 'restart') {
+      await command.execute(interaction, client);
+      // Delay sending the restart notification until after the bot has fully restarted
+      setTimeout(() => sendRestartNotification(interaction), 15000);
+    } else {
+      await command.execute(interaction, client);
+    }
     console.log(`Command ${interaction.commandName} executed successfully.`);
   } catch (error) {
     logError(error, `Executing ${interaction.commandName} command for user ${interaction.user.id}`, null, client);
@@ -273,6 +279,7 @@ async function init() {
     client.commands.set('points', commands.pointsCommand);
     client.commands.set('restart', commands.restartCommand);
     client.commands.set('leaderboard', commands.leaderboardCommand);
+    client.commands.set('broadcast', commands.broadcastCommand);
 
     // Check all voice channels in the guild for users and start updating their points
     try {
@@ -322,3 +329,15 @@ async function logToBotLogChannel(message, client) {
 
 // Start the bot
 init();
+
+// New function to send restart notification
+async function sendRestartNotification(interaction) {
+  try {
+    await interaction.followUp({
+      content: `GameNightBot is now online and has completed initial operations.`,
+      ephemeral: true
+    });
+  } catch (error) {
+    logError(error, 'Error sending restart notification', null, client);
+  }
+}

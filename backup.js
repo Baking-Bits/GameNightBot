@@ -4,9 +4,9 @@ const { log } = require('./logging.js');
 
 async function backupCode(isImportant = false) {
   const rootDir = path.resolve(__dirname);
-	const parentDir = path.join(rootDir, '../');
-  const saveDir = path.join(parentDir, 'saves');
-  const workingDir = path.join(saveDir, 'working');
+ 	const parentDir = path.join(rootDir, '../');
+	const saveDir = path.join(parentDir, 'saves');
+	const workingDir = path.join(saveDir, 'working');
   const brokenDir = path.join(saveDir, 'broken');
   
   const estDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));

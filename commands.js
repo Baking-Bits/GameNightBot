@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { getTotal } = require('./pointsManagement.js');
+const { restartBot } = require('./restart.js');
 
 module.exports = {
   pointsCommand: {
@@ -33,7 +34,6 @@ module.exports = {
     
     async execute(interaction, client) {
       try {
-        const { restartBot } = require('./restart.js');
         await interaction.reply({ content: 'Restarting the bot...', ephemeral: true });
         
         const isWorking = true; // Assume the bot is working before restart
@@ -69,6 +69,34 @@ module.exports = {
       } catch (error) {
         console.error('Error in leaderboard command:', error);
         await interaction.reply({ content: 'There was an error fetching the leaderboard.', ephemeral: true });
+      }
+    }
+  },
+
+  broadcastCommand: {
+    data: new SlashCommandBuilder()
+      .setName('broadcast')
+      .setDescription('Send a message to a specified channel (Admin only)')
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .addStringOption(option =>
+        option.setName('message')
+          .setDescription('The message to broadcast')
+          .setRequired(true))
+      .addChannelOption(option =>
+        option.setName('channel')
+          .setDescription('The channel to send the message to')
+          .setRequired(true)),
+    
+    async execute(interaction, client) {
+      try {
+        const message = interaction.options.getString('message');
+        const channel = interaction.options.getChannel('channel');
+        
+        await channel.send(message);
+        await interaction.reply({ content: 'Message broadcasted successfully.', ephemeral: true });
+      } catch (error) {
+        console.error('Error in broadcast command:', error);
+        await interaction.reply({ content: 'There was an error broadcasting the message.', ephemeral: true });
       }
     }
   }
