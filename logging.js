@@ -2,11 +2,12 @@ const fs = require('fs');
 const path = require('path');
 
 function log(message, client) {
-  const logDir = path.join(__dirname, 'logs');
+  const logDir = path.join(__dirname, '../logs');
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir);
   }
   const logFile = path.join(logDir, 'bot.log');
+  ensureLogFileExists(logFile);
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}\n`;
   
@@ -23,11 +24,12 @@ function log(message, client) {
 }
 
 function logError(error, context, additionalInfo = null, client) {
-  const logDir = path.join(__dirname, 'logs');
+  const logDir = path.join(__dirname, '../logs');
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir);
   }
   const errorFile = path.join(logDir, 'errors.log');
+  ensureLogFileExists(errorFile);
   const timestamp = new Date().toISOString();
   let errorMessage = `[${timestamp}] Error in ${context}: ${error.message}\n`;
   if (additionalInfo) {
@@ -48,7 +50,7 @@ function logError(error, context, additionalInfo = null, client) {
 }
 
 function watchLogs(client) {
-  const logDir = path.join(__dirname, 'logs');
+  const logDir = path.join(__dirname, '../logs');
   const logFile = path.join(logDir, 'bot.log');
   const errorFile = path.join(logDir, 'errors.log');
 
@@ -108,6 +110,12 @@ function checkAndRotateLog(filePath, maxSize) {
       fs.unlinkSync(backupPath);
     }
     fs.renameSync(filePath, backupPath);
+    fs.writeFileSync(filePath, '');
+  }
+}
+
+function ensureLogFileExists(filePath) {
+  if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, '');
   }
 }

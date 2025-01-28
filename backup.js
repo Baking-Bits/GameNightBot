@@ -4,7 +4,8 @@ const { log } = require('./logging.js');
 
 async function backupCode(isImportant = false) {
   const rootDir = path.resolve(__dirname);
-  const saveDir = path.join(rootDir, 'saves');
+	const parentDir = path.join(rootDir, '../');
+  const saveDir = path.join(parentDir, 'saves');
   const workingDir = path.join(saveDir, 'working');
   const brokenDir = path.join(saveDir, 'broken');
   
