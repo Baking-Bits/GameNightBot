@@ -1,6 +1,6 @@
 # Use the official Node.js LTS image
 # This ensures the image is using the current long-term support (LTS) version
-FROM node:lts
+FROM node:lts-slim
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -13,6 +13,8 @@ RUN npm install
 
 # Copy the rest of the application files
 COPY . .
+
+RUN mkdir /app/logs
 
 # Expose the port the app runs on
 EXPOSE 3000
