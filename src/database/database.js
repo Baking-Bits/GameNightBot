@@ -46,7 +46,7 @@ class VoiceDatabase {
     async getUserVoiceTime(userId, guildId, period = 'all') {
         let timeFilter = '';
         let params = [userId, guildId];
-        
+
         switch(period.toLowerCase()) {
             case 'daily': {
                 const now = new Date();
@@ -90,16 +90,16 @@ class VoiceDatabase {
         }
 
         const query = `
-            SELECT COALESCE(SUM(total_time), 0) as total_time 
-            FROM voice_times 
-            WHERE user_id = ? 
-            AND guild_id = ? 
+            SELECT COALESCE(SUM(total_time), 0) as total_time
+            FROM voice_times
+            WHERE user_id = ?
+            AND guild_id = ?
             ${timeFilter}
         `;
-        
+
         try {
             const result = await this.pool.query(query, params);
-            return result[0].total_time;
+            return Number(result[0].total_time);
         } catch (error) {
             console.error('Error getting user voice time:', error);
             return 0;
@@ -109,7 +109,7 @@ class VoiceDatabase {
     async getLeaderboard(guildId, period = 'all') {
         let timeFilter = '';
         let params = [guildId];
-        
+
         switch(period.toLowerCase()) {
             case 'daily': {
                 const today = new Date();
@@ -150,146 +150,163 @@ class VoiceDatabase {
         }
 
         const query = `
-            SELECT user_id, COALESCE(SUM(total_time), 0) as total_time 
-            FROM voice_times 
+            SELECT user_id, COALESCE(SUM(total_time), 0) as total_time
+            FROM voice_times
             WHERE guild_id = ? ${timeFilter}
-            GROUP BY user_id 
-            ORDER BY total_time DESC 
+            GROUP BY user_id
+            ORDER BY total_time DESC
             LIMIT 10
         `;
-        
+
         try {
-            return await this.pool.query(query, params);
+            const result = await this.pool.query(query, params);
+            return result.map(row => ({
+                user_id: row.user_id,
+                total_time: Number(row.total_time)
+            }));
         } catch (error) {
             console.error('Error getting leaderboard:', error);
             return [];
         }
     }
 
-    async getUserAverageTime(userId, guildId, period = 'all') {
-        let timeFilter = '';
-        let params = [userId, guildId];
-        let periodStart;
-        
-        switch(period.toLowerCase()) {
-            case 'daily': {
-                const startOfYear = new Date();
-                startOfYear.setMonth(0, 1);
-                startOfYear.setHours(0, 0, 0, 0);
-                timeFilter = 'AND timestamp >= ?';
-                periodStart = startOfYear.getTime();
-                params.push(periodStart);
-                break;
-            }
-            case 'weekly': {
-                const startOfYear = new Date();
-                startOfYear.setMonth(0, 1);
-                startOfYear.setHours(0, 0, 0, 0);
-                timeFilter = 'AND timestamp >= ?';
-                periodStart = startOfYear.getTime();
-                params.push(periodStart);
-                break;
-            }
-            case 'monthly': {
-                const startOfYear = new Date();
-                startOfYear.setMonth(0, 1);
-                startOfYear.setHours(0, 0, 0, 0);
-                timeFilter = 'AND timestamp >= ?';
-                periodStart = startOfYear.getTime();
-                params.push(periodStart);
-                break;
-            }
-            case 'yearly': {
-                const startOfData = new Date(2020, 0, 1);
-                startOfData.setHours(0, 0, 0, 0);
-                timeFilter = 'AND timestamp >= ?';
-                periodStart = startOfData.getTime();
-                params.push(periodStart);
-                break;
-            }
-        }
+async getUserAverageTime(userId, guildId, period = 'all') {
+    let timeFilter = '';
+    let params = [userId, guildId];
+    let periodStart;
 
-        const query = `
-            SELECT 
-                COALESCE(SUM(total_time), 0) as total_time,
-                MIN(timestamp) as first_record
-            FROM voice_times 
-            WHERE user_id = ? 
-            AND guild_id = ? 
-            ${timeFilter}
-        `;
-        
-        try {
-            const result = await this.pool.query(query, params);
-            const totalTime = result[0].total_time || 0;
-            const firstRecord = result[0].first_record || Date.now();
-            
-            let numberOfPeriods = 1;
-            
-            switch(period.toLowerCase()) {
-                case 'daily':
-                    numberOfPeriods = Math.max(1, Math.ceil((Date.now() - firstRecord) / (24 * 60 * 60 * 1000)));
-                    break;
-                case 'weekly':
-                    numberOfPeriods = Math.max(1, Math.ceil((Date.now() - firstRecord) / (7 * 24 * 60 * 60 * 1000)));
-                    break;
-                case 'monthly':
-                    const firstDate = new Date(firstRecord);
-                    const currentDate = new Date(Date.now());
-                    numberOfPeriods = Math.max(1, 
-                        (currentDate.getFullYear() - firstDate.getFullYear()) * 12 + 
-                        (currentDate.getMonth() - firstDate.getMonth()) + 1);
-                    break;
-                case 'yearly':
-                    const firstYear = new Date(firstRecord);
-                    const currentYear = new Date(Date.now());
-                    numberOfPeriods = Math.max(1, currentYear.getFullYear() - firstYear.getFullYear() + 1);
-                    break;
-            }
-            
-            return Math.floor(totalTime / numberOfPeriods);
-        } catch (error) {
-            console.error('Error getting user average time:', error);
-            return 0;
+    switch(period.toLowerCase()) {
+        case 'daily': {
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+            timeFilter = 'AND timestamp >= ?';
+            periodStart = startOfDay.getTime();
+            params.push(periodStart);
+            break;
+        }
+        case 'weekly': {
+            const startOfWeek = new Date();
+            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            timeFilter = 'AND timestamp >= ?';
+            periodStart = startOfWeek.getTime();
+            params.push(periodStart);
+            break;
+        }
+        case 'monthly': {
+            const startOfMonth = new Date();
+            startOfMonth.setDate(1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            timeFilter = 'AND timestamp >= ?';
+            periodStart = startOfMonth.getTime();
+            params.push(periodStart);
+            break;
+        }
+        case 'yearly': {
+            const startOfYear = new Date();
+            startOfYear.setMonth(0, 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            timeFilter = 'AND timestamp >= ?';
+            periodStart = startOfYear.getTime();
+            params.push(periodStart);
+            break;
         }
     }
 
+    const query = `
+        SELECT
+            COALESCE(SUM(total_time), 0) as total_time,
+            MIN(timestamp) as first_record
+        FROM voice_times
+        WHERE user_id = ?
+        AND guild_id = ?
+        ${timeFilter}
+    `;
+
+    try {
+        const result = await this.pool.query(query, params);
+        console.log('Query result:', result);
+
+        const totalTimeBigInt = result[0].total_time;
+        console.log('Total time (BigInt):', totalTimeBigInt);
+
+        const totalTime = Number(totalTimeBigInt) || 0;
+        console.log('Total time (Number):', totalTime);
+
+        const firstRecordBigInt = result[0].first_record || BigInt(Date.now());
+        console.log('First record timestamp (BigInt):', firstRecordBigInt);
+
+        const firstRecord = Number(firstRecordBigInt);
+        console.log('First record timestamp (Number):', firstRecord);
+
+        let numberOfPeriods = 1;
+
+        switch(period.toLowerCase()) {
+            case 'daily':
+                numberOfPeriods = Math.max(1, Math.ceil((Date.now() - firstRecord) / (24 * 60 * 60 * 1000)));
+                break;
+            case 'weekly':
+                numberOfPeriods = Math.max(1, Math.ceil((Date.now() - firstRecord) / (7 * 24 * 60 * 60 * 1000)));
+                break;
+            case 'monthly':
+                const firstDate = new Date(firstRecord);
+                const currentDate = new Date(Date.now());
+                numberOfPeriods = Math.max(1,
+                    (currentDate.getFullYear() - firstDate.getFullYear()) * 12 +
+                    (currentDate.getMonth() - firstDate.getMonth()) + 1);
+                break;
+            case 'yearly':
+                const firstYear = new Date(firstRecord);
+                const currentYear = new Date(Date.now());
+                numberOfPeriods = Math.max(1, currentYear.getFullYear() - firstYear.getFullYear() + 1);
+                break;
+        }
+
+        console.log('Number of periods:', numberOfPeriods);
+
+        return totalTime / numberOfPeriods;
+    } catch (error) {
+        console.error('Error getting user average time:', error);
+        return 0;
+    }
+}
+
     async getActivitySchedule(userId, guildId) {
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        
+
         const dayQuery = `
-            SELECT 
+            SELECT
                 CAST(DAYOFWEEK(FROM_UNIXTIME((timestamp/1000) - (5 * 3600))) AS INTEGER) - 1 as day_of_week,
                 SUM(total_time) as total_time
-            FROM voice_times 
-            WHERE user_id = ? 
-            AND guild_id = ? 
+            FROM voice_times
+            WHERE user_id = ?
+            AND guild_id = ?
             AND timestamp >= ?
             GROUP BY day_of_week
             ORDER BY total_time DESC
         `;
         const hourQuery = `
-            SELECT 
+            SELECT
                 CAST(HOUR(FROM_UNIXTIME((timestamp/1000) - (5 * 3600))) AS INTEGER) as hour,
                 SUM(total_time) as total_time
-            FROM voice_times 
-            WHERE user_id = ? 
-            AND guild_id = ? 
+            FROM voice_times
+            WHERE user_id = ?
+            AND guild_id = ?
             AND timestamp >= ?
             GROUP BY hour
             ORDER BY hour ASC
         `;
-        
+
         try {
             const dayResults = await this.pool.query(dayQuery, [userId, guildId, thirtyDaysAgo]);
             const hourResults = await this.pool.query(hourQuery, [userId, guildId, thirtyDaysAgo]);
-            
+
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const mostActiveDay = days[dayResults[0]?.day_of_week || 0];
             const isWeekendActive = dayResults.some(d => (d.day_of_week === 0 || d.day_of_week === 6) && d.total_time > 0);
-            
-            let peakStart = hourResults.reduce((max, curr) => 
-                curr.total_time > (hourResults[max]?.total_time || 0) ? curr.hour : max, 
+
+            let peakStart = hourResults.reduce((max, curr) =>
+                curr.total_time > (hourResults[max]?.total_time || 0) ? curr.hour : max,
                 0
             );
             let peakEnd = (peakStart + 1) % 24;
@@ -315,16 +332,16 @@ class VoiceDatabase {
 
     async getOptimalTime(guildId) {
         const query = `
-            SELECT 
+            SELECT
                 CAST(HOUR(FROM_UNIXTIME(timestamp/1000)) AS INTEGER) as hour,
                 COUNT(DISTINCT user_id) as unique_users,
                 SUM(total_time) as total_time
-            FROM voice_times 
+            FROM voice_times
             WHERE guild_id = ?
             GROUP BY hour
             ORDER BY unique_users DESC, total_time DESC
         `;
-        
+
         try {
             return await this.pool.query(query, [guildId]);
         } catch (error) {
@@ -335,59 +352,59 @@ class VoiceDatabase {
 
     async getServerActivitySchedule(guildId) {
         const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        
+
         const hourQuery = `
-            SELECT 
+            SELECT
                 CAST(HOUR(FROM_UNIXTIME((timestamp/1000) - (5 * 3600))) AS INTEGER) as hour,
                 SUM(total_time) as total_time,
                 COUNT(DISTINCT user_id) as unique_users
-            FROM voice_times 
-            WHERE guild_id = ? 
+            FROM voice_times
+            WHERE guild_id = ?
             AND timestamp >= ?
             GROUP BY hour
             ORDER BY hour ASC
         `;
         const dayQuery = `
-            SELECT 
+            SELECT
                 CAST(DAYOFWEEK(FROM_UNIXTIME((timestamp/1000) - (5 * 3600))) AS INTEGER) - 1 as day_of_week,
                 SUM(total_time) as total_time,
                 COUNT(DISTINCT user_id) as unique_users
-            FROM voice_times 
-            WHERE guild_id = ? 
+            FROM voice_times
+            WHERE guild_id = ?
             AND timestamp >= ?
             GROUP BY day_of_week
             ORDER BY day_of_week ASC
         `;
         const statsQuery = `
-            SELECT 
+            SELECT
                 COUNT(DISTINCT user_id) as total_users,
                 SUM(total_time) as total_time
-            FROM voice_times 
-            WHERE guild_id = ? 
+            FROM voice_times
+            WHERE guild_id = ?
             AND timestamp >= ?
         `;
         const avgDailyQuery = `
             SELECT COUNT(DISTINCT user_id) as users
-            FROM voice_times 
-            WHERE guild_id = ? 
+            FROM voice_times
+            WHERE guild_id = ?
             AND timestamp >= ?
             GROUP BY DATE(FROM_UNIXTIME((timestamp/1000) - (5 * 3600)))
         `;
-        
+
         try {
             const hourResults = await this.pool.query(hourQuery, [guildId, thirtyDaysAgo]);
             const dayResults = await this.pool.query(dayQuery, [guildId, thirtyDaysAgo]);
             const stats = await this.pool.query(statsQuery, [guildId, thirtyDaysAgo]);
             const dailyUsers = await this.pool.query(avgDailyQuery, [guildId, thirtyDaysAgo]);
-            
+
             const avgDailyUsers = Math.round(dailyUsers.reduce((sum, day) => sum + day.users, 0) / dailyUsers.length) || 0;
-            const peakHour = hourResults.reduce((max, curr) => 
-                curr.total_time > max.total_time ? curr : max, 
+            const peakHour = hourResults.reduce((max, curr) =>
+                curr.total_time > max.total_time ? curr : max,
                 { total_time: 0 }
             );
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const mostActiveDay = dayResults.reduce((max, curr) => 
-                curr.total_time > max.total_time ? curr : max, 
+            const mostActiveDay = dayResults.reduce((max, curr) =>
+                curr.total_time > max.total_time ? curr : max,
                 { total_time: 0 }
             );
 
@@ -395,7 +412,7 @@ class VoiceDatabase {
                 hourlyData: hourResults,
                 dailyData: dayResults,
                 totalUsers: stats[0].total_users || 0,
-                totalTime: stats[0].total_time || 0,
+                totalTime: Number(stats[0].total_time) || 0,
                 avgDailyUsers,
                 peakHours: `${formatHour(peakHour.hour)} CT`,
                 mostActive: days[mostActiveDay.day_of_week] || 'Unknown',

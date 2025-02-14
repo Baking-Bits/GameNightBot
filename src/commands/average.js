@@ -23,14 +23,33 @@ module.exports = {
                 description: 'User to check average time for',
                 type: 6, // USER
                 required: false
+            },
+            {
+                name: 'start_date',
+                description: 'Start date for the average calculation (YYYY-MM-DD)',
+                type: 3, // STRING
+                required: false
             }
         ]
     },
     async execute(interaction, bot) {
         const period = interaction.options.getString('period');
         const targetUser = interaction.options.getUser('user') || interaction.user;
-        const averageTime = await bot.db.getUserAverageTime(targetUser.id, interaction.guildId, period);
-        
+        const startDate = interaction.options.getString('start_date');
+
+        // Ensure startDate is parsed correctly
+        let parsedStartDate = null;
+        if (startDate) {
+            parsedStartDate = new Date(startDate);
+            if (isNaN(parsedStartDate.getTime())) {
+                return interaction.reply({ content: 'Invalid start date format. Please use YYYY-MM-DD.', ephemeral: true });
+            }
+        }
+
+        // Fetch average time from the database
+        const averageTimeBigInt = await bot.db.getUserAverageTime(targetUser.id, interaction.guildId, period, parsedStartDate);
+        const averageTime = Number(averageTimeBigInt);
+
         const periodText = {
             'daily': 'day',
             'weekly': 'week',
@@ -41,8 +60,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(`Average Voice Time`)
-            .setDescription(`${targetUser.id === interaction.user.id ? 'You spend' : `${targetUser.username} spends`} an average of ${formatTime(averageTime)} per ${periodText} in voice channels.`);
-        
+            .setDescription(`${targetUser.id === interaction.user.id ? 'You spend' : `${targetUser.username} spends`} an average of ${formatTime(averageTime)} per ${periodText} in voice channels${startDate ? ` since ${startDate}` : ''}.`);
+
         await interaction.reply({ embeds: [embed] });
     }
 };
