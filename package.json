@@ -1,6 +1,6 @@
 {
-  "name": "timewizardbot",
-  "version": "1.0.0",
+  "name": "GameNightBot",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {

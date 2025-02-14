@@ -16,9 +16,12 @@ module.exports = {
     },
     async execute(interaction, bot) {
         const targetUser = interaction.options.getUser('user') || interaction.user;
-        const schedule = bot.db.getActivitySchedule(targetUser.id, interaction.guildId);
+        await interaction.deferReply();
+        // Your long-running operations here
+        const schedule = await bot.db.getActivitySchedule(targetUser.id, interaction.guildId);
         
         // Create activity visualization using bar characters
+        console.dir(schedule)
         const maxValue = Math.max(...schedule.hourlyData.map(h => h.total_time));
         const barLength = 15; // Reduced bar length to accommodate time
         
@@ -56,6 +59,8 @@ module.exports = {
             )
             .setDescription(`${activityGraph}\n${dailyGraph}`);
 
-        await interaction.reply({ embeds: [embed] });
+
+        // Process data
+        await interaction.editReply({ embeds: [embed] });
     }
 };

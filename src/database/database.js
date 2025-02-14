@@ -293,7 +293,9 @@ class VoiceDatabase {
                 0
             );
             let peakEnd = (peakStart + 1) % 24;
-            
+
+            //console.dir(dayResults)
+            //console.dir(hourResults)
             return {
                 mostActive: isWeekendActive ? "Weekends" : "Weekdays",
                 peakHours: `${formatHour(peakStart)}-${formatHour(peakEnd)} CT`,
