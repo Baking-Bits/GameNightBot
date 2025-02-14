@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,7 +12,8 @@ module.exports = {
     .addStringOption(option =>
       option.setName('message')
         .setDescription('The message to broadcast')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
     const channel = interaction.options.getChannel('channel');
     const message = interaction.options.getString('message');
