@@ -1,13 +1,14 @@
 const mariadb = require('mariadb');
+const { mariadb: config } = require('../../config.json');
 const { formatHour, getPeriodOfDay } = require('../utils/timeFormatter');
 
 class VoiceDatabase {
     constructor() {
         this.pool = mariadb.createPool({
-            host: 'your_mariadb_host',
-            user: 'your_mariadb_user',
-            password: 'your_mariadb_password',
-            database: 'your_mariadb_database',
+            host: config.host,
+            user: config.user,
+            password: config.password,
+            database: config.database,
             connectionLimit: 5
         });
         this.initializeDatabase();
