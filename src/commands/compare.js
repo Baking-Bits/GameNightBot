@@ -23,8 +23,8 @@ module.exports = {
     async execute(interaction, bot) {
         const user1 = interaction.options.getUser('user1');
         const user2 = interaction.options.getUser('user2');
-        const time1 = bot.db.getUserVoiceTime(user1.id, interaction.guildId);
-        const time2 = bot.db.getUserVoiceTime(user2.id, interaction.guildId);
+        const time1 = await bot.db.getUserVoiceTime(user1.id, interaction.guildId);
+        const time2 = await bot.db.getUserVoiceTime(user2.id, interaction.guildId);
         const difference = Math.abs(time1 - time2);
         
         let description;

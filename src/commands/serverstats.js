@@ -7,7 +7,7 @@ module.exports = {
         description: 'Show server-wide voice activity statistics',
     },
     async execute(interaction, bot) {
-        const schedule = bot.db.getServerActivitySchedule(interaction.guildId);
+        const schedule = await bot.db.getServerActivitySchedule(interaction.guildId);
         
         // Create activity visualization using bar characters
         const maxValue = Math.max(...schedule.hourlyData.map(h => h.total_time));

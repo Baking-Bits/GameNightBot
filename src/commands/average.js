@@ -29,7 +29,7 @@ module.exports = {
     async execute(interaction, bot) {
         const period = interaction.options.getString('period');
         const targetUser = interaction.options.getUser('user') || interaction.user;
-        const averageTime = bot.db.getUserAverageTime(targetUser.id, interaction.guildId, period);
+        const averageTime = await bot.db.getUserAverageTime(targetUser.id, interaction.guildId, period);
         
         const periodText = {
             'daily': 'day',

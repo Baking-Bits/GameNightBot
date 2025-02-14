@@ -30,7 +30,7 @@ module.exports = {
     async execute(interaction, bot) {
         const period = interaction.options.getString('period') || 'all';
         const targetUser = interaction.options.getUser('user') || interaction.user;
-        const timeSpent = bot.db.getUserVoiceTime(targetUser.id, interaction.guildId, period);
+        const timeSpent = await bot.db.getUserVoiceTime(targetUser.id, interaction.guildId, period);
         
         const periodText = period === 'all' ? 'total' : period;
         const embed = new EmbedBuilder()
