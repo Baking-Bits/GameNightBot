@@ -1,4 +1,4 @@
 node_modules/
-saves/
-config/
-logs/
+package-lock.json
+voice_time_tracker.db
+config.json

@@ -1,22 +1,16 @@
 {
-  "name": "discordbot",
+  "name": "timewizardbot",
   "version": "1.0.0",
-  "description": "A Discord bot for managing points and tickets",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
   "dependencies": {
-    "@discordjs/rest": "^2.4.2",
-    "discord-api-types": "^0.37.117",
     "discord.js": "^14.17.3",
-    "dotenv": "^16.4.7",
-    "mysql2": "^3.12.0"
-  },
-  "author": "Your Name",
-  "license": "MIT",
-  "devDependencies": {
-    "vite": "^6.0.11"
+    "mariadb": "^3.1.0"
   }
 }
