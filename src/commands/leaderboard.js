@@ -23,7 +23,7 @@ module.exports = {
     },
     async execute(interaction, bot) {
         const period = interaction.options.getString('period') || 'all';
-        const leaderboardData = bot.db.getLeaderboard(interaction.guildId, period);
+        const leaderboardData = await bot.db.getLeaderboard(interaction.guildId, period);
         const periodText = period === 'all' ? 'All Time' : period.charAt(0).toUpperCase() + period.slice(1);
         
         let description = '';
