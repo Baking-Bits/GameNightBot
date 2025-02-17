@@ -1,4 +1,8 @@
-const fetch = require('node-fetch');
+const { craftyApiKey } = require('../../config.json');
+let fetch;
+(async () => {
+  fetch = (await import('node-fetch')).default;
+})();
 
 module.exports = {
   data: {
@@ -7,13 +11,11 @@ module.exports = {
     default_member_permissions: 8 // ADMINISTRATOR
   },
   async execute(interaction, bot) {
-    const apiKey = bot.config.craftyApiKey; // Assuming the API key is stored in the bot's config
-
     try {
-      const response = await fetch('https://api.craftycontrol.com/v2/servers', {
+      const response = await fetch('https://mc.gamenight.fun:8443/api/v2/servers', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${craftyApiKey}`,
           'Content-Type': 'application/json'
         }
       });
