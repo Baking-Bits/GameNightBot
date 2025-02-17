@@ -1,4 +1,4 @@
-const { craftyApiKey } = require('../../config.json');
+const { craftyApiKey } = require('../../../config.json');
 let fetch;
 (async () => {
   fetch = (await import('node-fetch')).default;
