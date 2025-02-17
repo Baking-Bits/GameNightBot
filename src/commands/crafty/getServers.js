@@ -6,7 +6,7 @@ let fetch;
 
 module.exports = {
   data: {
-    name: 'getallservers',
+    name: 'getServers',
     description: 'Fetches all servers from CraftyControl',
     default_member_permissions: 8 // ADMINISTRATOR
   },
