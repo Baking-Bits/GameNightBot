@@ -3,7 +3,7 @@ const { formatHour, formatTimeCompact, getPeriodOfDay } = require('../utils/time
 
 module.exports = {
     data: {
-        name: 'serverstats',
+        name: 'allStats',
         description: 'Show server-wide voice activity statistics',
     },
     async execute(interaction, bot) {
