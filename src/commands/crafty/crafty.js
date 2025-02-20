@@ -1,9 +1,8 @@
 const { craftyApiKey } = require('../../../config.json');
-const { MessageEmbed } = require('discord.js');
-let fetch;
-(async () => {
-    fetch = (await import('node-fetch')).default;
-})();
+const { EmbedBuilder } = require('discord.js');
+import fetch from 'node-fetch';
+
+const API_BASE_URL = 'https://crafty.gamenight.fun/api/v2';
 
 module.exports = {
     data: {
@@ -46,8 +45,22 @@ module.exports = {
                         required: true
                     }
                 ]
+            },
+            {
+                name: 'serverinfo',
+                description: 'Get public data of a specified server',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'server_id',
+                        description: 'The ID of the server',
+                        type: 3, // STRING
+                        required: true
+                    }
+                ]
             }
-        ]
+        ],
+        default_permission: 8 // ADMINISTRATOR
     },
     async execute(interaction) {
         const subcommand = interaction.options.getSubcommand();
@@ -58,7 +71,7 @@ module.exports = {
             let response;
             switch (subcommand) {
                 case 'getservers':
-                    response = await fetch('https://mc.gamenight.fun:8443/api/v2/servers', {
+                    response = await fetch(`${API_BASE_URL}/servers`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${craftyApiKey}`,
@@ -72,7 +85,7 @@ module.exports = {
                     break;
 
                 case 'getserverlogs':
-                    response = await fetch(`https://mc.gamenight.fun:8443/api/v2/servers/${serverId}/logs`, {
+                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/logs`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${craftyApiKey}`,
@@ -81,15 +94,15 @@ module.exports = {
                     });
                     if (!response.ok) throw new Error(`Error fetching server logs: ${response.statusText}`);
                     const logs = await response.json();
-                    const embed = new MessageEmbed()
+                    const embed = new EmbedBuilder()
                         .setTitle(`Server Logs for ${serverId}`)
                         .setDescription(`\`\`\`${logs.logs.join('\n')}\`\`\``)
-                        .setColor('#00FF00');
+                        .setColor(0x00FF00);
                     await interaction.reply({ embeds: [embed], ephemeral: true });
                     break;
 
                 case 'servercommand':
-                    response = await fetch(`https://mc.gamenight.fun:8443/api/v2/servers/${serverId}/actions`, {
+                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/actions`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${craftyApiKey}`,
@@ -99,6 +112,28 @@ module.exports = {
                     });
                     if (!response.ok) throw new Error(`Error sending command: ${response.statusText}`);
                     await interaction.reply({ content: `Command sent successfully to server ${serverId}`, ephemeral: true });
+                    break;
+
+                case 'serverinfo':
+                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/public`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${craftyApiKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (!response.ok) throw new Error(`Error fetching server public data: ${response.statusText}`);
+                    const publicData = await response.json();
+                    const embedInfo = new EmbedBuilder()
+                        .setTitle(`Public Data for Server ${serverId}`)
+                        .addFields(
+                            { name: 'Name', value: publicData.name, inline: true },
+                            { name: 'IP', value: publicData.ip, inline: true },
+                            { name: 'Port', value: publicData.port, inline: true },
+                            { name: 'Status', value: publicData.status, inline: true }
+                        )
+                        .setColor(0x00FF00);
+                    await interaction.reply({ embeds: [embedInfo], ephemeral: true });
                     break;
 
                 default:
