@@ -115,22 +115,23 @@ module.exports = {
                     break;
 
                 case 'serverinfo':
-                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/public`, {
+                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/statistics`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${craftyApiKey}`,
                             'Content-Type': 'application/json'
                         }
                     });
-                    if (!response.ok) throw new Error(`Error fetching server public data: ${response.statusText}`);
-                    const publicData = await response.json();
+                    if (!response.ok) throw new Error(`Error fetching server statistics: ${response.statusText}`);
+                    const statistics = await response.json();
                     const embedInfo = new EmbedBuilder()
-                        .setTitle(`Public Data for Server ${serverId}`)
+                        .setTitle(`Statistics for Server ${serverId}`)
                         .addFields(
-                            { name: 'Name', value: publicData.name, inline: true },
-                            { name: 'IP', value: publicData.ip, inline: true },
-                            { name: 'Port', value: publicData.port, inline: true },
-                            { name: 'Status', value: publicData.status, inline: true }
+                            { name: 'Name', value: statistics.name, inline: true },
+                            { name: 'Running', value: statistics.running ? 'Yes' : 'No', inline: true },
+                            { name: 'Version', value: statistics.version, inline: true },
+                            { name: 'IP', value: statistics.ip, inline: true },
+                            { name: 'Port', value: statistics.port, inline: true }
                         )
                         .setColor(0x00FF00);
                     await interaction.reply({ embeds: [embedInfo], ephemeral: true });
