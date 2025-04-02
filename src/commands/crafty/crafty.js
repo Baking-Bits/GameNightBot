@@ -1,7 +1,9 @@
 const { craftyApiKey } = require('../../../config.json');
 const { EmbedBuilder } = require('discord.js');
-import fetch from 'node-fetch';
-
+let fetch;
+(async () => {
+    fetch = (await import('node-fetch')).default;
+})();
 const API_BASE_URL = 'https://crafty.gamenight.fun/api/v2';
 
 module.exports = {
@@ -80,7 +82,7 @@ module.exports = {
                     });
                     if (!response.ok) throw new Error(`Error fetching servers: ${response.statusText}`);
                     const servers = await response.json();
-                    const serverList = servers.map(server => `${server.name} (ID: ${server.id})`).join('\n');
+                    const serverList = servers.data.map(server => `${server.server_name} (ID: ${server.server_id})`).join('\n');
                     await interaction.reply({ content: `Servers:\n${serverList}`, ephemeral: true });
                     break;
 
@@ -96,7 +98,7 @@ module.exports = {
                     const logs = await response.json();
                     const embed = new EmbedBuilder()
                         .setTitle(`Server Logs for ${serverId}`)
-                        .setDescription(`\`\`\`${logs.logs.join('\n')}\`\`\``)
+                        .setDescription(`\`\`\`${logs.data.join('\n')}\`\`\``)
                         .setColor(0x00FF00);
                     await interaction.reply({ embeds: [embed], ephemeral: true });
                     break;
@@ -115,7 +117,7 @@ module.exports = {
                     break;
 
                 case 'serverinfo':
-                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/statistics`, {
+                    response = await fetch(`${API_BASE_URL}/servers/${serverId}/stats`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${craftyApiKey}`,
