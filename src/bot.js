@@ -4,7 +4,7 @@ const TimeTracker = require('./services/timeTracker');
 const { registerCommands } = require('./utils/commandRegister');
 const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
-const { updateServiceStatus } = require('./commands/serviceStatus');
+// const { updateServiceStatus } = require('./events/serviceStatus');
 
 class VoiceTimeTracker {
     constructor() {
@@ -45,7 +45,7 @@ class VoiceTimeTracker {
             this.timeTracker.startPeriodicUpdates();
 
             // Start periodic service status updates
-            this.startServiceStatusUpdates();
+            // this.startServiceStatusUpdates();
 
             console.log(`Logged in as ${this.client.user.tag}!`);
         } catch (error) {
@@ -53,11 +53,11 @@ class VoiceTimeTracker {
         }
     }
 
-    startServiceStatusUpdates() {
-        setInterval(() => {
-            updateServiceStatus(this.client);
-        }, this.statusUpdateInterval);
-    }
+    // startServiceStatusUpdates() {
+    //     setInterval(() => {
+    //         updateServiceStatus(this.client);
+    //     }, this.statusUpdateInterval);
+    // }
 }
 
 module.exports = VoiceTimeTracker;
