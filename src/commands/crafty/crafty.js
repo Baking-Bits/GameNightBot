@@ -4,6 +4,7 @@ let fetch;
 (async () => {
     fetch = (await import('node-fetch')).default;
 })();
+
 const API_BASE_URL = 'https://crafty.gamenight.fun/api/v2';
 
 module.exports = {
