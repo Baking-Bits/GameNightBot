@@ -402,6 +402,33 @@ async function getServerActivitySchedule(guildId) {
     }
 }
 
+async function ensureRaffleTable() {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS raffle_tickets (
+                user_id VARCHAR(255),
+                guild_id VARCHAR(255),
+                tickets INT DEFAULT 0,
+                PRIMARY KEY (user_id, guild_id)
+            )
+        `);
+    } catch (error) {
+        console.error('Error ensuring raffle table exists:', error);
+    }
+}
+
+async function grantTickets(userId, guildId, tickets) {
+    try {
+        await pool.query(`
+            INSERT INTO raffle_tickets (user_id, guild_id, tickets)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE tickets = tickets + VALUES(tickets)
+        `, [userId, guildId, tickets]);
+    } catch (error) {
+        console.error('Error granting tickets:', error);
+    }
+}
+
 function getCentralTime(date) {
     const utcDate = new Date(date);
     utcDate.setHours(utcDate.getHours() + 5);
@@ -416,5 +443,7 @@ module.exports = {
     getActivitySchedule,
     getOptimalTime,
     getServerActivitySchedule,
-    getCentralTime
+    getCentralTime,
+    ensureRaffleTable,
+    grantTickets,
 };

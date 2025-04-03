@@ -1,6 +1,9 @@
 const { craftyApiKey } = require('../../../config.json');
 const { EmbedBuilder } = require('discord.js');
-import fetch from 'node-fetch';
+let fetch;
+(async () => {
+    fetch = (await import('node-fetch')).default;
+})();
 
 const API_BASE_URL = 'https://crafty.gamenight.fun/api/v2';
 

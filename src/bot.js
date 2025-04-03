@@ -4,7 +4,7 @@ const TimeTracker = require('./services/timeTracker');
 const { registerCommands } = require('./utils/commandRegister');
 const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
-const { updateServiceStatus } = require('../commands/serviceStatus');
+const { updateServiceStatus } = require('./commands/serviceStatus');
 
 class VoiceTimeTracker {
     constructor() {
