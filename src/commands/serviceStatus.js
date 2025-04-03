@@ -1,5 +1,8 @@
 const { EmbedBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
-const fetch = require('node-fetch');
+let fetch;
+(async () => {
+    fetch = (await import('node-fetch')).default;
+})();
 
 const services = [
     { name: 'Jellyseer', url: 'https://get.patproductions.net' },
