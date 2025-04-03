@@ -10,9 +10,12 @@ const services = [
 ];
 
 module.exports = {
-    name: 'servicestatus',
-    description: 'Check the status of various services',
-    permissions: [PermissionFlagsBits.Administrator],
+    data: {
+        name: 'servicestatus',
+        description: 'Check the status of various services',
+        defaultPermission: false,
+        permissions: [PermissionFlagsBits.Administrator]
+    },
     async execute(interaction) {
         const statusChannel = interaction.guild.channels.cache.find(channel => channel.name === 'bot' && channel.type === ChannelType.GuildText);
         if (!statusChannel) {
