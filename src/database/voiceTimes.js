@@ -452,8 +452,8 @@ async function getAllTickets(guildId) {
             WHERE guild_id = ?
             ORDER BY tickets DESC
         `, [guildId]);
-
-        return Array.isArray(rows) ? rows : []; // Ensure rows is an array
+console.log('Query result:', rows); // Debug log
+        return rows;
     } catch (error) {
         console.error('Error fetching all tickets:', error);
         return []; // Return an empty array on error
