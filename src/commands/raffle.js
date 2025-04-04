@@ -128,7 +128,8 @@ module.exports = {
                     }
 
                     const ticketList = Object.entries(allTickets)
-                        .map(([userId, tickets]) => `<@${userId}>: ${tickets} ticket${tickets === 1 ? '' : 's'}`) // Proper pluralization
+                        .map(([userId, tickets]) =>
+                            `<@${userId}> has ${tickets} ticket${tickets === 1 ? '' : 's'}`) // Proper pluralization
                         .join('\n');
 
                     return interaction.reply({ content: `**Raffle Tickets:**\n${ticketList}`, ephemeral: false });
