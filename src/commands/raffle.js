@@ -244,7 +244,7 @@ module.exports = {
                     currentMessage += `${user}\n`;
                 }
                 if (currentMessage) participantsMessages.push(currentMessage);
-
+console.dir(participantsMessages); // Debug log
                 // Send each chunk as a separate message
                 for (const message of participantsMessages) {
                     await interaction.channel.send({
