@@ -7,20 +7,26 @@ module.exports = {
         options: [
             {
                 name: 'grant',
-                description: 'Grant raffle tickets to a user or a role',
+                description: 'Grant raffle tickets to a user or role',
                 type: 1, // SUB_COMMAND
                 options: [
-                    {
-                        name: 'user',
-                        description: 'The user to grant tickets to',
-                        type: 6, // USER
-                        required: true
-                    },
                     {
                         name: 'tickets',
                         description: 'The number of tickets to grant',
                         type: 4, // INTEGER
                         required: true
+                    },
+                    {
+                        name: 'user',
+                        description: 'The user to grant tickets to',
+                        type: 6, // USER
+                        required: false
+                    },
+                    {
+                        name: 'role',
+                        description: 'The role to grant tickets to',
+                        type: 8, // ROLE
+                        required: false
                     }
                 ]
             },
@@ -83,21 +89,36 @@ module.exports = {
 
         if (subcommand === 'grant') {
             const user = interaction.options.getUser('user');
+            const role = interaction.options.getRole('role');
             const tickets = interaction.options.getInteger('tickets');
 
             if (tickets <= 0) {
                 return interaction.reply({ content: 'The number of tickets must be greater than 0.', ephemeral: true });
             }
 
+            if (!user && !role) {
+                return interaction.reply({ content: 'You must specify either a user or a role.', ephemeral: true });
+            }
+
             try {
-                // Ensure the database table exists
                 await bot.db.ensureRaffleTable();
 
-                // Update the user's ticket count in the database
-                await bot.db.grantTickets(user.id, interaction.guildId, tickets);
-
-                // Mention the user in the response
-                await interaction.reply({ content: `Granted ${tickets} tickets to <@${user.id}>.`, ephemeral: false });
+                if (user) {
+                    // Grant tickets to a single user
+                    await bot.db.grantTickets(user.id, interaction.guildId, tickets);
+                    await interaction.reply({ content: `Granted ${tickets} tickets to <@${user.id}>.`, ephemeral: false });
+                } else if (role) {
+                    // Grant tickets to all members of the role using cached members
+                    const grantedUsers = [];
+                    for (const [memberId, member] of bot.client.cachedMembers.entries()) {
+                        if (member.roles.cache.has(role.id)) {
+                            await bot.db.grantTickets(member.user.id, interaction.guildId, tickets);
+                            grantedUsers.push(`<@${member.user.id}>`);
+                        }
+                    }
+                    const grantedList = grantedUsers.join(', ');
+                    await interaction.reply({ content: `Granted ${tickets} tickets to the following members of the role ${role.name}: ${grantedList}`, ephemeral: false });
+                }
             } catch (error) {
                 console.error('Error granting tickets:', error);
                 await interaction.reply({ content: `There was an error granting tickets: ${error.message}`, ephemeral: true });
@@ -209,14 +230,28 @@ module.exports = {
                 const endTime = Math.floor(Date.now() / 1000) + delay; // Calculate the end time in seconds
 
                 const usersWithTickets = Object.entries(allTickets)
-                    .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`)
-                    .join(', ');
+                    .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`);
 
-                // Display the participants message
-                const participantsMessage = await interaction.channel.send({
-                    content: `Participants: ${usersWithTickets}`,
-                    allowedMentions: { parse: ['users'] }
-                });
+                // Split the participants list into chunks to avoid exceeding the Discord message length limit
+                const chunkSize = 2000; // Discord message limit
+                const participantsMessages = [];
+                let currentMessage = '';
+                for (const user of usersWithTickets) {
+                    if (currentMessage.length + user.length + 2 > chunkSize) { // +2 for newline
+                        participantsMessages.push(currentMessage);
+                        currentMessage = '';
+                    }
+                    currentMessage += `${user}\n`;
+                }
+                if (currentMessage) participantsMessages.push(currentMessage);
+
+                // Send each chunk as a separate message
+                for (const message of participantsMessages) {
+                    await interaction.channel.send({
+                        content: `Participants:\n${message}`,
+                        allowedMentions: { parse: ['users'] }
+                    });
+                }
 
                 // Wait 1 second before displaying the countdown message
                 setTimeout(async () => {
@@ -247,8 +282,6 @@ module.exports = {
                         };
 
                         await bot.db.clearAllTickets(interaction.guildId); // Wipe all tickets from the database
-                        await participantsMessage.delete(); // Remove the participants message
-                        await countdownMessage.delete(); // Remove the countdown message
                         await interaction.channel.send({ embeds: [winnerEmbed] });
                     }, delay * 1000);
                 }, 1000);

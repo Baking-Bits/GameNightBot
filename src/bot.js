@@ -13,7 +13,8 @@ class VoiceTimeTracker {
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.MessageContent,
-                GatewayIntentBits.GuildVoiceStates
+                GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMembers
             ]
         });
 
@@ -48,6 +49,16 @@ class VoiceTimeTracker {
             // this.startServiceStatusUpdates();
 
             console.log(`Logged in as ${this.client.user.tag}!`);
+
+            // Cache all members for all guilds the bot is in
+            this.client.cachedMembers = new Map();
+            for (const guild of this.client.guilds.cache.values()) {
+                const members = await guild.members.fetch();
+                this.client.cachedMembers = new Map([...this.client.cachedMembers, ...members]);
+            }
+
+            console.log('Cached all guild members.');
+            console.log(`Cached members: ${this.client.cachedMembers.size}`);
         } catch (error) {
             console.error('Error during login:', error);
         }
