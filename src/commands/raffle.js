@@ -127,6 +127,7 @@ module.exports = {
                         return interaction.reply({ content: 'No users have tickets.', ephemeral: false });
                     }
 
+                    console.dir(allTickets);
                     const ticketList = Object.entries(allTickets)
                         .map(([userId, tickets]) =>
                             `<@${userId}> has ${tickets} ticket${tickets === 1 ? '' : 's'}`) // Proper pluralization

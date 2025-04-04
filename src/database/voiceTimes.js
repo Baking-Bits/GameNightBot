@@ -452,11 +452,16 @@ async function getAllTickets(guildId) {
             WHERE guild_id = ?
             ORDER BY tickets DESC
         `, [guildId]);
-console.log('Query result:', rows); // Debug log
-        return rows;
+
+        const ticketsMap = {};
+        rows.forEach(row => {
+            ticketsMap[row.user_id] = row.tickets;
+        });
+
+        return ticketsMap;
     } catch (error) {
         console.error('Error fetching all tickets:', error);
-        return []; // Return an empty array on error
+        return {}; // Return an empty object on error
     }
 }
 
