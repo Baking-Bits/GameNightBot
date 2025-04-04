@@ -79,10 +79,23 @@ async function removeTickets(userId, guildId, tickets) {
     }
 }
 
+async function clearAllTickets(guildId) {
+    try {
+        await pool.query(`
+            DELETE FROM raffle_tickets
+            WHERE guild_id = ?
+        `, [guildId]);
+    } catch (error) {
+        console.error('Error clearing all tickets:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     ensureRaffleTable,
     grantTickets,
     getUserTickets,
     getAllTickets,
     removeTickets,
+    clearAllTickets
 };

@@ -1,3 +1,5 @@
+const config = require('../../config.json'); // Import the config file
+
 module.exports = {
     data: {
         name: 'raffle',
@@ -5,7 +7,7 @@ module.exports = {
         options: [
             {
                 name: 'grant',
-                description: 'Grant raffle tickets to a user',
+                description: 'Grant raffle tickets to a user or a role',
                 type: 1, // SUB_COMMAND
                 options: [
                     {
@@ -53,11 +55,31 @@ module.exports = {
                         required: false
                     }
                 ]
+            },
+            {
+                name: 'run',
+                description: 'Run the raffle and pick a winner',
+                type: 1, // SUB_COMMAND
+                options: [
+                    {
+                        name: 'delay',
+                        description: 'Time in seconds to delay the raffle (default: 60)',
+                        type: 4, // INTEGER
+                        required: false
+                    }
+                ]
             }
         ]
     },
     async execute(interaction, bot) {
         const subcommand = interaction.options.getSubcommand();
+
+        // Helper function to check admin permissions
+        const isAdmin = interaction.member.roles.cache.some(role => config.adminRoles.includes(role.id));
+
+        if (['grant', 'remove', 'run'].includes(subcommand) && !isAdmin) {
+            return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+        }
 
         if (subcommand === 'grant') {
             const user = interaction.options.getUser('user');
@@ -161,6 +183,78 @@ module.exports = {
             } catch (error) {
                 console.error('Error checking tickets:', error);
                 await interaction.reply({ content: `There was an error checking tickets: ${error.message}`, ephemeral: true });
+            }
+        } else if (subcommand === 'run') {
+            const delay = interaction.options.getInteger('delay') || 60;
+
+            if (delay < 0) {
+                return interaction.reply({ content: 'Delay must be a positive number.', ephemeral: true });
+            }
+
+            try {
+                await bot.db.ensureRaffleTable();
+
+                const allTickets = await bot.db.getAllTickets(interaction.guildId);
+                if (!allTickets || Object.keys(allTickets).length === 0) {
+                    return interaction.reply({ content: 'No users have tickets. Cannot run the raffle.', ephemeral: false });
+                }
+
+                const ticketPool = Object.entries(allTickets).flatMap(([userId, tickets]) =>
+                    Array(tickets).fill(userId)
+                );
+
+                const winnerId = ticketPool[Math.floor(Math.random() * ticketPool.length)];
+                const winnerMention = `<@${winnerId}>`;
+
+                const endTime = Math.floor(Date.now() / 1000) + delay; // Calculate the end time in seconds
+
+                const usersWithTickets = Object.entries(allTickets)
+                    .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`)
+                    .join(', ');
+
+                // Display the participants message
+                const participantsMessage = await interaction.channel.send({
+                    content: `Participants: ${usersWithTickets}`,
+                    allowedMentions: { parse: ['users'] }
+                });
+
+                // Wait 1 second before displaying the countdown message
+                setTimeout(async () => {
+                    const embed = {
+                        color: 0x0099ff, // Embed color
+                        title: '🎟️ Raffle Countdown',
+                        description: `The raffle will run <t:${endTime}:R>!`,
+                        timestamp: new Date(),
+                        footer: {
+                            text: 'Raffle Bot'
+                        }
+                    };
+
+                    const countdownMessage = await interaction.channel.send({
+                        embeds: [embed]
+                    });
+
+                    // Wait for the countdown to finish
+                    setTimeout(async () => {
+                        const winnerEmbed = {
+                            color: 0x00ff00, // Embed color
+                            title: '🎟️ Raffle Winner!',
+                            description: `Congratulations ${winnerMention}! You have won the raffle! 🎉`,
+                            timestamp: new Date(),
+                            footer: {
+                                text: 'Raffle Bot'
+                            }
+                        };
+
+                        await bot.db.clearAllTickets(interaction.guildId); // Wipe all tickets from the database
+                        await participantsMessage.delete(); // Remove the participants message
+                        await countdownMessage.delete(); // Remove the countdown message
+                        await interaction.channel.send({ embeds: [winnerEmbed] });
+                    }, delay * 1000);
+                }, 1000);
+            } catch (error) {
+                console.error('Error running the raffle:', error);
+                await interaction.reply({ content: `There was an error running the raffle: ${error.message}`, ephemeral: true });
             }
         } else {
             await interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });
