@@ -232,6 +232,8 @@ module.exports = {
                 const usersWithTickets = Object.entries(allTickets)
                     .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`);
 
+                console.log('usersWithTickets');
+                console.dir(usersWithTickets);
                 // Split the participants list into chunks to avoid exceeding the Discord message length limit
                 const chunkSize = 2000; // Discord message limit
                 const participantsMessages = [];
@@ -244,7 +246,8 @@ module.exports = {
                     currentMessage += `${user}\n`;
                 }
                 if (currentMessage) participantsMessages.push(currentMessage);
-console.dir(participantsMessages); // Debug log
+                console.log('participantsMessages');
+                console.dir(participantsMessages);
                 // Send each chunk as a separate message
                 for (const message of participantsMessages) {
                     await interaction.channel.send({
