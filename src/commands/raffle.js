@@ -78,7 +78,7 @@ module.exports = {
                 await interaction.reply({ content: `Granted ${tickets} tickets to <@${user.id}>.`, ephemeral: false });
             } catch (error) {
                 console.error('Error granting tickets:', error);
-                await interaction.reply({ content: 'There was an error granting tickets.', ephemeral: true });
+                await interaction.reply({ content: `There was an error granting tickets: ${error.message}`, ephemeral: true });
             }
         } else if (subcommand === 'remove') {
             const user = interaction.options.getUser('user');
@@ -103,7 +103,7 @@ module.exports = {
                 await interaction.reply({ content: `Removed ${tickets} tickets from <@${user.id}>.`, ephemeral: false });
             } catch (error) {
                 console.error('Error removing tickets:', error);
-                await interaction.reply({ content: 'There was an error removing tickets.', ephemeral: true });
+                await interaction.reply({ content: `There was an error removing tickets: ${error.message}`, ephemeral: true });
             }
         } else if (subcommand === 'check') {
             const user = interaction.options.getUser('user');
@@ -114,7 +114,7 @@ module.exports = {
                 if (user) {
                     // Check tickets for a specific user
                     const tickets = await bot.db.getUserTickets(user.id, interaction.guildId);
-                    if (tickets) {
+                    if (tickets !== null) { // Ensure null check for no tickets
                         return interaction.reply({ content: `<@${user.id}> has ${tickets} tickets.`, ephemeral: false });
                     } else {
                         return interaction.reply({ content: `<@${user.id}> has no tickets.`, ephemeral: false });
@@ -122,7 +122,7 @@ module.exports = {
                 } else {
                     // Check tickets for all users
                     const allTickets = await bot.db.getAllTickets(interaction.guildId);
-                    if (allTickets.length === 0) {
+                    if (allTickets.length === 0) { // Ensure the array is empty
                         return interaction.reply({ content: 'No users have tickets.', ephemeral: false });
                     }
 
@@ -131,7 +131,7 @@ module.exports = {
                 }
             } catch (error) {
                 console.error('Error checking tickets:', error);
-                await interaction.reply({ content: 'There was an error checking tickets.', ephemeral: true });
+                await interaction.reply({ content: `There was an error checking tickets: ${error.message}`, ephemeral: true });
             }
         } else {
             await interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });

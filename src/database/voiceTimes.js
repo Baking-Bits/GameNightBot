@@ -429,6 +429,52 @@ async function grantTickets(userId, guildId, tickets) {
     }
 }
 
+async function getUserTickets(userId, guildId) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT tickets
+            FROM raffle_tickets
+            WHERE user_id = ? AND guild_id = ?
+        `, [userId, guildId]);
+
+        return rows.length > 0 ? rows[0].tickets : null;
+    } catch (error) {
+        console.error('Error fetching user tickets:', error);
+        throw error;
+    }
+}
+
+async function getAllTickets(guildId) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT user_id, tickets
+            FROM raffle_tickets
+            WHERE guild_id = ?
+            ORDER BY tickets DESC
+        `, [guildId]);
+
+        return Array.isArray(rows) ? rows : []; // Ensure rows is an array
+    } catch (error) {
+        console.error('Error fetching all tickets:', error);
+        return []; // Return an empty array on error
+    }
+}
+
+async function removeTickets(userId, guildId, tickets) {
+    try {
+        const result = await pool.query(`
+            UPDATE raffle_tickets
+            SET tickets = tickets - ?
+            WHERE user_id = ? AND guild_id = ? AND tickets >= ?
+        `, [tickets, userId, guildId, tickets]);
+
+        return result;
+    } catch (error) {
+        console.error('Error removing tickets:', error);
+        throw error;
+    }
+}
+
 function getCentralTime(date) {
     const utcDate = new Date(date);
     utcDate.setHours(utcDate.getHours() + 5);
@@ -446,4 +492,7 @@ module.exports = {
     getCentralTime,
     ensureRaffleTable,
     grantTickets,
+    getUserTickets,
+    getAllTickets,
+    removeTickets,
 };
