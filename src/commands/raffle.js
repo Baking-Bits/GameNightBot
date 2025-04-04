@@ -114,11 +114,20 @@ module.exports = {
                 if (user) {
                     // Check tickets for a specific user
                     const tickets = await bot.db.getUserTickets(user.id, interaction.guildId);
-                    if (tickets) {
-                        return interaction.reply({ content: `<@${user.id}> has ${tickets} tickets.`, ephemeral: false });
-                    } else {
-                        return interaction.reply({ content: `<@${user.id}> has no tickets.`, ephemeral: false });
-                    }
+                    console.log(`Tickets for user ${user.id}:`, tickets); // Debug log
+                    const embed = {
+                        color: 0x0099ff, // Embed color
+                        title: `🎟️ Raffle Tickets for ${user.username}`,
+                        description: tickets
+                            ? `<@${user.id}> has **${tickets}** ticket${tickets === 1 ? '' : 's'}.`
+                            : `<@${user.id}> has no tickets.`,
+                        timestamp: new Date(),
+                        footer: {
+                            text: 'Raffle Bot'
+                        }
+                    };
+
+                    return interaction.reply({ embeds: [embed], ephemeral: false });
                 } else {
                     // Check tickets for all users
                     const allTickets = await bot.db.getAllTickets(interaction.guildId);
@@ -127,13 +136,27 @@ module.exports = {
                         return interaction.reply({ content: 'No users have tickets.', ephemeral: false });
                     }
 
-                    console.dir(allTickets);
+                    // Create a leaderboard-style embed
                     const ticketList = Object.entries(allTickets)
-                        .map(([userId, tickets]) =>
-                            `<@${userId}> has ${tickets} ticket${tickets === 1 ? '' : 's'}`) // Proper pluralization
+                        .map(([userId, tickets]) => ({
+                            user: `<@${userId}>`,
+                            tickets
+                        }))
+                        .sort((a, b) => b.tickets - a.tickets) // Sort by ticket count descending
+                        .map((entry, index) => `**${index + 1}.** ${entry.user} - ${entry.tickets} ticket${entry.tickets === 1 ? '' : 's'}`)
                         .join('\n');
 
-                    return interaction.reply({ content: `**Raffle Tickets:**\n${ticketList}`, ephemeral: false });
+                    const embed = {
+                        color: 0x0099ff, // Embed color
+                        title: '🎟️ Raffle Tickets Leaderboard',
+                        description: ticketList,
+                        timestamp: new Date(),
+                        footer: {
+                            text: 'Raffle Bot'
+                        }
+                    };
+
+                    return interaction.reply({ embeds: [embed], ephemeral: false });
                 }
             } catch (error) {
                 console.error('Error checking tickets:', error);
