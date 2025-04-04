@@ -157,7 +157,6 @@ module.exports = {
                 if (user) {
                     // Check tickets for a specific user
                     const tickets = await bot.db.getUserTickets(user.id, interaction.guildId);
-                    console.log(`Tickets for user ${user.id}:`, tickets); // Debug log
                     const embed = {
                         color: 0x0099ff, // Embed color
                         title: `🎟️ Raffle Tickets for ${user.username}`,
@@ -174,7 +173,6 @@ module.exports = {
                 } else {
                     // Check tickets for all users
                     const allTickets = await bot.db.getAllTickets(interaction.guildId);
-                    console.log('All tickets:', allTickets); // Debug log
                     if (!allTickets || Object.keys(allTickets).length === 0) { // Ensure the object is empty
                         return interaction.reply({ content: 'No users have tickets.', ephemeral: false });
                     }
@@ -255,7 +253,7 @@ module.exports = {
                         allowedMentions: { parse: ['users'] }
                     });
                 }
-
+console.log('participantsMessages sent');
                 // Wait 1 second before displaying the countdown message
                 setTimeout(async () => {
                     const embed = {
