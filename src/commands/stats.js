@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { formatHour, formatTimeCompact, getPeriodOfDay } = require('../utils/timeFormatter');
+const { formatHour, formatTimeCompact, getPeriodOfDay, convertToEST } = require('../utils/timeFormatter');
 
 module.exports = {
     data: {
@@ -30,7 +30,8 @@ module.exports = {
             const value = hour ? hour.total_time : 0;
             const bars = Math.round((value / maxValue) * barLength) || 0;
             const timeStr = formatTimeCompact(value).padEnd(12); // Use compact formatter
-            activityGraph += `${formatHour(i).padStart(5)} |${'█'.repeat(bars)}${' '.repeat(barLength - bars)}| ${timeStr}\n`;
+            const estHour = convertToEST(i);
+            activityGraph += `${formatHour(estHour).padStart(5)} |${'█'.repeat(bars)}${' '.repeat(barLength - bars)}| ${timeStr}\n`;
         }
         activityGraph += '```';
 
@@ -48,12 +49,17 @@ module.exports = {
         }
         dailyGraph += '```';
 
+        // Convert peak hours from CT to EST/EDT
+        const [startHour, endHour] = schedule.peakHours.match(/\d+/g).map(Number);
+        const estStartHour = convertToEST(startHour);
+        const estEndHour = convertToEST(endHour);
+
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle(`Voice Activity Stats for ${targetUser.username}`)
             .addFields(
                 { name: 'Most Active', value: schedule.mostActive, inline: true },
-                { name: 'Peak Hours', value: schedule.peakHours, inline: true },
+                { name: 'Peak Hours', value: `${formatHour(estStartHour)}-${formatHour(estEndHour)} EST/EDT`, inline: true },
                 { name: 'Least Active', value: schedule.leastActive, inline: true }
             )
             .setDescription(`${activityGraph}\n${dailyGraph}`);

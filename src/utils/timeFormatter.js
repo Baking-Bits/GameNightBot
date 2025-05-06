@@ -50,4 +50,8 @@ function getPeriodOfDay(hours) {
     return 'Unknown';
 }
 
-module.exports = { formatHour, formatTime, formatTimeCompact, getPeriodOfDay };
+function convertToEST(hour) {
+    return (hour - 1 + 24) % 24; // Convert CT to EST/EDT
+}
+
+module.exports = { formatHour, formatTime, formatTimeCompact, getPeriodOfDay, convertToEST };

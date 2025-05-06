@@ -230,30 +230,26 @@ module.exports = {
                 const usersWithTickets = Object.entries(allTickets)
                     .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`);
 
-                console.log('usersWithTickets');
-                console.dir(usersWithTickets);
                 // Split the participants list into chunks to avoid exceeding the Discord message length limit
-                const chunkSize = 2000; // Discord message limit
-                const participantsMessages = [];
-                let currentMessage = '';
+                const chunkSize = 1900; // Leave room for "Participants:\n" and formatting
+                let currentMessage = 'Participants:\n';
                 for (const user of usersWithTickets) {
-                    if (currentMessage.length + user.length + 2 > chunkSize) { // +2 for newline
-                        participantsMessages.push(currentMessage);
-                        currentMessage = '';
+                    if (currentMessage.length + user.length + 1 > chunkSize) { // +1 for newline
+                        await interaction.channel.send({
+                            content: currentMessage,
+                            allowedMentions: { parse: ['users'] }
+                        });
+                        currentMessage = 'Participants:\n';
                     }
                     currentMessage += `${user}\n`;
                 }
-                if (currentMessage) participantsMessages.push(currentMessage);
-                console.log('participantsMessages');
-                console.dir(participantsMessages);
-                // Send each chunk as a separate message
-                for (const message of participantsMessages) {
+                if (currentMessage.trim() !== 'Participants:') {
                     await interaction.channel.send({
-                        content: `Participants:\n${message}`,
+                        content: currentMessage,
                         allowedMentions: { parse: ['users'] }
                     });
                 }
-console.log('participantsMessages sent');
+
                 // Wait 1 second before displaying the countdown message
                 setTimeout(async () => {
                     const embed = {
