@@ -116,8 +116,20 @@ module.exports = {
                             grantedUsers.push(`<@${member.user.id}>`);
                         }
                     }
-                    const grantedList = grantedUsers.join(', ');
-                    await interaction.reply({ content: `Granted ${tickets} tickets to the following members of the role ${role.name}: ${grantedList}`, ephemeral: false });
+
+                    // Split the granted users list into chunks
+                    const chunkSize = 1900;
+                    let currentMessage = `Granted ${tickets} tickets to the following members of the role ${role.name}:\n`;
+                    for (const user of grantedUsers) {
+                        if (currentMessage.length + user.length + 1 > chunkSize) {
+                            await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                            currentMessage = '';
+                        }
+                        currentMessage += `${user}\n`;
+                    }
+                    if (currentMessage.trim()) {
+                        await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                    }
                 }
             } catch (error) {
                 console.error('Error granting tickets:', error);
@@ -132,17 +144,14 @@ module.exports = {
             }
 
             try {
-                // Ensure the database table exists
                 await bot.db.ensureRaffleTable();
 
-                // Deduct the user's ticket count in the database
                 const result = await bot.db.removeTickets(user.id, interaction.guildId, tickets);
 
                 if (result.affectedRows === 0) {
                     return interaction.reply({ content: `<@${user.id}> does not have enough tickets to remove.`, ephemeral: true });
                 }
 
-                // Mention the user in the response
                 await interaction.reply({ content: `Removed ${tickets} tickets from <@${user.id}>.`, ephemeral: false });
             } catch (error) {
                 console.error('Error removing tickets:', error);
@@ -152,6 +161,8 @@ module.exports = {
             const user = interaction.options.getUser('user');
 
             try {
+                await interaction.deferReply({ ephemeral: true }); // Defer the interaction response
+
                 await bot.db.ensureRaffleTable();
 
                 if (user) {
@@ -164,44 +175,39 @@ module.exports = {
                             ? `<@${user.id}> has **${tickets}** ticket${tickets === 1 ? '' : 's'}.`
                             : `<@${user.id}> has no tickets.`,
                         timestamp: new Date(),
-                        footer: {
-                            text: 'Raffle Bot'
-                        }
+                        footer: { text: 'Raffle Bot' }
                     };
 
-                    return interaction.reply({ embeds: [embed], ephemeral: false });
+                    return interaction.editReply({ embeds: [embed] }); // Edit the deferred response
                 } else {
                     // Check tickets for all users
                     const allTickets = await bot.db.getAllTickets(interaction.guildId);
-                    if (!allTickets || Object.keys(allTickets).length === 0) { // Ensure the object is empty
-                        return interaction.reply({ content: 'No users have tickets.', ephemeral: false });
+                    if (!allTickets || Object.keys(allTickets).length === 0) {
+                        return interaction.editReply({ content: 'No users have tickets.' }); // Edit the deferred response
                     }
 
-                    // Create a leaderboard-style embed
                     const ticketList = Object.entries(allTickets)
-                        .map(([userId, tickets]) => ({
-                            user: `<@${userId}>`,
-                            tickets
-                        }))
-                        .sort((a, b) => b.tickets - a.tickets) // Sort by ticket count descending
-                        .map((entry, index) => `**${index + 1}.** ${entry.user} - ${entry.tickets} ticket${entry.tickets === 1 ? '' : 's'}`)
-                        .join('\n');
+                        .map(([userId, tickets]) => `<@${userId}> - ${tickets} ticket${tickets === 1 ? '' : 's'}`);
 
-                    const embed = {
-                        color: 0x0099ff, // Embed color
-                        title: '🎟️ Raffle Tickets Leaderboard',
-                        description: ticketList,
-                        timestamp: new Date(),
-                        footer: {
-                            text: 'Raffle Bot'
+                    // Split the ticket list into chunks
+                    const chunkSize = 1900;
+                    let currentMessage = 'Raffle Tickets Leaderboard:\n';
+                    for (const entry of ticketList) {
+                        if (currentMessage.length + entry.length + 1 > chunkSize) {
+                            await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                            currentMessage = '';
                         }
-                    };
+                        currentMessage += `${entry}\n`;
+                    }
+                    if (currentMessage.trim()) {
+                        await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                    }
 
-                    return interaction.reply({ embeds: [embed], ephemeral: false });
+                    return interaction.editReply({ content: 'Raffle tickets leaderboard sent to the channel.' }); // Edit the deferred response
                 }
             } catch (error) {
                 console.error('Error checking tickets:', error);
-                await interaction.reply({ content: `There was an error checking tickets: ${error.message}`, ephemeral: true });
+                await interaction.editReply({ content: `There was an error checking tickets: ${error.message}` }); // Edit the deferred response
             }
         } else if (subcommand === 'run') {
             const delay = interaction.options.getInteger('delay') || 60;
