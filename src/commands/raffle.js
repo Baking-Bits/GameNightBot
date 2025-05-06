@@ -32,14 +32,20 @@ module.exports = {
             },
             {
                 name: 'remove',
-                description: 'Remove raffle tickets from a user',
+                description: 'Remove raffle tickets from a user or role',
                 type: 1, // SUB_COMMAND
                 options: [
                     {
                         name: 'user',
                         description: 'The user to remove tickets from',
                         type: 6, // USER
-                        required: true
+                        required: false
+                    },
+                    {
+                        name: 'role',
+                        description: 'The role to remove tickets from',
+                        type: 8, // ROLE
+                        required: false
                     },
                     {
                         name: 'tickets',
@@ -71,6 +77,12 @@ module.exports = {
                         name: 'delay',
                         description: 'Time in seconds to delay the raffle (default: 60)',
                         type: 4, // INTEGER
+                        required: false
+                    },
+                    {
+                        name: 'hide_participants',
+                        description: 'Hide the participants list when running the raffle',
+                        type: 5, // BOOLEAN
                         required: false
                     }
                 ]
@@ -137,7 +149,12 @@ module.exports = {
             }
         } else if (subcommand === 'remove') {
             const user = interaction.options.getUser('user');
+            const role = interaction.options.getRole('role');
             const tickets = interaction.options.getInteger('tickets');
+
+            if (!user && !role) {
+                return interaction.reply({ content: 'You must specify either a user or a role.', ephemeral: true });
+            }
 
             if (tickets <= 0) {
                 return interaction.reply({ content: 'The number of tickets must be greater than 0.', ephemeral: true });
@@ -146,13 +163,47 @@ module.exports = {
             try {
                 await bot.db.ensureRaffleTable();
 
-                const result = await bot.db.removeTickets(user.id, interaction.guildId, tickets);
+                if (user) {
+                    // Remove tickets from a single user
+                    const result = await bot.db.removeTickets(user.id, interaction.guildId, tickets);
 
-                if (result.affectedRows === 0) {
-                    return interaction.reply({ content: `<@${user.id}> does not have enough tickets to remove.`, ephemeral: true });
+                    if (result.affectedRows === 0) {
+                        return interaction.reply({ content: `<@${user.id}> does not have enough tickets to remove.`, ephemeral: true });
+                    }
+
+                    await interaction.reply({ content: `Removed ${tickets} tickets from <@${user.id}>.`, ephemeral: false });
+                } else if (role) {
+                    // Remove tickets from all members of the role using cached members
+                    const removedUsers = [];
+                    for (const [memberId, member] of bot.client.cachedMembers.entries()) {
+                        if (member.roles.cache.has(role.id)) {
+                            const result = await bot.db.removeTickets(member.user.id, interaction.guildId, tickets);
+                            if (result.affectedRows > 0) {
+                                removedUsers.push(`<@${member.user.id}>`);
+                            }
+                        }
+                    }
+
+                    // Split the removed users list into chunks
+                    const chunkSize = 1900;
+                    let currentMessage = `Removed ${tickets} tickets from the following members of the role ${role.name}:\n`;
+                    for (const user of removedUsers) {
+                        if (currentMessage.length + user.length + 1 > chunkSize) {
+                            await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                            currentMessage = '';
+                        }
+                        currentMessage += `${user}\n`;
+                    }
+                    if (currentMessage.trim()) {
+                        await interaction.channel.send({ content: currentMessage, allowedMentions: { parse: ['users'] } });
+                    }
+
+                    if (removedUsers.length === 0) {
+                        await interaction.reply({ content: `No members of the role ${role.name} had enough tickets to remove.`, ephemeral: true });
+                    } else {
+                        await interaction.reply({ content: `Tickets removed from members of the role ${role.name}.`, ephemeral: false });
+                    }
                 }
-
-                await interaction.reply({ content: `Removed ${tickets} tickets from <@${user.id}>.`, ephemeral: false });
             } catch (error) {
                 console.error('Error removing tickets:', error);
                 await interaction.reply({ content: `There was an error removing tickets: ${error.message}`, ephemeral: true });
@@ -211,17 +262,20 @@ module.exports = {
             }
         } else if (subcommand === 'run') {
             const delay = interaction.options.getInteger('delay') || 60;
+            const hideParticipants = interaction.options.getBoolean('hide_participants') || false;
 
             if (delay < 0) {
                 return interaction.reply({ content: 'Delay must be a positive number.', ephemeral: true });
             }
 
             try {
+                await interaction.deferReply(); // Defer the interaction response
+
                 await bot.db.ensureRaffleTable();
 
                 const allTickets = await bot.db.getAllTickets(interaction.guildId);
                 if (!allTickets || Object.keys(allTickets).length === 0) {
-                    return interaction.reply({ content: 'No users have tickets. Cannot run the raffle.', ephemeral: false });
+                    return interaction.editReply({ content: 'No users have tickets. Cannot run the raffle.' }); // Edit the deferred response
                 }
 
                 const ticketPool = Object.entries(allTickets).flatMap(([userId, tickets]) =>
@@ -229,13 +283,6 @@ module.exports = {
                 );
 
                 const winnerId = ticketPool[Math.floor(Math.random() * ticketPool.length)];
-                const winnerMention = `<@${winnerId}>`;
-
-                const endTime = Math.floor(Date.now() / 1000) + delay; // Calculate the end time in seconds
-
-                const usersWithTickets = Object.entries(allTickets)
-                    .map(([userId, tickets]) => `<@${userId}> (${tickets} ticket${tickets === 1 ? '' : 's'})`);
-
                 // Split the participants list into chunks to avoid exceeding the Discord message length limit
                 const chunkSize = 1900; // Leave room for "Participants:\n" and formatting
                 let currentMessage = 'Participants:\n';
@@ -268,9 +315,7 @@ module.exports = {
                         }
                     };
 
-                    const countdownMessage = await interaction.channel.send({
-                        embeds: [embed]
-                    });
+                    await interaction.editReply({ embeds: [embed] }); // Edit the deferred response
 
                     // Wait for the countdown to finish
                     setTimeout(async () => {
@@ -290,7 +335,7 @@ module.exports = {
                 }, 1000);
             } catch (error) {
                 console.error('Error running the raffle:', error);
-                await interaction.reply({ content: `There was an error running the raffle: ${error.message}`, ephemeral: true });
+                await interaction.editReply({ content: `There was an error running the raffle: ${error.message}` }); // Edit the deferred response
             }
         } else {
             await interaction.reply({ content: 'Invalid subcommand.', ephemeral: true });

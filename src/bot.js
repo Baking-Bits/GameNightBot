@@ -40,13 +40,10 @@ class VoiceTimeTracker {
                 else this.client.once('ready', () => resolve());
             });
 
-            // Register commands
+            // Register commands on startup
             await registerCommands(this.client, this, token);
 
             this.timeTracker.startPeriodicUpdates();
-
-            // Start periodic service status updates
-            // this.startServiceStatusUpdates();
 
             console.log(`Logged in as ${this.client.user.tag}!`);
 
