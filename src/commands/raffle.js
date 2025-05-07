@@ -283,24 +283,29 @@ module.exports = {
                 );
 
                 const winnerId = ticketPool[Math.floor(Math.random() * ticketPool.length)];
-                // Split the participants list into chunks to avoid exceeding the Discord message length limit
-                const chunkSize = 1900; // Leave room for "Participants:\n" and formatting
-                let currentMessage = 'Participants:\n';
-                for (const user of usersWithTickets) {
-                    if (currentMessage.length + user.length + 1 > chunkSize) { // +1 for newline
+                const winnerMention = `<@${winnerId}>`;
+
+                if (!hideParticipants) {
+                    const usersWithTickets = Object.keys(allTickets).map(userId => `<@${userId}>`);
+                    // Split the participants list into chunks to avoid exceeding the Discord message length limit
+                    const chunkSize = 1900; // Leave room for "Participants:\n" and formatting
+                    let currentMessage = 'Participants:\n';
+                    for (const user of usersWithTickets) {
+                        if (currentMessage.length + user.length + 1 > chunkSize) { // +1 for newline
+                            await interaction.channel.send({
+                                content: currentMessage,
+                                allowedMentions: { parse: ['users'] }
+                            });
+                            currentMessage = 'Participants:\n';
+                        }
+                        currentMessage += `${user}\n`;
+                    }
+                    if (currentMessage.trim() !== 'Participants:') {
                         await interaction.channel.send({
                             content: currentMessage,
                             allowedMentions: { parse: ['users'] }
                         });
-                        currentMessage = 'Participants:\n';
                     }
-                    currentMessage += `${user}\n`;
-                }
-                if (currentMessage.trim() !== 'Participants:') {
-                    await interaction.channel.send({
-                        content: currentMessage,
-                        allowedMentions: { parse: ['users'] }
-                    });
                 }
 
                 // Wait 1 second before displaying the countdown message
@@ -308,7 +313,7 @@ module.exports = {
                     const embed = {
                         color: 0x0099ff, // Embed color
                         title: '🎟️ Raffle Countdown',
-                        description: `The raffle will run <t:${endTime}:R>!`,
+                        description: `The raffle will run in ${delay} seconds!`,
                         timestamp: new Date(),
                         footer: {
                             text: 'Raffle Bot'
