@@ -10,12 +10,14 @@ module.exports = {
                 description: 'Grant raffle tickets to a user or role',
                 type: 1, // SUB_COMMAND
                 options: [
+                    // Required first
                     {
                         name: 'tickets',
                         description: 'The number of tickets to grant',
                         type: 4, // INTEGER
                         required: true
                     },
+                    // Optional after
                     {
                         name: 'user',
                         description: 'The user to grant tickets to',
@@ -35,6 +37,14 @@ module.exports = {
                 description: 'Remove raffle tickets from a user or role',
                 type: 1, // SUB_COMMAND
                 options: [
+                    // Required first
+                    {
+                        name: 'tickets',
+                        description: 'The number of tickets to remove',
+                        type: 4, // INTEGER
+                        required: true
+                    },
+                    // Optional after
                     {
                         name: 'user',
                         description: 'The user to remove tickets from',
@@ -46,12 +56,6 @@ module.exports = {
                         description: 'The role to remove tickets from',
                         type: 8, // ROLE
                         required: false
-                    },
-                    {
-                        name: 'tickets',
-                        description: 'The number of tickets to remove',
-                        type: 4, // INTEGER
-                        required: true
                     }
                 ]
             },
