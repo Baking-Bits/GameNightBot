@@ -56,6 +56,43 @@ class VoiceTimeTracker {
 
             console.log('Cached all guild members.');
             console.log(`Cached members: ${this.client.cachedMembers.size}`);
+
+            // Load event-role associations from DB and set up eventRoleMap
+            const eventRoles = await this.db.getAllEventRoles();
+            this.eventRoleMap = new Map();
+            for (const row of eventRoles) {
+                this.eventRoleMap.set(row.event_id, row.role_id);
+            }
+            // Register event listeners if any event roles exist
+            if (eventRoles.length && !this._eventRoleListenerRegistered) {
+                this.client.on('guildScheduledEventUserAdd', async (event, user) => {
+                    const trackedRoleId = this.eventRoleMap && this.eventRoleMap.get(event.id);
+                    if (trackedRoleId) {
+                        try {
+                            const member = await event.guild.members.fetch(user.id);
+                            if (!member.roles.cache.has(trackedRoleId)) {
+                                await member.roles.add(trackedRoleId, 'RSVPed to event');
+                            }
+                        } catch (err) {
+                            console.error('Error assigning event role:', err);
+                        }
+                    }
+                });
+                this.client.on('guildScheduledEventUserRemove', async (event, user) => {
+                    const trackedRoleId = this.eventRoleMap && this.eventRoleMap.get(event.id);
+                    if (trackedRoleId) {
+                        try {
+                            const member = await event.guild.members.fetch(user.id);
+                            if (member.roles.cache.has(trackedRoleId)) {
+                                await member.roles.remove(trackedRoleId, 'Un-RSVPed from event');
+                            }
+                        } catch (err) {
+                            console.error('Error removing event role:', err);
+                        }
+                    }
+                });
+                this._eventRoleListenerRegistered = true;
+            }
         } catch (error) {
             console.error('Error during login:', error);
         }
