@@ -4,6 +4,7 @@ const TimeTracker = require('./services/timeTracker');
 const { registerCommands } = require('./utils/commandRegister');
 const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
+const localaiRelay = require('./ai/localaiRelay');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
 class VoiceTimeTracker {
@@ -30,6 +31,9 @@ class VoiceTimeTracker {
 
             // Then load events
             loadEvents(this.client, this);
+
+            // Initialize AI relay
+            localaiRelay(this.client);
 
             // Login
             await this.client.login(token);
