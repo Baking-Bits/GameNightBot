@@ -37,7 +37,10 @@ async function removeEventRole(eventId) {
 async function getAllEventRoles() {
   await ensureEventRoleTable();
   const rows = await pool.query('SELECT event_id, role_id FROM event_roles');
-  return rows[0] || [];
+  if (Array.isArray(rows[0])) {
+    return rows[0];
+  }
+  return [];
 }
 
 module.exports = {
