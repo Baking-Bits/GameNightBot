@@ -25,7 +25,8 @@ In `config.json`, under the `aiSelfFiltering` section:
   "enabled": true,
   "responseThreshold": 0.2,
   "maxTokensForFiltering": 10,
-  "adminPingOnServerIssues": true
+  "adminPingOnServerIssues": true,
+  "silentFailureOnAIUnavailable": true
 }
 ```
 
@@ -49,6 +50,11 @@ In `config.json`, under the `aiSelfFiltering` section:
   - `true`: Automatically ping admin role when server issues are detected
   - `false`: Only provide regular AI responses to server issues
   - When enabled, provides troubleshooting steps and pings the first admin role in config
+
+- **`silentFailureOnAIUnavailable`** (boolean):
+  - `true`: Bot stays completely silent when AI is unreachable (recommended)
+  - `false`: Bot sends "There was an error contacting the AI" message when AI fails
+  - Prevents error messages from cluttering the chat when AI service is down
 
 ## System Prompts
 
@@ -118,6 +124,10 @@ For general technical problems that are NOT server-related (like Discord issues,
 - If filtering fails due to errors, the AI defaults to **not responding** (conservative approach)
 - If self-filtering is disabled, the AI responds to all messages as before
 - Direct questions and help requests always trigger a response regardless of other factors
+- **AI Unavailable**: When the AI service is unreachable:
+  - If `silentFailureOnAIUnavailable` is `true`: Bot stays completely silent (recommended)
+  - If `silentFailureOnAIUnavailable` is `false`: Bot sends error message to chat
+- **Server Issues**: If AI fails during server issue detection, no admin ping occurs (prevents false alerts)
 
 ## Monitoring
 
@@ -133,3 +143,32 @@ You can modify the filtering behavior by adjusting:
 2. The trigger words for auto-response (currently: "?", "help", "please")
 3. The number of context messages used for filtering (currently: last 5 messages)
 4. The configuration parameters in `config.json`
+
+### Dynamic Personality Changes
+
+Admins can change the AI personality in real-time using Discord commands:
+
+#### `/personality show`
+- Displays the current personality setting
+- Shows all available personality options
+- Admin-only command
+
+#### `/personality set <level>`
+- Changes the AI personality level immediately
+- Available levels: `professional`, `casual`, `playful`
+- Changes take effect for new AI responses instantly
+- Admin-only command
+
+**Example Usage:**
+```
+/personality show
+/personality set playful
+/personality set professional
+```
+
+**Personality Levels:**
+- **Professional**: Professional but friendly tone
+- **Casual**: Casual and friendly with gaming terminology  
+- **Playful**: Witty with gaming metaphors and culture references
+
+Changes made via Discord commands are automatically saved to the config file and take effect immediately without requiring a bot restart.
