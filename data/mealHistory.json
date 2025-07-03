@@ -1,0 +1,38 @@
+{
+  "meals": [
+    {
+      "name": "Mediterranean Chickpea Salad Wrap",
+      "type": "lunch",
+      "ingredients": [
+        "1 can chickpeas, drained and rinsed",
+        "1 medium cucumber, diced",
+        "1 small red bell pepper, diced",
+        "1/2 cup cherry tomatoes, halved",
+        "1/4 cup red onion, finely chopped",
+        "1/4 cup kalamata olives, pitted and sliced",
+        "1/4 cup feta cheese, crumbled",
+        "1 tablespoon extra virgin olive oil",
+        "1 tablespoon lemon juice",
+        "1 teaspoon dried oregano",
+        "Salt and pepper to taste",
+        "4 whole wheat tortillas",
+        "Fresh parsley, chopped for garnish"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "400-450",
+      "description": "A refreshing and satisfying Mediterranean-inspired wrap packed with protein, fiber, and healthy fats.",
+      "instructions": [
+        "In a large bowl, combine chickpeas, cucumber, red bell pepper, cherry tomatoes, red onion, and kalamata olives.",
+        "Add feta cheese, extra virgin olive oil, lemon juice, dried oregano, salt, and pepper. Mix well to combine.",
+        "Warm the tortillas slightly in a microwave or on a dry skillet for a few seconds.",
+        "Divide the chickpea salad evenly among the tortillas, roll them up, and garnish with chopped parsley.",
+        "Slice the wraps in half if desired and enjoy immediately."
+      ],
+      "nutritionNotes": "This meal is rich in plant-based protein from chickpeas, healthy fats from olive oil and olives, and vitamins and minerals from fresh vegetables. It's also high in fiber, supporting digestive health and keeping you full longer. The use of whole wheat tortillas adds whole grains for sustained energy.",
+      "generatedAt": "2025-07-03T18:48:10.826Z",
+      "id": "1751568490826",
+      "isAIGenerated": true
+    }
+  ],
+  "lastGenerated": "2025-07-03T18:48:10.826Z"
+}

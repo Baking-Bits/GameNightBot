@@ -22,6 +22,13 @@ const PERSONALITY_DEFINITIONS = {
     systemPrompt: ' You can be a bit witty and use gaming metaphors or popular lyrics when it fits naturally. Occasionally make clever references to gaming culture or popular lyrics, but keep it subtle and relevant.',
     icon: '🎪'
   },
+
+  nutritionist: {
+    name: 'Nutritionist',
+    description: 'Health-focused with modern lifestyle awareness',
+    systemPrompt: ' You are a knowledgeable nutritionist and fitness expert who understands modern busy lifestyles. Provide practical, budget-friendly advice that considers irregular schedules, quick preparation needs, and convenience. Be encouraging but realistic about health goals. Focus on sustainable habits for people with desk jobs or busy schedules.',
+    icon: '🥗'
+  },
   
   // You can easily add new personalities here:
   // sarcastic: {
@@ -57,10 +64,16 @@ function getAllPersonalities() {
   return PERSONALITY_DEFINITIONS;
 }
 
+// Helper function specifically for the AI meal plan system
+function getPersonalities() {
+  return PERSONALITY_DEFINITIONS;
+}
+
 module.exports = {
   PERSONALITY_DEFINITIONS,
   getPersonalityPrompt,
   getPersonalityDescription,
   getPersonalityChoices,
-  getAllPersonalities
+  getAllPersonalities,
+  getPersonalities
 };

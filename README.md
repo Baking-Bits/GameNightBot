@@ -1,13 +1,15 @@
-# The Time Wizard
+# GameNight Bot
 
-A Discord bot that tracks and analyzes the time users spend in voice channels. Get detailed statistics about voice channel usage, compare users' activity, and view server-wide leaderboards.
+A comprehensive Discord bot that tracks voice activity, provides AI-powered assistance, and promotes healthy gaming habits with automated meal plans and workout suggestions.
 
 ## Features
 
 - 🕒 Real-time voice activity tracking
 - 📈 Multiple time period views (daily, weekly, monthly, yearly, all-time)
 - 🤝 User comparison functionality
-- 💾 Persistent data storage using SQLite
+- 🤖 AI-powered chat with configurable personalities
+- 🥗 **AI Meal Plan & Workout System** - Automated healthy lifestyle suggestions
+- 💾 Persistent data storage using MariaDB
 - ⚡ Slash command support
 
 ## Commands
@@ -40,9 +42,32 @@ A Discord bot that tracks and analyzes the time users spend in voice channels. G
   * Shows total users and average daily users
   * Includes hourly and daily activity graphs with user counts
 
+### AI Meal Plan & Workouts
+* `/aimealplan generate <type>` - Generate meal, snack, or workout on demand
+  * `type` - meal/snack/workout
+  
+* `/aimealplan history <type> [count]` - View recent generation history
+  * `type` - meals/snacks/workouts
+  * `count` - Number of items to show (1-20, default: 5)
+
+* `/aimealplan toggle` - Enable/disable automatic scheduling
+
+* `/aimealplan schedule` - View current posting schedule
+
+## Setup
+
+### Basic Setup
+1. Install dependencies: `npm install`
+2. Configure `config.json` with your bot token and database credentials
+3. Run: `npm start`
+
+### AI Meal Plan System Setup
+See [MEAL_PLAN_SETUP.md](MEAL_PLAN_SETUP.md) for detailed setup instructions for the AI-powered meal plan and workout system.
+
 ## Prerequisites
 
 - Node.js 16.9.0 or higher
-- Discord Bot Token
-- SQLite3
-- replace the token field in `config.json`
+- Discord Bot Token  
+- MariaDB database
+- LocalAI instance (for AI features)
+- Configure all credentials in `config.json`

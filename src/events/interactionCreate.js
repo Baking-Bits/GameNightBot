@@ -7,7 +7,15 @@ module.exports = {
         if (!command) return;
 
         try {
-            await command.execute(interaction, bot);
+            // Special handling for aimealplan command to pass additional context
+            if (interaction.commandName === 'aimealplan') {
+                await command.execute(interaction, {
+                    aiMealPlan: bot.aiMealPlan,
+                    config: bot.config
+                });
+            } else {
+                await command.execute(interaction, bot);
+            }
         } catch (error) {
             console.error(error);
             await interaction.reply({ 

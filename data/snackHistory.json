@@ -1,0 +1,55 @@
+{
+  "snacks": [
+    {
+      "name": "Hummus and Veggie Sticks",
+      "type": "snack",
+      "ingredients": [
+        "1 cup canned chickpeas",
+        "2 tablespoons tahini",
+        "1 tablespoon olive oil",
+        "1 tablespoon lemon juice",
+        "1 clove garlic",
+        "Salt to taste",
+        "1 carrot",
+        "1 cucumber",
+        "1 bell pepper"
+      ],
+      "prepTime": "8 minutes",
+      "calories": "250",
+      "description": "A refreshing and filling snack that combines homemade hummus with crunchy veggie sticks for a satisfying energy boost.",
+      "instructions": [
+        "Drain and rinse the chickpeas.",
+        "In a food processor, combine chickpeas, tahini, olive oil, lemon juice, garlic, and salt. Blend until smooth.",
+        "Wash and cut the carrot, cucumber, and bell pepper into sticks.",
+        "Serve the hummus with the veggie sticks for dipping."
+      ],
+      "benefits": "This snack is rich in protein and fiber from the chickpeas and veggies, providing sustained energy. It's low in calories but highly nutritious, making it perfect for busy schedules. The hummus and veggies are portable and easy to eat on the go, ensuring you stay energized throughout your day.",
+      "generatedAt": "2025-07-03T19:01:48.771Z",
+      "id": "1751569308771",
+      "isAIGenerated": true
+    },
+    {
+      "name": "Apple Peanut Butter Bites",
+      "type": "snack",
+      "ingredients": [
+        "apples",
+        "natural peanut butter",
+        "chia seeds"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150 per serving",
+      "description": "Simple and satisfying apple slices topped with peanut butter and chia seeds, perfect for an on-the-go energy boost.",
+      "instructions": [
+        "Wash and core the apples, then slice them into thin wedges.",
+        "Spread a thin layer of natural peanut butter over each apple slice.",
+        "Sprinkle a small amount of chia seeds on top of the peanut butter for added crunch and nutrition.",
+        "Arrange the apple bites on a plate or in a portable container for easy snacking."
+      ],
+      "benefits": "This snack combines the fiber and natural sugars from apples with the protein and healthy fats from peanut butter, providing a balanced mix of nutrients to keep you energized and focused. The chia seeds add omega-3 fatty acids and additional fiber, making it a wholesome and filling option suitable for busy schedules.",
+      "generatedAt": "2025-07-03T20:01:39.781Z",
+      "id": "1751572899781",
+      "isAIGenerated": true
+    }
+  ],
+  "lastGenerated": "2025-07-03T20:01:39.781Z"
+}

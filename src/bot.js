@@ -5,6 +5,8 @@ const { registerCommands } = require('./utils/commandRegister');
 const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
 const localaiRelay = require('./ai/localaiRelay');
+const AIMealPlan = require('./features/aiMealPlan');
+const config = require('../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
 class VoiceTimeTracker {
@@ -22,6 +24,8 @@ class VoiceTimeTracker {
         this.db = { pool, initializeDatabase, ...dbMethods };
         this.timeTracker = new TimeTracker(this.client, this.db);
         this.statusUpdateInterval = 5 * 60 * 1000; // Default to 5 minutes
+        this.config = config;
+        this.aiMealPlan = null; // Will be initialized after client is ready
     }
 
     async login(token) {
@@ -48,6 +52,19 @@ class VoiceTimeTracker {
             await registerCommands(this.client, this, token);
 
             this.timeTracker.startPeriodicUpdates();
+
+            // Initialize AI Meal Plan system
+            if (this.config.mealPlanChannelId && this.config.mealPlanChannelId !== "CHANNEL_ID_HERE") {
+                try {
+                    this.aiMealPlan = new AIMealPlan(this.client, this.config);
+                    await this.aiMealPlan.initialize();
+                    console.log('AI Meal Plan system initialized successfully');
+                } catch (error) {
+                    console.error('Failed to initialize AI Meal Plan system:', error);
+                }
+            } else {
+                console.log('AI Meal Plan system not initialized - channel ID not configured in config.json');
+            }
 
             console.log(`Logged in as ${this.client.user.tag}!`);
 
