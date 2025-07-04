@@ -2,8 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('aimealplan')
-        .setDescription('AI-powered meal planning and workout system')
+        .setName('wellness')
+        .setDescription('Health and fitness system - meals, snacks, and workouts')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('generate')
@@ -58,24 +58,32 @@ module.exports = {
             subcommand
                 .setName('schedule')
                 .setDescription('View the current schedule for meals, snacks, and workouts')
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('adminstats')
+                .setDescription('View system performance statistics (admin only)')
         ),
 
-    async execute(interaction, { aiMealPlan, config }) {
+    async execute(interaction, { wellnessSystem, config }) {
         const subcommand = interaction.options.getSubcommand();
 
         try {
             switch (subcommand) {
                 case 'generate':
-                    await handleGenerate(interaction, aiMealPlan);
+                    await handleGenerate(interaction, wellnessSystem);
                     break;
                 case 'history':
-                    await handleHistory(interaction, aiMealPlan);
+                    await handleHistory(interaction, wellnessSystem);
                     break;
                 case 'toggle':
-                    await handleToggle(interaction, aiMealPlan);
+                    await handleToggle(interaction, wellnessSystem);
                     break;
                 case 'schedule':
                     await handleSchedule(interaction, config);
+                    break;
+                case 'adminstats':
+                    await handleAdminStats(interaction, wellnessSystem, config);
                     break;
                 default:
                     await interaction.reply({
@@ -100,7 +108,7 @@ module.exports = {
     }
 };
 
-async function handleGenerate(interaction, aiMealPlan) {
+async function handleGenerate(interaction, wellnessSystem) {
     const type = interaction.options.getString('type');
     const requirements = interaction.options.getString('requirements');
     
@@ -110,13 +118,13 @@ async function handleGenerate(interaction, aiMealPlan) {
         let result;
         switch (type) {
             case 'meal':
-                result = await aiMealPlan.generateMeal(requirements);
+                result = await wellnessSystem.generateMeal(requirements);
                 break;
             case 'snack':
-                result = await aiMealPlan.generateSnack(requirements);
+                result = await wellnessSystem.generateSnack(requirements);
                 break;
             case 'workout':
-                result = await aiMealPlan.generateWorkout(requirements);
+                result = await wellnessSystem.generateWorkout(requirements);
                 break;
         }
         
@@ -135,7 +143,7 @@ async function handleGenerate(interaction, aiMealPlan) {
     }
 }
 
-async function handleHistory(interaction, aiMealPlan) {
+async function handleHistory(interaction, wellnessSystem) {
     const type = interaction.options.getString('type');
     const count = interaction.options.getInteger('count') || 5;
     
@@ -182,13 +190,13 @@ async function handleHistory(interaction, aiMealPlan) {
     }
 }
 
-async function handleToggle(interaction, aiMealPlan) {
+async function handleToggle(interaction, wellnessSystem) {
     try {
-        const isEnabled = aiMealPlan.toggleSchedule();
+        const isEnabled = wellnessSystem.toggleSchedule();
         
         const embed = new EmbedBuilder()
             .setTitle('Schedule Status Updated')
-            .setDescription(`Automatic meal plan and workout schedule is now **${isEnabled ? 'ENABLED' : 'DISABLED'}**`)
+            .setDescription(`Automatic wellness schedule is now **${isEnabled ? 'ENABLED' : 'DISABLED'}**`)
             .setColor(isEnabled ? '#00ff00' : '#ff0000')
             .setTimestamp();
         
@@ -212,18 +220,18 @@ async function handleToggle(interaction, aiMealPlan) {
 
 async function handleSchedule(interaction, config) {
     try {
-        const schedule = config.mealPlanSchedule;
+        const schedule = config.wellnessSchedule;
         
         if (!schedule) {
             await interaction.reply({
-                content: 'No meal plan schedule configured.',
+                content: 'No wellness schedule configured.',
                 ephemeral: true
             });
             return;
         }
         
         const embed = new EmbedBuilder()
-            .setTitle('Current Meal Plan & Workout Schedule')
+            .setTitle('Current Wellness Schedule')
             .setColor('#ffa500')
             .setTimestamp();
         
@@ -253,7 +261,7 @@ async function handleSchedule(interaction, config) {
         
         embed.addFields({
             name: 'Channel',
-            value: config.mealPlanChannelId ? `<#${config.mealPlanChannelId}>` : 'Not configured',
+            value: config.wellnessChannelId ? `<#${config.wellnessChannelId}>` : 'Not configured',
             inline: false
         });
         
@@ -262,6 +270,148 @@ async function handleSchedule(interaction, config) {
         console.error('Error displaying schedule:', error);
         await interaction.reply({
             content: 'Failed to display schedule. Please try again.',
+            ephemeral: true
+        });
+    }
+}
+
+async function handleAdminStats(interaction, wellnessSystem, config) {
+    try {
+        // Check if user has admin role
+        const hasAdminRole = config.adminRoles && config.adminRoles.some(roleId => 
+            interaction.member.roles.cache.has(roleId)
+        );
+
+        if (!hasAdminRole) {
+            await interaction.reply({
+                content: 'You do not have permission to view admin statistics.',
+                ephemeral: true
+            });
+            return;
+        }
+
+        const stats = wellnessSystem.getAdminStats();
+        
+        const embed = new EmbedBuilder()
+            .setTitle('🔧 Wellness System - Admin Statistics')
+            .setColor('#9932cc')
+            .setTimestamp();
+
+        // Basic stats
+        embed.addFields({
+            name: '📊 Request Statistics',
+            value: [
+                `Total Requests: ${stats.total}`,
+                `Successful: ${stats.successful}`,
+                `Failed: ${stats.failed}`,
+                `Success Rate: ${stats.successRate}%`
+            ].join('\n'),
+            inline: true
+        });
+
+        if (stats.avgResponseTime > 0) {
+            embed.addFields({
+                name: '⏱️ Response Times (ms)',
+                value: [
+                    `Average: ${stats.avgResponseTime}ms`,
+                    `Minimum: ${stats.minResponseTime}ms`,
+                    `Maximum: ${stats.maxResponseTime}ms`
+                ].join('\n'),
+                inline: true
+            });
+        }
+
+        // Recent activity with enhanced details
+        if (stats.recentRequests && stats.recentRequests.length > 0) {
+            const recentActivity = stats.recentRequests.slice(-5).reverse().map(entry => {
+                const typeIcon = entry.type === 'meal' ? '🍽️' : entry.type === 'snack' ? '🍿' : '💪';
+                const status = entry.success ? '✅' : '❌';
+                const time = entry.success ? `${entry.responseTime}ms` : 'Failed';
+                
+                // Add trigger source icon
+                let triggerIcon = '';
+                switch (entry.triggerSource) {
+                    case 'user_request':
+                        triggerIcon = '👤';
+                        break;
+                    case 'scheduled':
+                        triggerIcon = '⏰';
+                        break;
+                    case 'auto_response':
+                        triggerIcon = '🤖';
+                        break;
+                    case 'fallback':
+                        triggerIcon = '📋';
+                        break;
+                    default:
+                        triggerIcon = '❓';
+                }
+                
+                return `${typeIcon} ${triggerIcon} ${entry.type} - ${status} ${time}`;
+            }).join('\n');
+
+            if (recentActivity) {
+                embed.addFields({
+                    name: '📝 Recent Activity (Last 5)',
+                    value: recentActivity + '\n\n👤 User Request | ⏰ Scheduled | 🤖 Auto Response | 📋 Fallback',
+                    inline: false
+                });
+            }
+        }
+
+        // Add breakdown by trigger source if data available
+        if (stats.triggerBreakdown && Object.keys(stats.triggerBreakdown).length > 0) {
+            const triggerStats = Object.entries(stats.triggerBreakdown)
+                .map(([source, data]) => {
+                    const icon = source === 'user_request' ? '👤' : 
+                               source === 'scheduled' ? '⏰' : 
+                               source === 'auto_response' ? '🤖' : 
+                               source === 'fallback' ? '📋' : '❓';
+                    const rate = data.total > 0 ? Math.round((data.successful / data.total) * 100) : 0;
+                    return `${icon} ${source}: ${data.successful}/${data.total} (${rate}%)`;
+                })
+                .join('\n');
+            
+            embed.addFields({
+                name: '📈 Breakdown by Trigger Source',
+                value: triggerStats,
+                inline: true
+            });
+        }
+
+        // Add breakdown by request type if data available
+        if (stats.typeBreakdown && Object.keys(stats.typeBreakdown).length > 0) {
+            const typeStats = Object.entries(stats.typeBreakdown)
+                .map(([type, data]) => {
+                    const icon = type === 'meal' ? '🍽️' : type === 'snack' ? '🍿' : type === 'workout' ? '💪' : '❓';
+                    const rate = data.total > 0 ? Math.round((data.successful / data.total) * 100) : 0;
+                    return `${icon} ${type}: ${data.successful}/${data.total} (${rate}%)`;
+                })
+                .join('\n');
+            
+            embed.addFields({
+                name: '📊 Breakdown by Request Type',
+                value: typeStats,
+                inline: true
+            });
+        }
+
+        // System info
+        embed.addFields({
+            name: '🔧 System Configuration',
+            value: [
+                `Channel: ${config.wellnessChannelId ? `<#${config.wellnessChannelId}>` : 'Not configured'}`,
+                `LocalAI URL: ${config.localAIUrl ? 'Configured' : 'Not configured'}`,
+                `Model: ${config.localAIModel || 'Not specified'}`
+            ].join('\n'),
+            inline: false
+        });
+
+        await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (error) {
+        console.error('[ADMIN] Error displaying admin stats:', error);
+        await interaction.reply({
+            content: 'Failed to retrieve admin statistics. Please try again.',
             ephemeral: true
         });
     }

@@ -1,7 +1,7 @@
-# AI Meal Plan & Workout System Setup Guide
+# Meal Plan & Workout System Setup Guide
 
 ## Overview
-The AI-powered meal plan and workout system automatically generates and posts meals, snacks, and workouts to a designated Discord channel based on a configurable schedule.
+The automated meal plan and workout system generates and posts meals, snacks, and workouts to a designated Discord channel based on a configurable schedule.
 
 ## Setup Instructions
 
@@ -24,7 +24,7 @@ You can modify these times in `config.json` under `mealPlanSchedule`.
 
 ### 3. Start the Bot
 Once configured, the system will automatically:
-- Generate AI-powered meal plans, snacks, and workouts
+- Generate smart meal plans, snacks, and workouts
 - Avoid repetition by tracking history
 - Post content as rich Discord embeds at scheduled times
 - Provide context-aware suggestions (time of day, progressive difficulty)
@@ -59,11 +59,14 @@ View the current posting schedule.
 - **Meals**: Budget-friendly, gaming-friendly, time-appropriate
 - **Snacks**: Quick, easy, healthy options for gaming sessions
 - **Workouts**: Progressive difficulty, context-aware (morning energy vs evening wind-down)
+- **Performance Tracking**: Response times displayed in admin console logs for monitoring
+- **Extended Timeout**: 10-minute timeout for requests ensures reliable generation
 
 ### History Tracking
 - Prevents repetition of recent suggestions
 - Tracks preparation times, calories, difficulty levels
 - Maintains context for progressive workout plans
+- Records response times for admin performance monitoring
 
 ### Scheduling
 - Fully configurable posting times in Eastern Time (America/New_York)
@@ -71,7 +74,7 @@ View the current posting schedule.
 - Can be enabled/disabled without losing schedule
 - Automatic restart after bot reboots
 
-## AI Integration
+## Content Generation
 The system uses your configured LocalAI instance with the "nutritionist" personality to generate contextually appropriate content in structured JSON format.
 
 ## Data Storage
@@ -82,11 +85,11 @@ The system uses your configured LocalAI instance with the "nutritionist" persona
 ## Troubleshooting
 
 ### System Not Starting
-- Check that `mealPlanChannelId` is set to a valid Discord channel ID
+- Check that `wellnessChannelId` is set to a valid Discord channel ID
 - Ensure the bot has permission to post in the configured channel
 - Check console logs for initialization errors
 
-### No AI Responses
+### No Responses
 - Verify LocalAI is running and accessible
 - Check that the "nutritionist" personality is available
 - Ensure LocalAI model is properly loaded

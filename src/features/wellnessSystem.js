@@ -26,18 +26,17 @@ class WellnessSystem {
         this.scheduledJobs = new Map();
         this.scheduleEnabled = true;
         this.responseTimeStats = {
-            recent: [], // Last 20 response times with timestamps, types, and trigger sources
+            recent: [], // Last 20 response times with timestamps and types
             totalRequests: 0,
             successfulRequests: 0,
             failedRequests: 0
         };
     }
 
-    async callLocalAI(messages, personality, channel = null, maxTokens = 500, timeoutMs = 30000, requestType = 'unknown', triggerSource = 'unknown') {
+    async callLocalAI(messages, personality, channel = null, maxTokens = 500, timeoutMs = 30000) {
         const startTime = Date.now();
         try {
             console.log(`[ADMIN] Making LocalAI call for personality: ${personality}`);
-            console.log(`[ADMIN] Request Type: ${requestType}, Trigger: ${triggerSource}`);
             
             const personalities = getPersonalities();
             const personalityPrompt = personalities[personality]?.systemPrompt || '';
@@ -97,7 +96,7 @@ class WellnessSystem {
             }
             
             console.log(`[ADMIN] Response content length: ${content.length}`);
-            return { content, responseTimeMs: responseTime, requestType, triggerSource };
+            return { content, responseTimeMs: responseTime };
         } catch (error) {
             const responseTime = Date.now() - startTime;
             if (error.name === 'AbortError') {
@@ -105,9 +104,6 @@ class WellnessSystem {
                 throw new Error('Request timed out');
             }
             console.error(`[ADMIN] ❌ Error calling service after ${responseTime}ms:`, error);
-            // Include request metadata in error for tracking
-            error.requestType = requestType;
-            error.triggerSource = triggerSource;
             throw error;
         }
     }
@@ -248,10 +244,10 @@ Response format (valid JSON only):
         return 'dinner';
     }
 
-    async generateContent(type, timeOfDay = null, requirements = null, triggerSource = 'user_request') {
+    async generateContent(type, timeOfDay = null, requirements = null) {
         const startTime = Date.now();
         try {
-            console.log(`[ADMIN] Generating ${type} content${requirements ? ` with requirements: ${requirements}` : ''} (Trigger: ${triggerSource})...`);
+            console.log(`[ADMIN] Generating ${type} content${requirements ? ` with requirements: ${requirements}` : ''}...`);
             const history = await this.loadHistory(type);
             const prompt = this.generatePrompt(type, history, timeOfDay, requirements);
             
@@ -273,7 +269,7 @@ Response format (valid JSON only):
             
             const response = await this.callLocalAI([
                 { role: 'user', content: prompt }
-            ], 'nutritionist', null, 500, timeoutMs, type, triggerSource);
+            ], 'nutritionist', null, 500, timeoutMs);
 
             if (!response || !response.content) {
                 throw new Error('No response from AI');
@@ -322,18 +318,16 @@ Response format (valid JSON only):
                 throw new Error('Invalid JSON response from service');
             }
 
-            // Add metadata including response time and tracking info
+            // Add metadata including response time
             contentData.generatedAt = new Date().toISOString();
             contentData.id = Date.now().toString();
             contentData.isAIGenerated = true; // Mark as AI-generated content
             contentData.responseTimeMs = response.responseTimeMs;
-            contentData.requestType = response.requestType;
-            contentData.triggerSource = response.triggerSource;
 
             // Record response time for admin tracking
-            this.recordResponseTime(type, response.responseTimeMs, true, triggerSource);
+            this.recordResponseTime(type, response.responseTimeMs, true);
 
-            console.log(`[ADMIN] ✅ Successfully generated ${type}: ${contentData.name} (Response time: ${response.responseTimeMs}ms / ${(response.responseTimeMs / 1000).toFixed(1)}s, Trigger: ${triggerSource})`);
+            console.log(`[ADMIN] ✅ Successfully generated ${type}: ${contentData.name} (Response time: ${response.responseTimeMs}ms / ${(response.responseTimeMs / 1000).toFixed(1)}s)`);
 
             // Save to history
             const key = type + 's';
@@ -350,17 +344,14 @@ Response format (valid JSON only):
             return contentData;
         } catch (error) {
             const responseTime = Date.now() - startTime;
-            const errorTriggerSource = error.triggerSource || triggerSource;
-            const errorRequestType = error.requestType || type;
+            this.recordResponseTime(type, responseTime, false);
+            console.error(`[ADMIN] ❌ Failed to generate ${type} after ${responseTime}ms:`, error);
             
-            this.recordResponseTime(type, responseTime, false, errorTriggerSource);
-            console.error(`[ADMIN] ❌ Failed to generate ${type} after ${responseTime}ms (Trigger: ${errorTriggerSource}):`, error);
+            // Record failed response time
+            this.recordResponseTime(type, responseTime, false);
             
-            // Return fallback content with tracking info
-            const fallbackContent = this.getFallbackContent(type);
-            fallbackContent.triggerSource = errorTriggerSource;
-            fallbackContent.requestType = errorRequestType;
-            return fallbackContent;
+            // Return fallback content
+            return this.getFallbackContent(type);
         }
     }
 
@@ -380,9 +371,7 @@ Response format (valid JSON only):
                 generatedAt: new Date().toISOString(),
                 id: Date.now().toString(),
                 isAIGenerated: false, // Mark as fallback content
-                responseTimeMs: 0, // No AI response time for fallback
-                requestType: 'meal',
-                triggerSource: 'fallback'
+                responseTimeMs: 0 // No AI response time for fallback
             },
             snack: {
                 name: "Energy Trail Mix",
@@ -396,9 +385,7 @@ Response format (valid JSON only):
                 generatedAt: new Date().toISOString(),
                 id: Date.now().toString(),
                 isAIGenerated: false, // Mark as fallback content
-                responseTimeMs: 0, // No AI response time for fallback
-                requestType: 'snack',
-                triggerSource: 'fallback'
+                responseTimeMs: 0 // No AI response time for fallback
             },
             workout: {
                 name: "Quick Desk Break Workout",
@@ -417,9 +404,7 @@ Response format (valid JSON only):
                 generatedAt: new Date().toISOString(),
                 id: Date.now().toString(),
                 isAIGenerated: false, // Mark as fallback content
-                responseTimeMs: 0, // No AI response time for fallback
-                requestType: 'workout',
-                triggerSource: 'fallback'
+                responseTimeMs: 0 // No AI response time for fallback
             }
         };
         
@@ -518,10 +503,7 @@ Response format (valid JSON only):
             footerText = `📋 • ${footerText}`;
         } else if (data.responseTimeMs) {
             const responseTimeSeconds = (data.responseTimeMs / 1000).toFixed(1);
-            // Add trigger source for admin logging purposes (not shown to regular users)
-            const triggerIndicator = data.triggerSource === 'scheduled' ? ' ⏰' : 
-                                   data.triggerSource === 'auto_response' ? ' 🤖' : '';
-            footerText = `AI Generated (${responseTimeSeconds}s)${triggerIndicator} • ${footerText}`;
+            footerText = `🤖 AI Generated (${responseTimeSeconds}s) • ${footerText}`;
         }
         embed.setFooter({ text: footerText });
         return embed;
@@ -569,7 +551,7 @@ Response format (valid JSON only):
                         if (!this.scheduleEnabled) return;
                         try {
                             const hour = parseInt(mealTime.split(':')[0]);
-                            const meal = await this.generateContent('meal', hour, null, 'scheduled');
+                            const meal = await this.generateContent('meal', hour);
                             await this.postToChannel('meal', channelId, meal);
                         } catch (error) {
                             console.error('Failed to generate/post meal:', error);
@@ -588,7 +570,7 @@ Response format (valid JSON only):
                     const job = cron.schedule(this.timeToCron(snackTime), async () => {
                         if (!this.scheduleEnabled) return;
                         try {
-                            const snack = await this.generateContent('snack', null, null, 'scheduled');
+                            const snack = await this.generateContent('snack');
                             await this.postToChannel('snack', channelId, snack);
                         } catch (error) {
                             console.error('Failed to generate/post snack:', error);
@@ -608,7 +590,7 @@ Response format (valid JSON only):
                         if (!this.scheduleEnabled) return;
                         try {
                             const hour = parseInt(workoutTime.split(':')[0]);
-                            const workout = await this.generateContent('workout', hour, null, 'scheduled');
+                            const workout = await this.generateContent('workout', hour);
                             await this.postToChannel('workout', channelId, workout);
                         } catch (error) {
                             console.error('Failed to generate/post workout:', error);
@@ -647,7 +629,7 @@ Response format (valid JSON only):
 
     async generateMeal(requirements = null) {
         const hour = new Date().getHours();
-        const data = await this.generateContent('meal', hour, requirements, 'user_request');
+        const data = await this.generateContent('meal', hour, requirements);
         return {
             data,
             embed: this.createEmbed('meal', data, requirements)
@@ -655,7 +637,7 @@ Response format (valid JSON only):
     }
 
     async generateSnack(requirements = null) {
-        const data = await this.generateContent('snack', null, requirements, 'user_request');
+        const data = await this.generateContent('snack', null, requirements);
         return {
             data,
             embed: this.createEmbed('snack', data, requirements)
@@ -664,7 +646,7 @@ Response format (valid JSON only):
 
     async generateWorkout(requirements = null) {
         const hour = new Date().getHours();
-        const data = await this.generateContent('workout', hour, requirements, 'user_request');
+        const data = await this.generateContent('workout', hour, requirements);
         return {
             data,
             embed: this.createEmbed('workout', data, requirements)
@@ -683,7 +665,7 @@ Response format (valid JSON only):
     }
 
     // Response time tracking methods
-    recordResponseTime(type, responseTimeMs, success = true, triggerSource = 'unknown') {
+    recordResponseTime(type, responseTimeMs, success = true) {
         this.responseTimeStats.totalRequests++;
         if (success) {
             this.responseTimeStats.successfulRequests++;
@@ -696,8 +678,7 @@ Response format (valid JSON only):
             type,
             responseTime: responseTimeMs,
             timestamp: new Date().toISOString(),
-            success,
-            triggerSource
+            success
         });
 
         // Keep only last 20 responses
@@ -722,36 +703,6 @@ Response format (valid JSON only):
             ? Math.max(...successful.map(r => r.responseTime))
             : 0;
 
-        // Calculate breakdown by trigger source
-        const triggerBreakdown = {};
-        recent.forEach(request => {
-            const source = request.triggerSource || 'unknown';
-            if (!triggerBreakdown[source]) {
-                triggerBreakdown[source] = { total: 0, successful: 0, failed: 0 };
-            }
-            triggerBreakdown[source].total++;
-            if (request.success) {
-                triggerBreakdown[source].successful++;
-            } else {
-                triggerBreakdown[source].failed++;
-            }
-        });
-
-        // Calculate breakdown by request type
-        const typeBreakdown = {};
-        recent.forEach(request => {
-            const type = request.type || 'unknown';
-            if (!typeBreakdown[type]) {
-                typeBreakdown[type] = { total: 0, successful: 0, failed: 0 };
-            }
-            typeBreakdown[type].total++;
-            if (request.success) {
-                typeBreakdown[type].successful++;
-            } else {
-                typeBreakdown[type].failed++;
-            }
-        });
-
         return {
             total: this.responseTimeStats.totalRequests,
             successful: this.responseTimeStats.successfulRequests,
@@ -762,54 +713,8 @@ Response format (valid JSON only):
             avgResponseTime,
             minResponseTime,
             maxResponseTime,
-            recentRequests: recent.slice(-10), // Last 10 requests
-            triggerBreakdown,
-            typeBreakdown
+            recentRequests: recent.slice(-10) // Last 10 requests
         };
-    }
-
-    // Method for when the bot decides to respond on its own (future functionality)
-    async generateAutoResponse(messages, personality = 'default', channel = null) {
-        const startTime = Date.now();
-        try {
-            console.log(`[ADMIN] Generating auto AI chat response for personality: ${personality}...`);
-            
-            const response = await this.callLocalAI(
-                messages, 
-                personality, 
-                channel, 
-                300, // Shorter response for chat
-                30000, // 30 second timeout for chat responses
-                'auto_chat_response', 
-                'auto_response'
-            );
-
-            if (!response || !response.content) {
-                throw new Error('No response from AI');
-            }
-
-            console.log(`[ADMIN] ✅ Successfully generated auto response (Response time: ${response.responseTimeMs}ms / ${(response.responseTimeMs / 1000).toFixed(1)}s)`);
-
-            // Record response time for admin tracking
-            this.recordResponseTime('auto_chat_response', response.responseTimeMs, true, 'auto_response');
-
-            return {
-                content: response.content,
-                responseTimeMs: response.responseTimeMs,
-                requestType: response.requestType,
-                triggerSource: response.triggerSource
-            };
-        } catch (error) {
-            const responseTime = Date.now() - startTime;
-            const errorTriggerSource = error.triggerSource || 'auto_response';
-            const errorRequestType = error.requestType || 'auto_chat_response';
-            
-            this.recordResponseTime('auto_chat_response', responseTime, false, errorTriggerSource);
-            console.error(`[ADMIN] ❌ Failed to generate auto response after ${responseTime}ms:`, error);
-            
-            // Return null for failed auto responses (bot shouldn't respond)
-            return null;
-        }
     }
 }
 

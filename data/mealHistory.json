@@ -32,7 +32,65 @@
       "generatedAt": "2025-07-03T18:48:10.826Z",
       "id": "1751568490826",
       "isAIGenerated": true
+    },
+    {
+      "name": "Berry Almond Overnight Oats",
+      "type": "breakfast",
+      "ingredients": [
+        "1/2 cup rolled oats",
+        "1/2 cup almond milk (or any milk of choice)",
+        "1/2 cup Greek yogurt",
+        "1 tablespoon chia seeds",
+        "1/2 teaspoon vanilla extract",
+        "1 tablespoon honey or maple syrup",
+        "1/2 cup mixed seasonal berries (e.g., strawberries, blueberries, raspberries)",
+        "1 tablespoon sliced almonds"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "350-400",
+      "description": "A refreshing and energizing start to your day with creamy oats, fresh berries, and crunchy almonds.",
+      "instructions": [
+        "In a jar or bowl, combine the rolled oats, almond milk, Greek yogurt, chia seeds, vanilla extract, and sweetener.",
+        "Stir well to mix, then cover and refrigerate overnight.",
+        "In the morning, give the oats a good stir. If too thick, add a splash of milk.",
+        "Top with fresh mixed berries and sliced almonds before serving."
+      ],
+      "nutritionNotes": "This meal provides a balance of protein, healthy fats, and fiber to keep you full and energized throughout the morning. Chia seeds and Greek yogurt add a protein boost, while berries offer antioxidants and vitamins.",
+      "generatedAt": "2025-07-04T11:01:57.909Z",
+      "id": "1751626917909",
+      "isAIGenerated": true
+    },
+    {
+      "name": "Spiced Lentil and Vegetable Soup",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup dried lentils",
+        "2 carrots, diced",
+        "1 onion, chopped",
+        "2 celery stalks, chopped",
+        "3 cloves garlic, minced",
+        "1 can diced tomatoes (14.5 oz)",
+        "4 cups vegetable broth",
+        "1 teaspoon ground cumin",
+        "1 teaspoon smoked paprika",
+        "Salt and pepper to taste",
+        "2 tablespoons olive oil",
+        "Fresh parsley for garnish"
+      ],
+      "prepTime": "20 minutes",
+      "calories": "300-350",
+      "description": "A hearty and comforting lentil and vegetable soup seasoned with warm spices, perfect for a satisfying lunch.",
+      "instructions": [
+        "Heat the olive oil in a large pot over medium heat. Add the onion, carrots, and celery, and sauté until softened, about 5 minutes.",
+        "Stir in the garlic, cumin, and smoked paprika, cooking for an additional minute until fragrant.",
+        "Add the lentils, diced tomatoes, and vegetable broth to the pot. Bring to a boil, then reduce heat to low, cover, and simmer for 20 minutes or until lentils are tender.",
+        "Season with salt and pepper to taste. Garnish with fresh parsley before serving."
+      ],
+      "nutritionNotes": "This meal is rich in plant-based protein from lentils, fiber from vegetables, and healthy fats from olive oil. It's balanced with carbohydrates and is perfect for sustaining energy levels throughout the day.",
+      "generatedAt": "2025-07-04T16:02:14.494Z",
+      "id": "1751644934494",
+      "isAIGenerated": true
     }
   ],
-  "lastGenerated": "2025-07-03T18:48:10.826Z"
+  "lastGenerated": "2025-07-04T16:02:14.494Z"
 }

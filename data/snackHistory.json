@@ -49,7 +49,51 @@
       "generatedAt": "2025-07-03T20:01:39.781Z",
       "id": "1751572899781",
       "isAIGenerated": true
+    },
+    {
+      "name": "Greek Yogurt and Berry Parfait",
+      "type": "snack",
+      "ingredients": [
+        "Greek yogurt",
+        "mixed berries (e.g., strawberries, blueberries, raspberries)",
+        "chia seeds"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "180",
+      "description": "A refreshing and nutritious snack combining creamy Greek yogurt, antioxidant-rich berries, and fiber-packed chia seeds.",
+      "instructions": [
+        "In a small container or jar, layer a scoop of Greek yogurt.",
+        "Add a handful of mixed berries and sprinkle some chia seeds.",
+        "Repeat the layers as desired, finishing with berries and chia seeds on top."
+      ],
+      "benefits": "This snack is packed with protein from the Greek yogurt, providing sustained energy. The berries offer antioxidants and vitamins, while chia seeds contribute fiber and omega-3 fatty acids, supporting digestion and heart health. It's easy to prepare, portable, and perfect for busy schedules.",
+      "generatedAt": "2025-07-04T13:31:28.603Z",
+      "id": "1751635888603",
+      "isAIGenerated": true
+    },
+    {
+      "name": "Almond Butter Banana Roll-Ups",
+      "type": "snack",
+      "ingredients": [
+        "Whole grain tortilla",
+        "Almond butter",
+        "Banana"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "A quick, portable snack featuring a whole grain tortilla spread with almond butter and rolled with banana slices.",
+      "instructions": [
+        "Lay a whole grain tortilla flat on a clean surface.",
+        "Spread a thin layer of almond butter evenly across the tortilla.",
+        "Slice a banana into thin rounds and place them along the edge of the tortilla.",
+        "Carefully roll the tortilla from the edge with the banana slices, forming a tight roll.",
+        "Slice the roll into bite-sized pieces for easy eating on the go."
+      ],
+      "benefits": "This snack combines complex carbohydrates from the whole grain tortilla, healthy fats from the almond butter, and natural sugars and fiber from the banana. This combination helps maintain energy levels, supports satiety, and provides essential nutrients, making it ideal for busy schedules.",
+      "generatedAt": "2025-07-04T19:01:36.940Z",
+      "id": "1751655696940",
+      "isAIGenerated": true
     }
   ],
-  "lastGenerated": "2025-07-03T20:01:39.781Z"
+  "lastGenerated": "2025-07-04T19:01:36.940Z"
 }

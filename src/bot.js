@@ -5,7 +5,7 @@ const { registerCommands } = require('./utils/commandRegister');
 const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
 const localaiRelay = require('./ai/localaiRelay');
-const AIMealPlan = require('./features/aiMealPlan');
+const WellnessSystem = require('./features/wellnessSystem');
 const config = require('../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
@@ -25,7 +25,7 @@ class VoiceTimeTracker {
         this.timeTracker = new TimeTracker(this.client, this.db);
         this.statusUpdateInterval = 5 * 60 * 1000; // Default to 5 minutes
         this.config = config;
-        this.aiMealPlan = null; // Will be initialized after client is ready
+        this.wellnessSystem = null; // Will be initialized after client is ready
     }
 
     async login(token) {
@@ -53,17 +53,17 @@ class VoiceTimeTracker {
 
             this.timeTracker.startPeriodicUpdates();
 
-            // Initialize AI Meal Plan system
-            if (this.config.mealPlanChannelId && this.config.mealPlanChannelId !== "CHANNEL_ID_HERE") {
+            // Initialize Wellness system
+            if (this.config.wellnessChannelId && this.config.wellnessChannelId !== "CHANNEL_ID_HERE") {
                 try {
-                    this.aiMealPlan = new AIMealPlan(this.client, this.config);
-                    await this.aiMealPlan.initialize();
-                    console.log('AI Meal Plan system initialized successfully');
+                    this.wellnessSystem = new WellnessSystem(this.client, this.config);
+                    await this.wellnessSystem.initialize();
+                    console.log('[ADMIN] Wellness system initialized successfully');
                 } catch (error) {
-                    console.error('Failed to initialize AI Meal Plan system:', error);
+                    console.error('[ADMIN] Failed to initialize Wellness system:', error);
                 }
             } else {
-                console.log('AI Meal Plan system not initialized - channel ID not configured in config.json');
+                console.log('[ADMIN] Wellness system not initialized - channel ID not configured in config.json');
             }
 
             console.log(`Logged in as ${this.client.user.tag}!`);
