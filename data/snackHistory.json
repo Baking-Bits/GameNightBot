@@ -269,7 +269,34 @@
       "id": "1751981491330",
       "isAIGenerated": true,
       "responseTimeMs": 91085
+    },
+    {
+      "name": "Protein-Packed Edamame Salad",
+      "type": "snack",
+      "ingredients": [
+        "shelled edamame",
+        "feta cheese",
+        "lemon juice",
+        "olive oil",
+        "salt",
+        "pepper",
+        "parsley"
+      ],
+      "prepTime": "8 minutes",
+      "calories": "150",
+      "description": "A refreshing and savory snack combining edamame with feta for a protein-rich bite.",
+      "instructions": [
+        "Combine shelled edamame and crumbled feta cheese in a bowl.",
+        "In a small bowl, whisk together lemon juice, olive oil, salt, and pepper.",
+        "Pour the dressing over the edamame and feta, toss to coat.",
+        "Garnish with freshly chopped parsley."
+      ],
+      "benefits": "Edamame provides plant-based protein and fiber, which help in maintaining energy levels. Feta adds a savory flavor and additional protein, while the lemon and olive oil dressing offers healthy fats and a refreshing taste. This snack is easy to prepare, portable, and ideal for a quick energy boost during busy days.",
+      "generatedAt": "2025-07-08T19:01:42.985Z",
+      "id": "1752001302985",
+      "isAIGenerated": true,
+      "responseTimeMs": 102321
     }
   ],
-  "lastGenerated": "2025-07-08T13:31:31.330Z"
+  "lastGenerated": "2025-07-08T19:01:42.985Z"
 }
