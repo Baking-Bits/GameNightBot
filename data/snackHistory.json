@@ -93,7 +93,183 @@
       "generatedAt": "2025-07-04T19:01:36.940Z",
       "id": "1751655696940",
       "isAIGenerated": true
+    },
+    {
+      "name": "Chia Seed Energy Balls",
+      "type": "snack",
+      "ingredients": [
+        "1/2 cup rolled oats",
+        "1/4 cup chia seeds",
+        "1/4 cup nut butter (almond or peanut)",
+        "1/4 cup honey or maple syrup",
+        "1/2 cup dried fruit (like cranberries or raisins)",
+        "1/2 teaspoon vanilla extract"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per ball",
+      "description": "These no-bake energy balls are packed with fiber, healthy fats, and natural sweetness, making them perfect for a quick and satisfying snack.",
+      "instructions": [
+        "In a large bowl, combine rolled oats, chia seeds, nut butter, honey or maple syrup, dried fruit, and vanilla extract.",
+        "Mix until all ingredients are well incorporated. If the mixture is too dry, add a little more nut butter or honey.",
+        "Roll the mixture into small balls, about 1 inch in diameter.",
+        "Place the balls on a parchment-lined tray and refrigerate for at least 30 minutes to firm up."
+      ],
+      "benefits": "Chia seeds are high in omega-3 fatty acids and fiber, providing sustained energy and keeping you full. The combination of oats and nut butter offers complex carbohydrates and protein for balanced nutrition. These energy balls are easy to prepare, portable, and can be made in advance.",
+      "generatedAt": "2025-07-05T13:31:59.903Z",
+      "id": "1751722319903",
+      "isAIGenerated": true,
+      "responseTimeMs": 119717
+    },
+    {
+      "name": "Cottage Cheese and Pineapple Cups",
+      "type": "snack",
+      "ingredients": [
+        "cottage cheese",
+        "pineapple chunks"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A refreshing and protein-rich snack perfect for keeping energy levels steady throughout the day.",
+      "instructions": [
+        "Scoop 1/2 cup of cottage cheese into a portable container or cup.",
+        "Top with 1/4 cup of fresh or canned pineapple chunks."
+      ],
+      "benefits": "Cottage cheese provides high-quality protein and casein, which releases energy slowly, helping to keep hunger at bay. Pineapple offers natural sweetness, vitamins, and enzymes that aid digestion. This snack is easy to prepare, portable, and perfect for maintaining energy during busy days.",
+      "generatedAt": "2025-07-05T19:01:17.851Z",
+      "id": "1751742077851",
+      "isAIGenerated": true,
+      "responseTimeMs": 77664
+    },
+    {
+      "name": "Nutty Oatmeal Energy Bites",
+      "type": "snack",
+      "ingredients": [
+        "rolled oats",
+        "honey",
+        "peanut butter or almond butter",
+        "chopped walnuts",
+        "dried cranberries or raisins"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per bite",
+      "description": "These nutty oatmeal energy bites are a perfect on-the-go snack that combines wholesome oats, nut butter, and a mix of nuts and dried fruits for a burst of energy.",
+      "instructions": [
+        "In a mixing bowl, combine 1 cup of rolled oats, 2 tablespoons of honey, 2 tablespoons of peanut butter or almond butter, 1/2 cup of chopped walnuts, and 1/2 cup of dried cranberries or raisins.",
+        "Mix well until all ingredients are fully incorporated.",
+        "Using a small scoop or spoon, form the mixture into bite-sized balls.",
+        "Place the energy bites on a baking sheet lined with parchment paper.",
+        "Refrigerate for 30 minutes to firm up before storing in an airtight container."
+      ],
+      "benefits": "These energy bites are rich in fiber from oats, healthy fats from nuts, and natural sugars from honey and dried fruits, providing a balanced source of energy. They're also easy to prepare and portable, making them ideal for busy schedules.",
+      "generatedAt": "2025-07-06T13:31:58.640Z",
+      "id": "1751808718640",
+      "isAIGenerated": true,
+      "responseTimeMs": 117730
+    },
+    {
+      "name": "Quinoa Crunch Mix",
+      "type": "snack",
+      "ingredients": [
+        "quinoa",
+        "sunflower seeds",
+        "raisins",
+        "honey",
+        "cinnamon"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per serving",
+      "description": "A delightful and crunchy snack mix combining the nutty flavor of quinoa with the sweetness of raisins and a hint of cinnamon.",
+      "instructions": [
+        "Rinse 1 cup of quinoa under cold water and drain.",
+        "In a small saucepan, combine the quinoa with 2 cups of water. Bring to a boil, then reduce heat and simmer for 15 minutes, or until quinoa is cooked and water is absorbed. Let it cool slightly.",
+        "In a bowl, mix 1 tablespoon of honey with 1 teaspoon of cinnamon.",
+        "Combine the cooked quinoa with 1/2 cup of sunflower seeds and 1/4 cup of raisins in a large bowl.",
+        "Drizzle the honey-cinnamon mixture over the quinoa mix and toss to coat evenly.",
+        "Spread the mixture on a baking sheet and bake in a preheated oven at 350°F (175°C) for about 10 minutes, stirring halfway through until golden and crispy. Let it cool before serving."
+      ],
+      "benefits": "This snack is a great source of protein and fiber from quinoa and sunflower seeds, which help sustain energy levels throughout the day. The natural sugars from raisins provide a quick energy boost, while the honey and cinnamon add flavor without excessive sugar. It's portable, easy to prepare in advance, and perfect for on-the-go snacking.",
+      "generatedAt": "2025-07-06T19:02:19.996Z",
+      "id": "1751828539996",
+      "isAIGenerated": true,
+      "responseTimeMs": 139198
+    },
+    {
+      "name": "Avocado Toast Cups",
+      "type": "snack",
+      "ingredients": [
+        "whole grain tortilla wraps",
+        "ripe avocado",
+        "hard-boiled eggs",
+        "cherry tomatoes",
+        "salt",
+        "pepper"
+      ],
+      "prepTime": "8 minutes",
+      "calories": "150",
+      "description": "A portable and nutritious snack featuring creamy avocado and protein-rich eggs in tortilla cups.",
+      "instructions": [
+        "Cut the tortilla wraps into quarters to form cups.",
+        "Mash the ripe avocado and season with salt and pepper.",
+        "Scoop the avocado mixture into the tortilla cups.",
+        "Slice the hard-boiled eggs and cherry tomatoes into small pieces.",
+        "Top the avocado with egg and tomato pieces.",
+        "Serve immediately or pack for later."
+      ],
+      "benefits": "This snack is packed with healthy fats from avocado, protein from eggs, and fiber from whole grain tortillas, providing sustained energy and keeping you full longer. It's quick to prepare and perfect for on-the-go eating.",
+      "generatedAt": "2025-07-07T13:31:33.928Z",
+      "id": "1751895093928",
+      "isAIGenerated": true,
+      "responseTimeMs": 93007
+    },
+    {
+      "name": "Caprese Skewers",
+      "type": "snack",
+      "ingredients": [
+        "cherry tomatoes",
+        "fresh mozzarella balls",
+        "basil leaves",
+        "olive oil",
+        "balsamic glaze"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A refreshing and savory snack featuring cherry tomatoes, mozzarella, and basil drizzled with olive oil and balsamic glaze.",
+      "instructions": [
+        "Wash and pat dry cherry tomatoes.",
+        "Skewer a cherry tomato, a basil leaf, and a mozzarella ball onto a small skewer stick.",
+        "Drizzle with a small amount of olive oil and balsamic glaze.",
+        "Repeat until all ingredients are used."
+      ],
+      "benefits": "Caprese Skewers provide a balanced mix of protein from the mozzarella, healthy fats from the olive oil, and carbohydrates from the tomatoes. This combination helps sustain energy levels and is easy to prepare and consume on the go. The fresh ingredients also make it a hydrating and satisfying snack.",
+      "generatedAt": "2025-07-07T19:01:38.010Z",
+      "id": "1751914898010",
+      "isAIGenerated": true,
+      "responseTimeMs": 97379
+    },
+    {
+      "name": "Cucumber and Turkey Roll-Ups",
+      "type": "snack",
+      "ingredients": [
+        "sliced cucumber",
+        "sliced turkey breast",
+        "cream cheese",
+        "optional: fresh dill or chives"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150 per serving",
+      "description": "A refreshing and satisfying snack that combines the crispness of cucumber with the protein-rich turkey, enhanced with a creamy spread.",
+      "instructions": [
+        "Spread a thin layer of cream cheese over each slice of turkey.",
+        "Place a cucumber slice on one end of the turkey slice.",
+        "Roll the turkey slice around the cucumber.",
+        "Secure with a toothpick if desired, and garnish with dill or chives if using."
+      ],
+      "benefits": "This snack is high in protein and healthy fats from the turkey and cream cheese, which help sustain energy levels. The cucumber adds hydration and essential vitamins, making it a balanced and satisfying option for busy schedules.",
+      "generatedAt": "2025-07-08T13:31:31.330Z",
+      "id": "1751981491330",
+      "isAIGenerated": true,
+      "responseTimeMs": 91085
     }
   ],
-  "lastGenerated": "2025-07-04T19:01:36.940Z"
+  "lastGenerated": "2025-07-08T13:31:31.330Z"
 }

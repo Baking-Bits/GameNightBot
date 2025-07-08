@@ -90,7 +90,380 @@
       "generatedAt": "2025-07-04T16:02:14.494Z",
       "id": "1751644934494",
       "isAIGenerated": true
+    },
+    {
+      "name": "Roasted Vegetable Quinoa Bowl",
+      "type": "dinner",
+      "ingredients": [
+        "1 cup quinoa",
+        "2 cups water or vegetable broth",
+        "1 red bell pepper, chopped",
+        "1 zucchini, sliced",
+        "1 yellow squash, sliced",
+        "1 cup cherry tomatoes, halved",
+        "1/4 cup olive oil",
+        "2 tablespoons balsamic vinegar",
+        "1 teaspoon dried oregano",
+        "Salt and pepper to taste",
+        "1 can chickpeas, drained and rinsed",
+        "1 avocado, sliced",
+        "Fresh parsley for garnish"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "400-500",
+      "description": "A vibrant and satisfying roasted vegetable quinoa bowl, perfect for a nutritious and hearty dinner.",
+      "instructions": [
+        "Preheat your oven to 400°F (200°C).",
+        "In a medium saucepan, bring quinoa and water or broth to a boil. Reduce heat to low, cover, and simmer for 15 minutes until water is absorbed. Fluff with a fork and set aside.",
+        "Toss chopped vegetables and chickpeas with olive oil, balsamic vinegar, oregano, salt, and pepper. Spread on a baking sheet and roast for 20 minutes, stirring halfway through.",
+        "In a serving bowl, combine roasted vegetables and chickpeas with cooked quinoa. Top with sliced avocado and garnish with fresh parsley.",
+        "Serve warm."
+      ],
+      "nutritionNotes": "This meal is packed with protein from quinoa and chickpeas, healthy fats from avocado and olive oil, and a variety of vitamins and minerals from the seasonal vegetables. It's a balanced and satisfying option for an active lifestyle, providing energy and nutrients.",
+      "generatedAt": "2025-07-04T23:02:29.889Z",
+      "id": "1751670149890",
+      "isAIGenerated": true,
+      "responseTimeMs": 149162
+    },
+    {
+      "name": "Apple Cinnamon Yogurt Parfait",
+      "type": "breakfast",
+      "ingredients": [
+        "1 cup plain Greek yogurt",
+        "1 apple, diced",
+        "1 tablespoon chia seeds",
+        "1 tablespoon honey",
+        "1/2 teaspoon cinnamon",
+        "1/4 cup granola"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "300-350",
+      "description": "A delightful and refreshing parfait layered with creamy Greek yogurt, sweet apple pieces, crunchy granola, and a hint of cinnamon.",
+      "instructions": [
+        "In a small bowl, mix the diced apple with cinnamon and honey, and let sit for 5 minutes to marinate.",
+        "In a glass or jar, layer half of the Greek yogurt at the bottom.",
+        "Add a layer of the apple mixture, followed by a sprinkle of chia seeds and half of the granola.",
+        "Repeat the layering with the remaining Greek yogurt, apple mixture, chia seeds, and granola.",
+        "Garnish with a sprinkle of cinnamon on top, and serve immediately."
+      ],
+      "nutritionNotes": "This parfait provides a great balance of protein from Greek yogurt, fiber from apple and chia seeds, and a bit of healthy fat from the chia seeds and granola. It's an energizing start to the day, perfect for active lifestyles.",
+      "generatedAt": "2025-07-05T11:01:59.452Z",
+      "id": "1751713319452",
+      "isAIGenerated": true,
+      "responseTimeMs": 119203
+    },
+    {
+      "name": "Turkey and Avocado Lettuce Wraps",
+      "type": "lunch",
+      "ingredients": [
+        "sliced turkey breast",
+        "avocado",
+        "romaine lettuce leaves",
+        "red bell pepper",
+        "red onion",
+        "lime juice",
+        "cumin",
+        "salt",
+        "pepper"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "250-300",
+      "description": "A fresh and satisfying lunch option with a burst of flavors, perfect for a quick midday meal.",
+      "instructions": [
+        "Slice the red bell pepper and red onion into thin strips.",
+        "In a bowl, mash the avocado and mix in lime juice, cumin, salt, and pepper.",
+        "Lay out the romaine lettuce leaves and spoon a small amount of the mashed avocado onto each leaf.",
+        "Add slices of turkey breast, red bell pepper, and red onion on top of the avocado.",
+        "Roll up the lettuce leaves to create wraps and secure with a toothpick if needed."
+      ],
+      "nutritionNotes": "This meal is rich in protein from the turkey, healthy fats from the avocado, and fiber from the vegetables, making it a balanced option for active lifestyles.",
+      "generatedAt": "2025-07-05T16:02:11.956Z",
+      "id": "1751731331956",
+      "isAIGenerated": true,
+      "responseTimeMs": 131062
+    },
+    {
+      "name": "Herb-Infused Baked Cod with Sweet Potato Mash and Steamed Broccoli",
+      "type": "dinner",
+      "ingredients": [
+        "cod fillets",
+        "garlic cloves",
+        "lemon slices",
+        "fresh dill",
+        "olive oil",
+        "sweet potatoes",
+        "unsweetened almond milk",
+        "fresh broccoli florets",
+        "salt",
+        "black pepper"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "350-450",
+      "description": "A light yet satisfying dinner featuring flaky cod baked with aromatic herbs and served alongside a creamy sweet potato mash and nutrient-rich steamed broccoli.",
+      "instructions": [
+        "Preheat your oven to 400°F (200°C).",
+        "Season the cod fillets with salt, pepper, minced garlic, lemon slices, and fresh dill. Drizzle with a little olive oil.",
+        "Place the cod on a baking sheet and bake for 15-20 minutes, or until the fish flakes easily with a fork.",
+        "While the cod is baking, peel and chop the sweet potatoes into cubes. Boil them until tender, about 15 minutes.",
+        "Mash the sweet potatoes with unsweetened almond milk and a pinch of salt until creamy.",
+        "Steam the broccoli florets until tender-crisp, about 5 minutes.",
+        "Serve the baked cod with a side of sweet potato mash and steamed broccoli."
+      ],
+      "nutritionNotes": "This meal provides a good balance of lean protein from the cod, complex carbohydrates from the sweet potatoes, and fiber and vitamins from the broccoli. The use of fresh herbs and lemon enhances flavor without adding extra calories, supporting a heart-healthy diet.",
+      "generatedAt": "2025-07-05T23:02:25.416Z",
+      "id": "1751756545416",
+      "isAIGenerated": true,
+      "responseTimeMs": 144687
+    },
+    {
+      "name": "Sweet Potato and Spinach Breakfast Hash",
+      "type": "breakfast",
+      "ingredients": [
+        "1 medium sweet potato, diced",
+        "1 cup fresh spinach",
+        "2 eggs",
+        "1 tablespoon olive oil",
+        "1/4 teaspoon paprika",
+        "Salt and pepper to taste",
+        "Optional: 1/4 cup diced bell pepper",
+        "Optional: 1/4 cup diced onion"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "250-300",
+      "description": "A hearty yet light breakfast hash featuring sweet potatoes and fresh spinach, seasoned to perfection for a savory start to your day.",
+      "instructions": [
+        "Preheat a non-stick skillet over medium heat and add olive oil.",
+        "Add sweet potato (and optional bell pepper and onion) to the skillet. Cook for about 5-7 minutes, stirring occasionally, until the sweet potato starts to soften.",
+        "Sprinkle with paprika, salt, and pepper. Continue to cook for another 3-4 minutes until the sweet potato is golden brown.",
+        "Stir in the spinach and cook until wilted, about 1-2 minutes.",
+        "Make two wells in the hash and crack an egg into each well. Cover the skillet with a lid and cook until the eggs are set to your liking.",
+        "Serve hot with a sprinkle of additional salt and pepper if desired."
+      ],
+      "nutritionNotes": "This meal offers a balanced combination of complex carbohydrates, protein, and healthy fats. Sweet potatoes provide fiber and beta-carotene, while eggs offer high-quality protein and essential vitamins. Spinach adds a boost of iron and vitamins A, C, and K.",
+      "generatedAt": "2025-07-06T11:02:30.358Z",
+      "id": "1751799750358",
+      "isAIGenerated": true,
+      "responseTimeMs": 150000
+    },
+    {
+      "name": "Grilled Chicken and Avocado Quinoa Salad",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup quinoa",
+        "2 boneless, skinless chicken breasts",
+        "1 ripe avocado, diced",
+        "1 cup cherry tomatoes, halved",
+        "1/2 cup cucumber, diced",
+        "1/4 cup red onion, thinly sliced",
+        "1 cup fresh spinach",
+        "2 tablespoons olive oil",
+        "1 tablespoon lemon juice",
+        "1 tablespoon balsamic vinegar",
+        "Salt and pepper to taste",
+        "1 tablespoon fresh parsley, chopped"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "400-450",
+      "description": "A refreshing and hearty salad featuring grilled chicken, creamy avocado, and nutrient-rich quinoa, perfect for an active lifestyle.",
+      "instructions": [
+        "Rinse quinoa under cold water. Cook according to package instructions and let it cool.",
+        "Season chicken breasts with salt, pepper, and a drizzle of olive oil. Grill until fully cooked and slice into strips.",
+        "In a large bowl, combine quinoa, grilled chicken, avocado, cherry tomatoes, cucumber, red onion, and spinach.",
+        "In a small bowl, whisk together olive oil, lemon juice, balsamic vinegar, salt, and pepper. Drizzle over salad and toss to combine.",
+        "Garnish with chopped parsley before serving."
+      ],
+      "nutritionNotes": "This meal offers a balanced mix of protein, healthy fats, and complex carbohydrates. Quinoa provides fiber and plant-based protein, while chicken offers lean protein to support muscle recovery. Avocado adds heart-healthy fats, and spinach delivers essential vitamins and minerals.",
+      "generatedAt": "2025-07-06T16:02:24.210Z",
+      "id": "1751817744210",
+      "isAIGenerated": true,
+      "responseTimeMs": 143581
+    },
+    {
+      "name": "Cilantro Lime Shrimp Tacos with Mango Salsa",
+      "type": "dinner",
+      "ingredients": [
+        "1 lb shrimp, peeled and deveined",
+        "1 tablespoon olive oil",
+        "1 teaspoon ground cumin",
+        "1 teaspoon chili powder",
+        "1 lime, juiced",
+        "1/4 cup fresh cilantro, chopped",
+        "1 avocado, sliced",
+        "8 small corn or flour tortillas",
+        "1 cup diced mango",
+        "1/2 cup diced red bell pepper",
+        "1/4 cup chopped red onion",
+        "1 jalapeño, minced (optional)",
+        "salt and pepper to taste"
+      ],
+      "prepTime": "25 minutes",
+      "calories": "350-400",
+      "description": "A vibrant and refreshing dinner option featuring succulent shrimp seasoned with lime and spices, served in warm tortillas with a sweet and zesty mango salsa.",
+      "instructions": [
+        "In a bowl, toss shrimp with olive oil, cumin, chili powder, lime juice, and half of the cilantro. Season with salt and pepper.",
+        "Heat a skillet over medium-high heat. Add shrimp and cook for 2-3 minutes on each side until pink and cooked through. Remove from heat and toss with remaining cilantro.",
+        "In a separate bowl, combine mango, bell pepper, red onion, jalapeño (if using), and a squeeze of lime juice. Season with salt and pepper to taste.",
+        "Warm tortillas in a dry skillet or microwave. Assemble tacos with shrimp, avocado slices, and mango salsa. Serve immediately."
+      ],
+      "nutritionNotes": "This meal offers a good balance of protein from shrimp, healthy fats from avocado, and fiber from vegetables. The mango salsa adds a sweet and tangy flavor, making it a satisfying yet light dinner option perfect for active lifestyles. Seasonal ingredients like mango and bell peppers bring vibrant flavors and nutrients.",
+      "generatedAt": "2025-07-06T23:02:39.848Z",
+      "id": "1751842959848",
+      "isAIGenerated": true,
+      "responseTimeMs": 159641
+    },
+    {
+      "name": "Pumpkin Seed and Banana Smoothie",
+      "type": "breakfast",
+      "ingredients": [
+        "1 ripe banana",
+        "1 cup spinach",
+        "1 tablespoon pumpkin seeds",
+        "1 tablespoon chia seeds",
+        "1 cup unsweetened almond milk",
+        "1/2 teaspoon vanilla extract",
+        "1 tablespoon honey or maple syrup (optional)"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250-300",
+      "description": "A creamy, nutrient-packed smoothie featuring ripe bananas and spinach, with a delightful crunch from pumpkin and chia seeds. Perfect for a quick and energizing start to your day!",
+      "instructions": [
+        "Peel the banana and place it in a blender.",
+        "Add the spinach, pumpkin seeds, chia seeds, almond milk, vanilla extract, and optional sweetener.",
+        "Blend until smooth and creamy, adjusting the thickness with more almond milk if desired.",
+        "Pour into a glass and enjoy immediately for the best taste and nutrient retention."
+      ],
+      "nutritionNotes": "This smoothie is rich in protein, fiber, and healthy fats, thanks to the seeds. It also provides a good dose of vitamins and minerals, including vitamin C from the spinach and potassium from the banana, making it ideal for maintaining energy throughout the morning.",
+      "generatedAt": "2025-07-07T11:02:13.563Z",
+      "id": "1751886133563",
+      "isAIGenerated": true,
+      "responseTimeMs": 133357
+    },
+    {
+      "name": "Mason Jar Chicken and Farro Salad",
+      "type": "lunch",
+      "ingredients": [
+        "Cooked chicken breast (or canned for convenience)",
+        "Cooked farro",
+        "Cucumber",
+        "Cherry tomatoes",
+        "Red onion",
+        "Kalamata olives",
+        "Feta cheese",
+        "Olive oil",
+        "Lemon juice",
+        "Dried oregano",
+        "Salt and pepper"
+      ],
+      "prepTime": "20 minutes",
+      "calories": "450-550",
+      "description": "A refreshing and satisfying chicken and farro salad packed with protein and fiber, layered in a mason jar for easy transport.",
+      "instructions": [
+        "In a mason jar, start with the dressing: combine 2 tablespoons olive oil, 1 tablespoon lemon juice, 1 teaspoon dried oregano, salt, and pepper. Shake well.",
+        "Add the red onion slices to the jar, followed by the cucumber slices, cherry tomatoes, and Kalamata olives.",
+        "Add the cooked farro and then the cooked chicken breast, sliced.",
+        "Top with crumbled feta cheese. Seal the jar and refrigerate until ready to eat. Shake well before serving."
+      ],
+      "nutritionNotes": "This meal provides a good balance of protein from chicken, complex carbohydrates from farro, and healthy fats from olive oil. It's rich in fiber and antioxidants from the vegetables, making it ideal for sustaining energy throughout the day.",
+      "generatedAt": "2025-07-07T16:02:14.205Z",
+      "id": "1751904134205",
+      "isAIGenerated": true,
+      "responseTimeMs": 133461
+    },
+    {
+      "name": "Stuffed Bell Peppers with Brown Rice and Black Beans",
+      "type": "dinner",
+      "ingredients": [
+        "4 large bell peppers (red or yellow)",
+        "1 cup brown rice, cooked",
+        "1 can (15 oz) black beans, drained and rinsed",
+        "1 cup corn kernels (fresh, frozen, or canned)",
+        "1 small onion, diced",
+        "2 cloves garlic, minced",
+        "1 tsp chili powder",
+        "1 tsp cumin",
+        "1 tbsp olive oil",
+        "1 cup shredded low-fat cheddar cheese",
+        "Salt and pepper to taste",
+        "Fresh cilantro for garnish (optional)"
+      ],
+      "prepTime": "45 minutes",
+      "calories": "400-450 per serving",
+      "description": "A flavorful and hearty dinner of bell peppers stuffed with a savory mix of brown rice, black beans, corn, and spices, topped with melted cheese.",
+      "instructions": [
+        "Preheat your oven to 375°F (190°C).",
+        "Cut the tops off the bell peppers and remove the seeds and membranes. Set aside.",
+        "In a large skillet, heat olive oil over medium heat. Add onion and garlic, sautéing until translucent.",
+        "Stir in the cooked brown rice, black beans, corn, chili powder, cumin, salt, and pepper. Cook for 5 minutes, allowing the flavors to meld.",
+        "Fill each bell pepper with the rice and bean mixture. Place them in a baking dish.",
+        "Sprinkle shredded cheese on top of each stuffed pepper.",
+        "Cover the dish with aluminum foil and bake for 25 minutes. Remove the foil and bake for another 10 minutes, or until the peppers are tender and the cheese is bubbly.",
+        "Garnish with fresh cilantro before serving, if desired."
+      ],
+      "nutritionNotes": "This meal is rich in fiber from the brown rice and black beans, providing sustained energy. It offers a good balance of protein, carbohydrates, and healthy fats, making it suitable for active lifestyles. Using seasonal bell peppers ensures a boost of vitamins A and C.",
+      "generatedAt": "2025-07-07T23:02:55.938Z",
+      "id": "1751929375938",
+      "isAIGenerated": true,
+      "responseTimeMs": 175337
+    },
+    {
+      "name": "Banana Peanut Butter Chia Seed Toast",
+      "type": "breakfast",
+      "ingredients": [
+        "Whole grain bread (2 slices)",
+        "Peanut butter (2 tablespoons)",
+        "Ripe banana (1, sliced)",
+        "Chia seeds (1 tablespoon)",
+        "Honey (optional, 1 teaspoon)",
+        "Cinnamon (optional, a pinch)"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "350-400",
+      "description": "A quick and energizing start to your day with a delightful blend of creamy peanut butter, sweet banana slices, and a sprinkle of chia seeds for a satisfying crunch.",
+      "instructions": [
+        "Toast the whole grain bread slices to your desired level of crispiness.",
+        "Spread peanut butter evenly on each slice of toast.",
+        "Layer banana slices on top of the peanut butter.",
+        "Sprinkle chia seeds over the bananas and, if desired, drizzle with honey and a pinch of cinnamon for added sweetness."
+      ],
+      "nutritionNotes": "This meal provides a balanced mix of carbohydrates, protein, and healthy fats. The chia seeds offer fiber and omega-3 fatty acids, supporting sustained energy and digestive health. Whole grain bread contributes complex carbs for lasting energy, while bananas provide natural sugars and potassium, essential for muscle function.",
+      "generatedAt": "2025-07-08T11:02:06.566Z",
+      "id": "1751972526566",
+      "isAIGenerated": true,
+      "responseTimeMs": 125721
+    },
+    {
+      "name": "Mushroom and White Bean Stuffed Pita Pockets",
+      "type": "lunch",
+      "ingredients": [
+        "whole wheat pita bread",
+        "cremini mushrooms",
+        "canned white beans (drained and rinsed)",
+        "baby spinach",
+        "red onion",
+        "olive oil",
+        "lemon juice",
+        "garlic",
+        "salt and pepper",
+        "feta cheese (optional)",
+        "fresh parsley"
+      ],
+      "prepTime": "20 minutes",
+      "calories": "350-450",
+      "description": "A delicious and hearty pita pocket filled with savory mushrooms, creamy white beans, and crisp spinach, seasoned with zesty lemon and garlic. Perfect for a satisfying lunch.",
+      "instructions": [
+        "Preheat your oven to 375°F (190°C).",
+        "Slice the mushrooms and red onion. Mince the garlic.",
+        "In a pan, heat a tablespoon of olive oil over medium heat. Sauté the mushrooms, onion, and garlic until softened, about 5 minutes.",
+        "Add the white beans and spinach to the pan, cooking until the spinach wilts. Season with salt, pepper, and a squeeze of lemon juice.",
+        "Slice open each pita pocket and fill with the mushroom and bean mixture. Top with crumbled feta cheese and fresh parsley, if using.",
+        "Place the stuffed pitas on a baking sheet and bake for 10 minutes, until warm and slightly crispy."
+      ],
+      "nutritionNotes": "This meal is rich in plant-based protein from the white beans, fiber from the beans and whole wheat pita, and vitamins and minerals from the mushrooms and spinach. The olive oil provides healthy fats, and lemon juice adds a refreshing zest. It's a balanced meal supporting an active lifestyle with sustained energy.",
+      "generatedAt": "2025-07-08T16:02:37.164Z",
+      "id": "1751990557164",
+      "isAIGenerated": true,
+      "responseTimeMs": 156401
     }
   ],
-  "lastGenerated": "2025-07-04T16:02:14.494Z"
+  "lastGenerated": "2025-07-08T16:02:37.164Z"
 }
