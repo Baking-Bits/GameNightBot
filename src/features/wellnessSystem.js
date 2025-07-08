@@ -212,26 +212,64 @@ Response format (valid JSON only):
             const workoutTime = timeOfDay && timeOfDay < 12 ? 'morning' : 'evening';
             const intensity = workoutTime === 'morning' ? 'light to moderate' : 'moderate to intense';
             
-            specificPrompt = `Generate a ${workoutTime} workout routine. Requirements:
+            specificPrompt = `Generate a comprehensive daily workout routine that can be broken into multiple parts throughout the day. Requirements:
 - Must be different from recent workouts: ${recentNames.join(', ')}
+- Create a full-body workout with 3-4 distinct sections that can be done separately
+- Each section should be 15-20 minutes long
 - ${intensity} intensity appropriate for ${workoutTime}
-- Suitable for desk workers (address posture, flexibility, strength)
-- 15-30 minutes duration
-- Can be done at home with minimal equipment${requirements ? `\n- SPECIAL REQUEST: ${requirements}` : ''}
+- Suitable for desk workers (address posture, flexibility, strength, cardio)
+- Can be done at home with minimal equipment
+- Include warm-up and cool-down sections
+- Progressive difficulty that builds throughout the day${requirements ? `\n- SPECIAL REQUEST: ${requirements}` : ''}
 
 Response format (valid JSON only):
 {
   "name": "Workout name",
   "type": "${workoutTime}",
-  "duration": "XX minutes",
+  "duration": "60-75 minutes total (can be split)",
   "intensity": "${intensity}",
   "equipment": ["equipment1", "bodyweight"],
-  "description": "Brief motivating description",
-  "exercises": [
-    {"name": "Exercise 1", "sets": "3", "reps": "10-15", "description": "How to perform"},
-    {"name": "Exercise 2", "duration": "30 seconds", "description": "How to perform"}
+  "description": "Brief motivating description explaining how to split the workout",
+  "sections": [
+    {
+      "name": "Warm-Up & Mobility",
+      "duration": "10-15 minutes",
+      "timing": "Start of day or before any section",
+      "exercises": [
+        {"name": "Exercise 1", "duration": "30 seconds", "description": "How to perform"},
+        {"name": "Exercise 2", "sets": "2", "reps": "10", "description": "How to perform"}
+      ]
+    },
+    {
+      "name": "Upper Body Strength",
+      "duration": "15-20 minutes", 
+      "timing": "Morning or lunch break",
+      "exercises": [
+        {"name": "Exercise 1", "sets": "3", "reps": "10-15", "description": "How to perform"},
+        {"name": "Exercise 2", "sets": "3", "reps": "8-12", "description": "How to perform"}
+      ]
+    },
+    {
+      "name": "Lower Body & Core",
+      "duration": "15-20 minutes",
+      "timing": "Afternoon break",
+      "exercises": [
+        {"name": "Exercise 1", "sets": "3", "reps": "12-15", "description": "How to perform"},
+        {"name": "Exercise 2", "sets": "3", "reps": "30 seconds", "description": "How to perform"}
+      ]
+    },
+    {
+      "name": "Cardio & Cool-Down",
+      "duration": "15-20 minutes",
+      "timing": "Evening wind-down",
+      "exercises": [
+        {"name": "Exercise 1", "duration": "2-3 minutes", "description": "How to perform"},
+        {"name": "Exercise 2", "duration": "5 minutes", "description": "How to perform"}
+      ]
+    }
   ],
-  "healthBenefits": "How this helps with posture, flexibility, and overall health"
+  "healthBenefits": "How this comprehensive routine helps with posture, flexibility, strength, and cardiovascular health",
+  "gamerBenefits": "Specific benefits for gamers including improved focus, reduced fatigue, better posture"
 }`;
         }
 
@@ -388,19 +426,56 @@ Response format (valid JSON only):
                 responseTimeMs: 0 // No AI response time for fallback
             },
             workout: {
-                name: "Quick Desk Break Workout",
+                name: "Complete Daily Wellness Routine",
                 type: "fallback",
-                duration: "10 minutes",
-                intensity: "Low",
+                duration: "60 minutes total (can be split into 4 parts)",
+                intensity: "Low to Moderate",
                 equipment: ["bodyweight"],
-                description: "Simple exercises to combat the effects of prolonged sitting",
-                exercises: [
-                    {"name": "Neck Rolls", "duration": "30 seconds", "description": "Gently roll neck in circles to relieve tension"},
-                    {"name": "Shoulder Shrugs", "sets": "2", "reps": "10", "description": "Lift shoulders up and back down to release upper body tension"},
-                    {"name": "Wrist Circles", "duration": "30 seconds", "description": "Rotate wrists clockwise and counterclockwise"},
-                    {"name": "Seated Spinal Twist", "sets": "2", "reps": "5 each side", "description": "Twist gently left and right to improve spine mobility"}
+                description: "A comprehensive daily routine designed to combat desk work effects. Break it into parts throughout your day or do it all at once.",
+                sections: [
+                    {
+                        name: "Morning Wake-Up",
+                        duration: "10 minutes",
+                        timing: "Start of day",
+                        exercises: [
+                            {"name": "Gentle Neck Rolls", "duration": "1 minute", "description": "Slowly roll neck in both directions to release overnight tension"},
+                            {"name": "Shoulder Blade Squeezes", "sets": "2", "reps": "10", "description": "Pull shoulder blades together, hold for 2 seconds"},
+                            {"name": "Cat-Cow Stretches", "sets": "2", "reps": "10", "description": "Arch and round your back to mobilize spine"}
+                        ]
+                    },
+                    {
+                        name: "Midday Energy Boost",
+                        duration: "15 minutes", 
+                        timing: "Lunch break or mid-morning",
+                        exercises: [
+                            {"name": "Desk Push-ups", "sets": "3", "reps": "8-12", "description": "Use desk or wall for incline push-ups"},
+                            {"name": "Chair Dips", "sets": "2", "reps": "8-10", "description": "Use sturdy chair for tricep dips"},
+                            {"name": "Standing Calf Raises", "sets": "3", "reps": "15", "description": "Rise up on toes, lower slowly"}
+                        ]
+                    },
+                    {
+                        name: "Afternoon Posture Reset",
+                        duration: "15 minutes",
+                        timing: "Mid-afternoon break",
+                        exercises: [
+                            {"name": "Wall Angels", "sets": "3", "reps": "12", "description": "Stand against wall, move arms like making snow angels"},
+                            {"name": "Hip Flexor Stretches", "duration": "30 seconds each leg", "description": "Stretch tight hips from sitting"},
+                            {"name": "Seated Spinal Twists", "sets": "2", "reps": "8 each side", "description": "Rotate torso left and right"}
+                        ]
+                    },
+                    {
+                        name: "Evening Wind-Down",
+                        duration: "20 minutes",
+                        timing: "After work or before bed",
+                        exercises: [
+                            {"name": "Gentle Yoga Flow", "duration": "10 minutes", "description": "Child's pose, downward dog, gentle stretches"},
+                            {"name": "Deep Breathing", "duration": "5 minutes", "description": "4-7-8 breathing pattern to relax"},
+                            {"name": "Progressive Muscle Relaxation", "duration": "5 minutes", "description": "Tense and release each muscle group"}
+                        ]
+                    }
                 ],
-                healthBenefits: "Improves posture, reduces muscle tension, and increases flexibility for desk workers",
+                healthBenefits: "Improves posture, reduces muscle tension, increases flexibility, boosts energy, and promotes better sleep for desk workers",
+                gamerBenefits: "Enhances focus, reduces eye strain fatigue, prevents repetitive strain injuries, and maintains alertness during long gaming sessions",
                 generatedAt: new Date().toISOString(),
                 id: Date.now().toString(),
                 isAIGenerated: false, // Mark as fallback content
@@ -468,7 +543,28 @@ Response format (valid JSON only):
                     { name: '🏋️ Equipment', value: data.equipment.join(', '), inline: true }
                 );
 
-            if (data.exercises && data.exercises.length > 0) {
+            // Handle new sections format for comprehensive workouts
+            if (data.sections && data.sections.length > 0) {
+                data.sections.forEach((section, index) => {
+                    const sectionNumber = index + 1;
+                    const sectionTitle = `${sectionNumber}. ${section.name} (${section.duration})`;
+                    const timingInfo = section.timing ? `*Best time: ${section.timing}*\n\n` : '';
+                    
+                    const exerciseText = section.exercises.map(ex => {
+                        const reps = ex.reps ? `${ex.sets} sets × ${ex.reps} reps` : 
+                                    ex.duration ? ex.duration : 'As prescribed';
+                        return `**${ex.name}** (${reps})\n${ex.description}`;
+                    }).join('\n\n');
+                    
+                    embed.addFields({ 
+                        name: sectionTitle, 
+                        value: timingInfo + exerciseText, 
+                        inline: false 
+                    });
+                });
+            } 
+            // Fallback for old format workouts
+            else if (data.exercises && data.exercises.length > 0) {
                 const exerciseText = data.exercises.map(ex => {
                     const reps = ex.reps ? `${ex.sets} sets × ${ex.reps} reps` : 
                                 ex.duration ? ex.duration : 'As prescribed';
@@ -497,13 +593,12 @@ Response format (valid JSON only):
             timeZoneName: 'short'
         });
         
-        // Only show fallback indicator if it's fallback content
+        // Simple footer with just logo indicators
         let footerText = `Generated at ${easternTime}`;
         if (!data.isAIGenerated) {
             footerText = `📋 • ${footerText}`;
-        } else if (data.responseTimeMs) {
-            const responseTimeSeconds = (data.responseTimeMs / 1000).toFixed(1);
-            footerText = `🤖 AI Generated (${responseTimeSeconds}s) • ${footerText}`;
+        } else {
+            footerText = `🤖 • ${footerText}`;
         }
         embed.setFooter({ text: footerText });
         return embed;
@@ -519,7 +614,7 @@ Response format (valid JSON only):
             const embed = this.createEmbed(type, data, requirements);
             await channel.send({ embeds: [embed] });
             
-            console.log(`[ADMIN] Posted ${type} to channel ${channelId}: ${data.name}${requirements ? ` (with requirements: ${requirements})` : ''}${data.isAIGenerated ? '' : ' [FALLBACK]'}`);
+            console.log(`[ADMIN] Posted ${type} to channel ${channelId}: ${data.name}${requirements ? ` (with requirements: ${requirements})` : ''}`);
         } catch (error) {
             console.error(`Failed to post ${type} to channel:`, error);
         }
