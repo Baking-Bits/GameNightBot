@@ -296,7 +296,34 @@
       "id": "1752001302985",
       "isAIGenerated": true,
       "responseTimeMs": 102321
+    },
+    {
+      "name": "Rice Cake Tuna Melt",
+      "type": "snack",
+      "ingredients": [
+        "whole grain rice cakes",
+        "canned tuna in water",
+        "light cream cheese",
+        "sliced tomato",
+        "spinach leaves",
+        "salt and pepper"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A savory and satisfying snack that combines the protein-rich goodness of tuna with the creamy texture of light cream cheese, all on a crunchy whole grain rice cake base.",
+      "instructions": [
+        "Drain the canned tuna and flake it into a small bowl.",
+        "Mix the tuna with a dollop of light cream cheese, a pinch of salt and pepper.",
+        "Spread the tuna mixture onto a rice cake.",
+        "Top with a slice of tomato and a few spinach leaves.",
+        "Enjoy immediately or wrap for a portable snack."
+      ],
+      "benefits": "This snack is high in protein from the tuna, which helps keep you full and energized throughout the day. The whole grain rice cakes provide complex carbohydrates for sustained energy, while the spinach and tomato add essential vitamins and minerals. The light cream cheese adds a creamy texture without too many extra calories, making it a balanced and convenient option for busy schedules.",
+      "generatedAt": "2025-07-09T19:01:49.899Z",
+      "id": "1752087709899",
+      "isAIGenerated": true,
+      "responseTimeMs": 109546
     }
   ],
-  "lastGenerated": "2025-07-08T19:01:42.985Z"
+  "lastGenerated": "2025-07-09T19:01:49.899Z"
 }

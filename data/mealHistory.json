@@ -463,7 +463,76 @@
       "id": "1751990557164",
       "isAIGenerated": true,
       "responseTimeMs": 156401
+    },
+    {
+      "name": "Creamy Coconut Chickpea Curry",
+      "type": "dinner",
+      "ingredients": [
+        "1 can (14 oz) chickpeas, drained and rinsed",
+        "1 can (13.5 oz) coconut milk",
+        "1 tablespoon olive oil",
+        "1 medium onion, diced",
+        "2 cloves garlic, minced",
+        "1 tablespoon curry powder",
+        "1 teaspoon ground cumin",
+        "1 teaspoon ground turmeric",
+        "1/2 teaspoon red pepper flakes (optional)",
+        "1 cup diced tomatoes (fresh or canned)",
+        "1 cup chopped kale or spinach",
+        "1 tablespoon lemon juice",
+        "1 tablespoon fresh cilantro, chopped",
+        "Salt and pepper to taste",
+        "Cooked brown rice or quinoa for serving"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "350-450 per serving",
+      "description": "A comforting, creamy coconut chickpea curry with a spicy kick, served over brown rice or quinoa for a satisfying, nutritious dinner.",
+      "instructions": [
+        "Heat olive oil in a large skillet over medium heat. Add onion and garlic, sauté until translucent, about 5 minutes.",
+        "Stir in curry powder, cumin, turmeric, and red pepper flakes. Cook for 1 minute until fragrant.",
+        "Add chickpeas, diced tomatoes, and coconut milk. Bring to a simmer, then reduce heat to medium-low and cook for 15 minutes, stirring occasionally.",
+        "Stir in kale or spinach and cook until wilted, about 3 minutes. Add lemon juice and season with salt and pepper.",
+        "Serve curry over cooked brown rice or quinoa, garnished with fresh cilantro."
+      ],
+      "nutritionNotes": "This dish is rich in plant-based protein from chickpeas, healthy fats from coconut milk, and fiber from vegetables. It's also packed with vitamins and minerals, making it a balanced meal for active lifestyles.",
+      "generatedAt": "2025-07-08T23:02:50.159Z",
+      "id": "1752015770159",
+      "isAIGenerated": true,
+      "responseTimeMs": 170128
+    },
+    {
+      "name": "Mediterranean Chickpea and Veggie Wrap",
+      "type": "lunch",
+      "ingredients": [
+        "whole grain tortilla",
+        "canned chickpeas",
+        "spinach",
+        "grape tomatoes",
+        "cucumber",
+        "red onion",
+        "feta cheese",
+        "olive oil",
+        "lemon juice",
+        "garlic powder",
+        "salt and pepper"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "350-400",
+      "description": "A refreshing and satisfying Mediterranean-inspired wrap filled with protein-rich chickpeas and crisp seasonal vegetables.",
+      "instructions": [
+        "Drain and rinse the canned chickpeas.",
+        "In a bowl, combine chickpeas, chopped spinach, halved grape tomatoes, diced cucumber, and thinly sliced red onion.",
+        "Add crumbled feta cheese, a drizzle of olive oil, a squeeze of lemon juice, garlic powder, salt, and pepper. Toss everything to combine.",
+        "Warm the whole grain tortilla in a microwave or on a pan for a few seconds.",
+        "Place a generous amount of the chickpea and veggie mixture onto the tortilla and roll it up tightly.",
+        "Slice the wrap in half and serve."
+      ],
+      "nutritionNotes": "This wrap provides a great balance of protein, fiber, and healthy fats. Chickpeas are a great source of plant-based protein and fiber, while the vegetables add vitamins and antioxidants. The feta cheese adds calcium and flavor. Using whole grain tortillas contributes to whole grain intake, which is beneficial for sustained energy levels.",
+      "generatedAt": "2025-07-09T16:02:21.039Z",
+      "id": "1752076941039",
+      "isAIGenerated": true,
+      "responseTimeMs": 140775
     }
   ],
-  "lastGenerated": "2025-07-08T16:02:37.164Z"
+  "lastGenerated": "2025-07-09T16:02:21.039Z"
 }
