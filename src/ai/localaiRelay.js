@@ -328,7 +328,9 @@ function queueMessage(message) {
 // Helper function to generate AI-powered server issue response with admin ping
 async function generateServerIssueResponse(context, message) {
   const config = getFreshConfig();
-  const adminRoleId = config.adminRoles[0]; // Use first admin role
+  
+  // Intelligently determine which admin roles to ping based on issue content
+  const adminRolesToPing = determineAdminRolesToPing(message.content, config);
   
   try {
     // Create a specialized prompt for server issue troubleshooting
@@ -381,8 +383,9 @@ Do NOT include admin ping information - that will be added automatically.`
       return null; // Return null to indicate failure
     }
     
-    // Combine AI suggestion with admin ping
-    const response = `${aiSuggestion.trim()}\n\nPinging <@&${adminRoleId}> for additional help! 🛠️`;
+    // Combine AI suggestion with admin ping(s)
+    const adminPings = adminRolesToPing.map(roleId => `<@&${roleId}>`).join(' ');
+    const response = `${aiSuggestion.trim()}\n\nPinging ${adminPings} for additional help! 🛠️`;
     
     return response;
   } catch (err) {
@@ -453,6 +456,40 @@ function shouldPingAdmin(currentMessage, context, conversationKey, aiConfig) {
   }
   
   return false;
+}
+
+// Helper function to determine which admin roles to ping based on issue type
+function determineAdminRolesToPing(issueContent, config) {
+  const adminRoleConfig = config.adminRoleConfig || {};
+  const issueTypeMapping = adminRoleConfig.issueTypeMapping || {};
+  
+  // Default fallback
+  let adminRoles = config.adminRoles ? [config.adminRoles[0]] : [];
+  
+  const content = issueContent.toLowerCase();
+  
+  // Categorize the issue type
+  let issueType = 'general';
+  
+  if (content.includes('server') || content.includes('minecraft') || content.includes('connection')) {
+    issueType = 'server';
+  } else if (content.includes('database') || content.includes('data') || content.includes('sql')) {
+    issueType = 'database';  
+  } else if (content.includes('critical') || content.includes('emergency') || content.includes('urgent')) {
+    issueType = 'critical';
+  }
+  
+  // Check for specific configuration
+  if (issueTypeMapping[issueType]) {
+    adminRoles = issueTypeMapping[issueType];
+  } else if (adminRoleConfig.pingAllForServerIssues && issueType === 'server') {
+    adminRoles = config.adminRoles || [];
+  } else if (adminRoleConfig.pingAllForCriticalIssues && issueType === 'critical') {
+    adminRoles = config.adminRoles || [];
+  }
+  
+  console.log(`[ADMIN] Issue type detected: ${issueType}, pinging roles: ${adminRoles.join(', ')}`);
+  return adminRoles;
 }
 
 // Helper function to determine if message needs professional response and personality to use
@@ -630,7 +667,6 @@ async function processMessage(message, conversationKey) {
     // Get fresh config for dynamic updates
     const config = getFreshConfig();
     const AI_SELF_FILTERING = config.aiSelfFiltering || { enabled: false };
-    const ADMIN_ROLE_ID = config.adminRoles[0]; // Use the first admin role for server alerts
     
     // Fetch last 10 messages for context
     const messages = await message.channel.messages.fetch({ limit: 10 });
@@ -659,7 +695,8 @@ async function processMessage(message, conversationKey) {
       console.log('Server issue detected, generating AI-powered troubleshooting response with admin ping');
       const serverResponse = await generateServerIssueResponse(context, message);
       if (serverResponse) {
-        await sendOrEditResponse(message, serverResponse, true, ADMIN_ROLE_ID, conversationKey);
+        const serverAdminRoles = determineAdminRolesToPing(message.content, config);
+        await sendOrEditResponse(message, serverResponse, true, serverAdminRoles, conversationKey);
       } else {
         console.log('AI not reachable for server issue response - staying silent');
       }
@@ -686,6 +723,9 @@ async function processMessage(message, conversationKey) {
     // Check if this is a server issue that needs admin attention
     // Look at both current message and conversation context for server issues
     const needsAdminPing = shouldPingAdmin(message, context, conversationKey, AI_SELF_FILTERING);
+    
+    // Determine appropriate admin roles to ping if needed
+    const ADMIN_ROLES = needsAdminPing ? determineAdminRolesToPing(message.content, config) : [];
     
     // Use the dynamically determined personality instead of config setting
     const personalityPrompt = getPersonalityPrompt(responseDecision.personality);
@@ -730,7 +770,7 @@ async function processMessage(message, conversationKey) {
     }
 
     // Determine if we should send as a reply or regular message, and handle editing
-    await sendOrEditResponse(message, reply, needsAdminPing, ADMIN_ROLE_ID, conversationKey);
+    await sendOrEditResponse(message, reply, needsAdminPing, ADMIN_ROLES, conversationKey);
     
   } catch (err) {
     console.error('LocalAI relay error:', err);
@@ -749,14 +789,18 @@ async function processMessage(message, conversationKey) {
 }
 
 // Helper function to send or edit responses appropriately
-async function sendOrEditResponse(originalMessage, reply, needsAdminPing, adminRoleId, conversationKey) {
+async function sendOrEditResponse(originalMessage, reply, needsAdminPing, adminRoles, conversationKey) {
   try {
     // Check if we already have a response for this conversation
     const existingResponseData = botResponses.get(conversationKey);
     
     let finalMessage;
-    if (needsAdminPing) {
-      finalMessage = `<@&${adminRoleId}> ${reply}`;
+    if (needsAdminPing && adminRoles && adminRoles.length > 0) {
+      // Handle multiple admin roles
+      const adminPings = Array.isArray(adminRoles) 
+        ? adminRoles.map(roleId => `<@&${roleId}>`).join(' ')
+        : `<@&${adminRoles}>`;
+      finalMessage = `${adminPings} ${reply}`;
     } else {
       finalMessage = reply;
     }

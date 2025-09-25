@@ -1,0 +1,147 @@
+{
+  "users": {
+    "97133775074390016": {
+      "postalCode": "21030",
+      "zipCode": "21030",
+      "displayName": "P@",
+      "discordUserId": "97133775074390016",
+      "city": "Cockeysville",
+      "country": "US",
+      "region": "Northern Maryland",
+      "joinedAt": "2025-09-25T17:01:06.732Z",
+      "lastWeatherCheck": "2025-09-25T19:14:08.767Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T19:14:08.767Z"
+    },
+    "161637430540238849": {
+      "zipCode": "06371",
+      "displayName": "Dylan",
+      "discordUserId": "161637430540238849",
+      "city": "Old Lyme",
+      "region": "Connecticut",
+      "joinedAt": "2025-09-25T17:04:10.777Z",
+      "lastWeatherCheck": "2025-09-25T19:00:00.911Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T17:04:10.777Z",
+      "migratedAt": "2025-09-25T17:24:53.731Z"
+    },
+    "354506743201398794": {
+      "zipCode": "21117",
+      "displayName": "Scotty",
+      "discordUserId": "354506743201398794",
+      "city": "Owings Mills",
+      "region": "Maryland",
+      "joinedAt": "2025-09-25T17:05:13.283Z",
+      "lastWeatherCheck": "2025-09-25T19:00:01.067Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T17:05:13.283Z",
+      "migratedAt": "2025-09-25T17:24:53.731Z"
+    },
+    "1225795652924084244": {
+      "postalCode": "CR2 7AR",
+      "zipCode": "CR2 7AR",
+      "displayName": "Stephen-GoodMorningGames",
+      "discordUserId": "1225795652924084244",
+      "city": "Croydon",
+      "country": "GB",
+      "region": "United Kingdom",
+      "joinedAt": "2025-09-25T18:06:54.723Z",
+      "lastWeatherCheck": "2025-09-25T19:00:05.633Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T18:06:54.723Z"
+    },
+    "670110851088384030": {
+      "postalCode": "21117",
+      "zipCode": "21117",
+      "displayName": "MerciussTheSilly",
+      "discordUserId": "670110851088384030",
+      "city": "Owings Mills",
+      "country": "US",
+      "region": "Maryland",
+      "joinedAt": "2025-09-25T18:55:55.170Z",
+      "lastWeatherCheck": "2025-09-25T19:28:08.743Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T19:28:08.743Z",
+      "migratedAt": "2025-09-25T19:56:53.279Z"
+    },
+    "95541144825364480": {
+      "postalCode": "WR1 3LL",
+      "zipCode": "WR1 3LL",
+      "displayName": "Rob",
+      "discordUserId": "95541144825364480",
+      "city": "Worcester",
+      "country": "GB",
+      "region": "United Kingdom",
+      "joinedAt": "2025-09-25T19:42:31.066Z",
+      "lastWeatherCheck": "2025-09-25T19:42:31.066Z",
+      "isActive": true,
+      "updatedAt": "2025-09-25T19:42:31.066Z"
+    }
+  },
+  "weatherHistory": [
+    {
+      "timestamp": "2025-09-25T18:21:31.816Z",
+      "updates": 4,
+      "alerts": 0
+    },
+    {
+      "timestamp": "2025-09-25T19:00:05.900Z",
+      "updates": 5,
+      "alerts": 0
+    }
+  ],
+  "lastUpdated": "2025-09-25T19:56:53.279Z",
+  "shittyWeatherScores": {
+    "161637430540238849": 2
+  },
+  "shittyWeatherHistory": [
+    {
+      "timestamp": "2025-09-25T18:21:32.483Z",
+      "userId": "161637430540238849",
+      "displayName": "Dylan",
+      "region": "Connecticut",
+      "score": 3,
+      "weather": {
+        "temp": 72,
+        "description": "light rain",
+        "wind": 9,
+        "humidity": 94
+      },
+      "totalPoints": 1
+    },
+    {
+      "timestamp": "2025-09-25T18:34:44.180Z",
+      "userId": "161637430540238849",
+      "displayName": "Dylan",
+      "region": "Connecticut",
+      "score": 3,
+      "breakdown": [
+        "🌧️ Rain (+3)"
+      ],
+      "weather": {
+        "temp": 72,
+        "description": "light rain",
+        "wind": 9,
+        "humidity": 94
+      },
+      "totalPoints": 2
+    }
+  ],
+  "lastShittyWeatherAward": {
+    "timestamp": "2025-09-25T18:34:44.180Z",
+    "userId": "161637430540238849",
+    "displayName": "Dylan",
+    "region": "Connecticut",
+    "score": 3,
+    "breakdown": [
+      "🌧️ Rain (+3)"
+    ],
+    "weather": {
+      "temp": 72,
+      "description": "light rain",
+      "wind": 9,
+      "humidity": 94
+    },
+    "totalPoints": 2
+  }
+}
