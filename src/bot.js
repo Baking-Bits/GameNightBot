@@ -6,6 +6,7 @@ const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
 const localaiRelay = require('./ai/localaiRelay');
 const WellnessSystem = require('./features/wellnessSystem');
+const WeatherSystem = require('./features/weatherSystem');
 const config = require('../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
@@ -26,6 +27,7 @@ class VoiceTimeTracker {
         this.statusUpdateInterval = 5 * 60 * 1000; // Default to 5 minutes
         this.config = config;
         this.wellnessSystem = null; // Will be initialized after client is ready
+        this.weatherSystem = null; // Will be initialized after client is ready
     }
 
     async login(token) {
@@ -64,6 +66,21 @@ class VoiceTimeTracker {
                 }
             } else {
                 console.log('[ADMIN] Wellness system not initialized - channel ID not configured in config.json');
+            }
+
+            // Initialize Weather system
+            if (this.config.weatherChannelId && this.config.weatherApiKey && 
+                this.config.weatherChannelId !== "CHANNEL_ID_HERE" && 
+                this.config.weatherApiKey !== "YOUR_API_KEY_HERE") {
+                try {
+                    this.weatherSystem = new WeatherSystem(this.client, this.config);
+                    this.client.weatherSystem = this.weatherSystem; // Make available to commands
+                    console.log('[WEATHER] Weather system initialized successfully');
+                } catch (error) {
+                    console.error('[WEATHER] Failed to initialize Weather system:', error);
+                }
+            } else {
+                console.log('[WEATHER] Weather system not initialized - channel ID or API key not configured in config.json');
             }
 
             console.log(`Logged in as ${this.client.user.tag}!`);
