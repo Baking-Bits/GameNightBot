@@ -107,13 +107,13 @@ module.exports = {
                     await this.handleManualAward(interaction, bot.serviceManager);
                     break;
                 case 'trigger-update':
-                    await this.handleTriggerUpdate(interaction, bot.serviceManager);
+                    await this.handleTriggerUpdate(interaction, bot);
                     break;
                 case 'trigger-celebration':
-                    await this.handleTriggerCelebration(interaction, bot.serviceManager);
+                    await this.handleTriggerCelebration(interaction, bot);
                     break;
                 case 'trigger-alerts':
-                    await this.handleTriggerAlerts(interaction, bot.serviceManager);
+                    await this.handleTriggerAlerts(interaction, bot);
                     break;
                 default:
                     await interaction.reply({
@@ -152,7 +152,13 @@ module.exports = {
         await interaction.deferReply({ flags: 64 }); // MessageFlags.Ephemeral
 
         try {
-            const result = await serviceManager.joinWeatherTracking(userId, zipCode, displayName, countryCode);
+            const response = await serviceManager.joinWeatherTracking(userId, zipCode, displayName, countryCode);
+            
+            if (!response.success) {
+                throw new Error(response.message || 'Failed to join weather tracking');
+            }
+            
+            const result = response.data;
             
             // Validate result data before creating embed
             if (!result || !result.weather || !result.location) {
@@ -194,10 +200,12 @@ module.exports = {
         }
     },
 
-    async handleLeave(interaction, weatherSystem) {
+    async handleLeave(interaction, serviceManager) {
         const userId = interaction.user.id;
         
-        const success = await weatherSystem.removeUserLocation(userId);
+        try {
+            const response = await serviceManager.leaveWeatherTracking(userId);
+            const success = response.success;
         
         if (success) {
             const embed = new EmbedBuilder()
@@ -218,23 +226,30 @@ module.exports = {
                 flags: 64 // MessageFlags.Ephemeral
             });
         }
+        } catch (error) {
+            console.error('Error in handleLeave:', error);
+            await interaction.reply({
+                content: `❌ Failed to leave weather tracking: ${error.message}`,
+                flags: 64 // MessageFlags.Ephemeral
+            });
+        }
     },
 
-    async handleCurrent(interaction, weatherSystem) {
+    async handleCurrent(interaction, serviceManager) {
         const userId = interaction.user.id;
         
         await interaction.deferReply();
 
         try {
-            const result = await weatherSystem.getCurrentWeather(userId);
+            const response = await serviceManager.getCurrentWeatherForUser(userId);
             
-            if (!result) {
+            if (!response.user) {
                 return await interaction.editReply({
                     content: '❌ You are not in the weather tracking system. Use `/weather join` to get started!'
                 });
             }
 
-            const weather = result.weather;
+            const weather = response.weather;
             const temp = Math.round(weather.main.temp);
             const feelsLike = Math.round(weather.main.feels_like);
             const conditions = weather.weather[0];
@@ -289,11 +304,11 @@ module.exports = {
         }
     },
 
-    async handleLeaderboard(interaction, weatherSystem) {
+    async handleLeaderboard(interaction, serviceManager) {
         await interaction.deferReply();
 
         try {
-            const leaderboard = await weatherSystem.getWeatherLeaderboard();
+            const leaderboard = await serviceManager.getWeatherLeaderboard();
             
             if (leaderboard.length === 0) {
                 const embed = new EmbedBuilder()
@@ -340,7 +355,7 @@ module.exports = {
         }
     },
 
-    async handleStats(interaction, weatherSystem) {
+    async handleStats(interaction, serviceManager) {
         // Check if user has admin permissions
         if (!interaction.member.permissions.has('ADMINISTRATOR')) {
             return await interaction.reply({
@@ -449,7 +464,7 @@ module.exports = {
         };
     },
 
-    async handleShittyLeaderboard(interaction, weatherSystem) {
+    async handleShittyLeaderboard(interaction, serviceManager) {
         await interaction.deferReply();
 
         try {
@@ -516,7 +531,7 @@ module.exports = {
         }
     },
 
-    async handleManualAward(interaction, weatherSystem) {
+    async handleManualAward(interaction, serviceManager) {
         // Check if user has admin permissions
         if (!interaction.member.permissions.has('ADMINISTRATOR')) {
             return await interaction.reply({
@@ -583,7 +598,7 @@ module.exports = {
         }
     },
 
-    async handleTriggerUpdate(interaction, weatherSystem) {
+    async handleTriggerUpdate(interaction, bot) {
         // Check if user is admin
         if (!interaction.member.permissions.has('Administrator')) {
             return await interaction.reply({
@@ -595,7 +610,14 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const channel = interaction.client.channels.cache.get(weatherSystem.channelId);
+            // Get channel ID from config
+            const channelId = bot?.config?.weatherChannelId;
+            if (!channelId) {
+                return await interaction.editReply({
+                    content: '❌ Weather channel not configured!'
+                });
+            }
+            const channel = interaction.client.channels.cache.get(channelId);
             if (!channel) {
                 return await interaction.editReply({
                     content: '❌ Weather channel not found!'
@@ -603,7 +625,7 @@ module.exports = {
             }
 
             // Trigger the daily weather update (6 PM message)
-            const leaderboard = await weatherSystem.getShittyWeatherLeaderboard();
+            const leaderboard = await bot.serviceManager.getShittyWeatherLeaderboard();
             if (leaderboard.length === 0) {
                 return await interaction.editReply({
                     content: '❌ No users in the weather system to create daily update.'
@@ -639,7 +661,7 @@ module.exports = {
         }
     },
 
-    async handleTriggerCelebration(interaction, weatherSystem) {
+    async handleTriggerCelebration(interaction, bot) {
         // Check if user is admin
         if (!interaction.member.permissions.has('Administrator')) {
             return await interaction.reply({
@@ -651,7 +673,14 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const channel = interaction.client.channels.cache.get(weatherSystem.channelId);
+            // Get channel ID from config
+            const channelId = bot?.config?.weatherChannelId;
+            if (!channelId) {
+                return await interaction.editReply({
+                    content: '❌ Weather channel not configured!'
+                });
+            }
+            const channel = interaction.client.channels.cache.get(channelId);
             if (!channel) {
                 return await interaction.editReply({
                     content: '❌ Weather channel not found!'
@@ -659,7 +688,7 @@ module.exports = {
             }
 
             // Trigger the weekly celebration (Sunday 8 PM message)
-            const leaderboard = await weatherSystem.getWeatherLeaderboard();
+            const leaderboard = await bot.serviceManager.getWeatherLeaderboard();
             if (leaderboard.length === 0) {
                 return await interaction.editReply({
                     content: '❌ No users in the weather system to create celebration.'
@@ -703,7 +732,7 @@ module.exports = {
         }
     },
 
-    async handleTriggerAlerts(interaction, weatherSystem) {
+    async handleTriggerAlerts(interaction, bot) {
         // Check if user is admin
         if (!interaction.member.permissions.has('Administrator')) {
             return await interaction.reply({
@@ -715,7 +744,14 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const channel = interaction.client.channels.cache.get(weatherSystem.channelId);
+            // Get channel ID from config
+            const channelId = bot?.config?.weatherChannelId;
+            if (!channelId) {
+                return await interaction.editReply({
+                    content: '❌ Weather channel not configured!'
+                });
+            }
+            const channel = interaction.client.channels.cache.get(channelId);
             if (!channel) {
                 return await interaction.editReply({
                     content: '❌ Weather channel not found!'
@@ -723,14 +759,21 @@ module.exports = {
             }
 
             // Trigger weather alerts and shitty weather awards (every 4 hours message)
-            const { weatherUpdates, alerts } = await weatherSystem.checkAllUsersWeather();
+            console.log('[WEATHER TRIGGER-ALERTS] Checking all users weather...');
+            const { weatherUpdates, alerts } = await bot.serviceManager.checkAllUsersWeather();
+            console.log('[WEATHER TRIGGER-ALERTS] Weather check completed:', {
+                totalUpdates: weatherUpdates?.length || 0,
+                totalAlerts: alerts?.length || 0
+            });
             
             if (alerts.length > 0) {
                 const alertMessage = `🚨 **Weather Alerts** 🚨\n\n${alerts.map(a => a.alert).join('\n\n')}`;
                 await channel.send(alertMessage);
             }
 
-            const shittyWeatherResult = await weatherSystem.awardShittyWeatherPoints();
+            console.log('[WEATHER TRIGGER-ALERTS] Awarding shitty weather points...');
+            const shittyWeatherResult = await bot.serviceManager.awardShittyWeatherPoints();
+            console.log('[WEATHER TRIGGER-ALERTS] Shitty weather award result:', shittyWeatherResult);
             
             if (shittyWeatherResult && shittyWeatherResult.award) {
                 const award = shittyWeatherResult.award;

@@ -169,7 +169,7 @@ async function handleAddUser(interaction, serviceManager) {
         }
 
         // Use the ServiceManager's addWeatherUser method
-        const response = await serviceManager.addWeatherUser(user.id, postalCode, countryCode, interaction.user.id, displayName);
+        const response = await serviceManager.addWeatherUser(user.id, postalCode, countryCode, interaction.user.id);
         
         if (!response.success) {
             await interaction.editReply(`❌ ${response.message || 'Failed to add user to weather system.'}`);

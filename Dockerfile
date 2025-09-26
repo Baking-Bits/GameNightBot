@@ -5,22 +5,26 @@ FROM node:lts-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json files first (for better caching of dependencies)
+# Copy package.json files for all services (better caching)
 COPY package*.json ./
+COPY main-bot/package*.json ./main-bot/
+COPY services/weather-service/package*.json ./services/weather-service/
 
-# Install dependencies
+# Install dependencies for all services
 RUN npm install
+RUN cd main-bot && npm install
+RUN cd services/weather-service && npm install
 
 # Copy the rest of the application files
 COPY . .
 
-RUN mkdir /app/logs
+RUN mkdir -p /app/logs
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Expose ports for main bot and services
+EXPOSE 3000 3001
 
-# Command to run the application
-CMD ["npm", "start"]
+# Command to run all services (using Node.js startup script)
+CMD ["node", "scripts/start-all.js"]
 
 # GitHub Actions annotation for Docker build caching
 # This helps GitHub Actions identify cacheable layers to speed up CI/CD builds.
