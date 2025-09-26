@@ -2,3 +2,49 @@ node_modules/
 package-lock.json
 voice_time_tracker.db
 config.json
+
+# User data and sensitive files (but allow templates and readme)
+data/*
+!data/.gitkeep
+!data/README.md
+!data/*.template
+!data/backups/
+data/backups/*
+!data/backups/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
