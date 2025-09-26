@@ -17,7 +17,21 @@ module.exports = {
                 .addStringOption(option =>
                     option.setName('zipcode')
                         .setDescription('Your postal/zip code (kept private) - US: 12345, UK: SW1A 1AA, etc.')
-                        .setRequired(true)))
+                        .setRequired(true))
+                .addStringOption(option =>
+                    option
+                        .setName('country')
+                        .setDescription('Country (optional, helps with ambiguous codes like 4-digit codes)')
+                        .setRequired(false)
+                        .addChoices(
+                            { name: 'United States', value: 'US' },
+                            { name: 'United Kingdom', value: 'GB' },
+                            { name: 'Canada', value: 'CA' },
+                            { name: 'Australia', value: 'AU' },
+                            { name: 'Denmark', value: 'DK' },
+                            { name: 'Germany', value: 'DE' },
+                            { name: 'France', value: 'FR' }
+                        )))
         .addSubcommand(subcommand =>
             subcommand
                 .setName('leave')
@@ -118,6 +132,7 @@ module.exports = {
 
     async handleJoin(interaction, weatherSystem) {
         const zipCode = interaction.options.getString('zipcode');
+        const countryCode = interaction.options.getString('country');
         const userId = interaction.user.id;
         // Use Discord display name (nickname if set, otherwise username)
         const displayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
@@ -134,7 +149,7 @@ module.exports = {
         await interaction.deferReply({ flags: 64 }); // MessageFlags.Ephemeral
 
         try {
-            const result = await weatherSystem.setUserLocation(userId, zipCode, displayName);
+            const result = await weatherSystem.setUserLocation(userId, zipCode, displayName, countryCode);
             
             // Validate result data before creating embed
             if (!result || !result.weather || !result.location) {

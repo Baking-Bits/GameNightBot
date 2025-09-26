@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const cron = require('node-cron');
 const axios = require('axios');
+const DataProtection = require('../utils/dataProtection');
 
 class WeatherSystem {
     constructor(client, config) {
@@ -16,6 +17,8 @@ class WeatherSystem {
         this.significantPointThreshold = 3; // Only notify when point changes are >= 3
         this.lastUserScores = new Map(); // Track previous scores for comparison
         this.dailyWeatherEvents = new Map(); // Track weather events for daily summary
+        this.isWritingData = false; // Prevent concurrent file writes
+        this.dataProtection = new DataProtection(path.join(__dirname, '../../data')); // Data protection system
         
         this.initializeData();
         this.setupScheduledTasks();
@@ -23,11 +26,21 @@ class WeatherSystem {
 
     async initializeData() {
         try {
+            // Initialize data protection system
+            await this.dataProtection.initialize();
+            
+            // Create backup of existing data before any operations
+            await this.dataProtection.createBackup('weatherData.json', 'startup');
+
             // Initialize weather data file
             try {
                 await fs.access(this.weatherDataPath);
                 // If file exists, check if we need to migrate existing users to new region format
                 await this.migrateExistingUsers();
+                // Fix any detailed region names to simplified state/province names
+                await this.fixDetailedRegionNames();
+                // Fix users showing country instead of state/province
+                await this.fixCountryToStateRegions();
             } catch {
                 const initialData = {
                     users: {},
@@ -35,6 +48,8 @@ class WeatherSystem {
                     shittyWeatherScores: {},
                     shittyWeatherHistory: [],
                     lastShittyWeatherAward: null,
+                    dailyLightningEvents: {},
+                    lightningHistory: [],
                     lastUpdated: new Date().toISOString()
                 };
                 await fs.writeFile(this.weatherDataPath, JSON.stringify(initialData, null, 2));
@@ -54,6 +69,9 @@ class WeatherSystem {
 
             // Load today's API usage
             await this.loadApiUsage();
+            
+            // Load lightning data from persistent storage
+            await this.loadLightningData();
         } catch (error) {
             console.error('Error initializing weather system data:', error);
         }
@@ -105,6 +123,161 @@ class WeatherSystem {
         }
     }
 
+    async fixDetailedRegionNames() {
+        try {
+            const data = await this.getWeatherData();
+            let needsUpdate = false;
+
+            for (const [userId, userData] of Object.entries(data.users)) {
+                // Check if user has old detailed region format (e.g., "Northern Maryland", "Central Virginia")
+                const region = userData.region;
+                if (region && this.shouldSimplifyRegion(region)) {
+                    const simplifiedRegion = this.simplifyRegionName(region);
+                    if (simplifiedRegion !== region) {
+                        console.log(`[WEATHER] Updating ${userData.displayName} from "${region}" to "${simplifiedRegion}"`);
+                        userData.region = simplifiedRegion;
+                        userData.regionSimplifiedAt = new Date().toISOString();
+                        needsUpdate = true;
+                    }
+                }
+            }
+
+            if (needsUpdate) {
+                await this.saveWeatherData(data);
+                console.log('[WEATHER] Region name simplification completed');
+            }
+        } catch (error) {
+            console.error('Error fixing detailed region names:', error);
+        }
+    }
+
+    shouldSimplifyRegion(region) {
+        // Check if region contains detailed descriptors that should be simplified
+        const detailedPatterns = [
+            /^(Northern|Southern|Eastern|Western|Central|Northeast|Northwest|Southeast|Southwest)\s+/,
+            /^(Upper|Lower|North|South|East|West)\s+/,
+            /\s+(Region|Area|Valley|Coast)$/,
+            /City Area$/
+        ];
+        
+        return detailedPatterns.some(pattern => pattern.test(region));
+    }
+
+    simplifyRegionName(region) {
+        // Remove descriptive prefixes and suffixes to get just the state/province name
+        let simplified = region;
+        
+        // Remove directional prefixes
+        simplified = simplified.replace(/^(Northern|Southern|Eastern|Western|Central|Northeast|Northwest|Southeast|Southwest)\s+/, '');
+        simplified = simplified.replace(/^(Upper|Lower|North|South|East|West)\s+/, '');
+        
+        // Handle special cases first
+        if (simplified.includes('New York City')) {
+            return 'New York';
+        }
+        
+        // Remove suffixes
+        simplified = simplified.replace(/\s+(Region|Area|Valley|Coast)$/, '');
+        simplified = simplified.replace(/\s+City$/, ''); // Remove "City" suffix too
+        
+        return simplified;
+    }
+
+    async fixCountryToStateRegions() {
+        try {
+            const data = await this.getWeatherData();
+            let needsUpdate = false;
+
+            for (const [userId, userData] of Object.entries(data.users)) {
+                // Check if user's region is showing as a country instead of state/province
+                if (userData.region && this.isCountryName(userData.region)) {
+                    console.log(`[WEATHER] Fixing region for ${userData.displayName} from "${userData.region}"`);
+                    
+                    try {
+                        // Try to get fresh weather data to get proper state information
+                        const freshWeather = await this.fetchWeatherByPostalCode(userData.postalCode || userData.zipCode);
+                        if (freshWeather) {
+                            const newRegion = this.getPrivacyFriendlyLocation(freshWeather);
+                            if (newRegion && newRegion !== userData.region && !this.isCountryName(newRegion)) {
+                                console.log(`[WEATHER] Updated ${userData.displayName} region to "${newRegion}"`);
+                                userData.region = newRegion;
+                                userData.regionFixedAt = new Date().toISOString();
+                                needsUpdate = true;
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`[WEATHER] Could not fix region for ${userData.displayName}:`, error.message);
+                    }
+                }
+            }
+
+            if (needsUpdate) {
+                await this.saveWeatherData(data);
+                console.log('[WEATHER] Country-to-state region fix completed');
+            }
+        } catch (error) {
+            console.error('Error fixing country-to-state regions:', error);
+        }
+    }
+
+    isCountryName(region) {
+        const countryNames = [
+            'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France',
+            'Italy', 'Spain', 'Netherlands', 'Belgium', 'Switzerland', 'Austria', 'Sweden',
+            'Norway', 'Denmark', 'Finland', 'Japan', 'South Korea', 'China', 'India',
+            'Brazil', 'Mexico', 'Russia'
+        ];
+        return countryNames.includes(region);
+    }
+
+    detectLightning(weather) {
+        const conditions = weather.weather[0].main.toLowerCase();
+        const description = weather.weather[0].description.toLowerCase();
+        
+        // Lightning detection based on weather conditions and descriptions
+        if (conditions === 'thunderstorm') {
+            // Different types of thunderstorms indicate different lightning intensity
+            if (description.includes('severe') || description.includes('heavy')) {
+                return {
+                    detected: true,
+                    intensity: 'severe',
+                    points: 3,
+                    emoji: '⚡',
+                    description: 'Severe Lightning Activity'
+                };
+            } else if (description.includes('light')) {
+                return {
+                    detected: true,
+                    intensity: 'light',
+                    points: 1,
+                    emoji: '🌩️',
+                    description: 'Light Lightning Activity'
+                };
+            } else {
+                return {
+                    detected: true,
+                    intensity: 'moderate',
+                    points: 2,
+                    emoji: '⚡',
+                    description: 'Lightning Activity'
+                };
+            }
+        }
+        
+        // Check for lightning-related terms in description
+        if (description.includes('lightning') || description.includes('electric')) {
+            return {
+                detected: true,
+                intensity: 'moderate',
+                points: 2,
+                emoji: '⚡',
+                description: 'Lightning Detected'
+            };
+        }
+        
+        return { detected: false };
+    }
+
     async loadApiUsage() {
         try {
             const data = await fs.readFile(this.apiUsagePath, 'utf8');
@@ -143,6 +316,120 @@ class WeatherSystem {
             await fs.writeFile(this.apiUsagePath, JSON.stringify(usage, null, 2));
         } catch (error) {
             console.error('Error updating API usage:', error);
+        }
+    }
+
+    async loadLightningData() {
+        try {
+            const data = await this.getWeatherData();
+            const today = new Date().toDateString();
+            
+            // Initialize dailyWeatherEvents Map from persistent storage
+            if (data.dailyLightningEvents && data.dailyLightningEvents[today]) {
+                const todayData = data.dailyLightningEvents[today];
+                this.dailyWeatherEvents.set(today, new Map());
+                const todayEvents = this.dailyWeatherEvents.get(today);
+                
+                // Restore each user's lightning data
+                for (const [userId, userEvents] of Object.entries(todayData)) {
+                    todayEvents.set(userId, {
+                        displayName: userEvents.displayName,
+                        region: userEvents.region,
+                        events: userEvents.events,
+                        lightningStrikes: userEvents.lightningStrikes
+                    });
+                }
+                
+                console.log(`[LIGHTNING] Loaded lightning data for ${todayEvents.size} users`);
+            }
+        } catch (error) {
+            console.error('Error loading lightning data:', error);
+        }
+    }
+
+    async saveLightningData() {
+        try {
+            const data = await this.getWeatherData();
+            const today = new Date().toDateString();
+            
+            // Initialize dailyLightningEvents if it doesn't exist
+            if (!data.dailyLightningEvents) {
+                data.dailyLightningEvents = {};
+            }
+            
+            // Convert today's Map data to plain object for JSON storage
+            if (this.dailyWeatherEvents.has(today)) {
+                const todayEvents = this.dailyWeatherEvents.get(today);
+                data.dailyLightningEvents[today] = {};
+                
+                for (const [userId, userEvents] of todayEvents) {
+                    data.dailyLightningEvents[today][userId] = {
+                        displayName: userEvents.displayName,
+                        region: userEvents.region,
+                        events: userEvents.events,
+                        lightningStrikes: userEvents.lightningStrikes
+                    };
+                }
+            }
+            
+            // Clean up old lightning data (keep only last 7 days)  
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 7);
+            const cutoffDateStr = cutoffDate.toDateString();
+            
+            for (const dateStr in data.dailyLightningEvents) {
+                // Compare date strings properly (convert to Date objects for comparison)
+                if (new Date(dateStr) < new Date(cutoffDateStr)) {
+                    delete data.dailyLightningEvents[dateStr];
+                }
+            }
+            
+            await this.saveWeatherData(data);
+        } catch (error) {
+            console.error('Error saving lightning data:', error);
+        }
+    }
+
+    async recordLightningEvent(userId, userData, lightningData, weather) {
+        try {
+            // Only record severe or notable lightning events to avoid spam
+            if (lightningData.intensity === 'severe' || 
+                (lightningData.intensity === 'moderate' && Math.random() < 0.5)) {
+                
+                const data = await this.getWeatherData();
+                
+                // Initialize lightning history if it doesn't exist
+                if (!data.lightningHistory) {
+                    data.lightningHistory = [];
+                }
+                
+                const lightningEvent = {
+                    timestamp: new Date().toISOString(),
+                    userId: userId,
+                    displayName: userData.displayName,
+                    region: userData.region,
+                    intensity: lightningData.intensity,
+                    points: lightningData.points,
+                    description: lightningData.description,
+                    weather: {
+                        temp: Math.round(weather.main.temp),
+                        condition: weather.weather[0].description,
+                        wind: Math.round(weather.wind?.speed || 0),
+                        humidity: weather.main.humidity
+                    }
+                };
+                
+                data.lightningHistory.push(lightningEvent);
+                
+                // Keep only last 100 lightning events
+                if (data.lightningHistory.length > 100) {
+                    data.lightningHistory = data.lightningHistory.slice(-100);
+                }
+                
+                await this.saveWeatherData(data);
+            }
+        } catch (error) {
+            console.error('Error recording lightning event:', error);
         }
     }
 
@@ -199,22 +486,38 @@ class WeatherSystem {
     }
 
     async saveWeatherData(data) {
+        // Wait for any pending writes to complete
+        while (this.isWritingData) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        this.isWritingData = true;
         try {
             data.lastUpdated = new Date().toISOString();
-            await fs.writeFile(this.weatherDataPath, JSON.stringify(data, null, 2));
+            
+            // Use protected write operation
+            const success = await this.dataProtection.safeWrite('weatherData.json', data, 'weather-update');
+            
+            if (!success) {
+                // Fallback to direct write if protected write fails
+                console.warn('[WEATHER] Protected write failed, using fallback');
+                await fs.writeFile(this.weatherDataPath, JSON.stringify(data, null, 2));
+            }
         } catch (error) {
             console.error('Error saving weather data:', error);
+        } finally {
+            this.isWritingData = false;
         }
     }
 
-    async setUserLocation(userId, zipCode, displayName) {
+    async setUserLocation(userId, zipCode, displayName, countryCode = null) {
         try {
             if (!this.canMakeApiCall()) {
                 throw new Error('Daily API limit reached. Please try again tomorrow.');
             }
 
             // Validate postal code by making API call
-            const weatherData = await this.fetchWeatherByPostalCode(zipCode);
+            const weatherData = await this.fetchWeatherByPostalCode(zipCode, countryCode);
             
             const data = await this.getWeatherData();
             const existingUser = data.users[userId];
@@ -226,6 +529,7 @@ class WeatherSystem {
                 discordUserId: userId, // Store Discord user ID
                 city: weatherData.name, // Stored for internal use only
                 country: weatherData.sys.country, // Store country for better region mapping
+                countryCode: countryCode, // Store the user-specified country code for future API calls
                 region: this.getPrivacyFriendlyLocation(weatherData),
                 joinedAt: existingUser?.joinedAt || new Date().toISOString(), // Keep original join date if re-joining
                 lastWeatherCheck: new Date().toISOString(),
@@ -301,39 +605,70 @@ class WeatherSystem {
         return ukPostcodeMap[areaCode] || null;
     }
 
-    async fetchWeatherByPostalCode(postalCode) {
-        // Determine the best API endpoint based on postal code format
+    async fetchWeatherByPostalCode(postalCode, countryCode = null) {
+        // Determine the best API endpoint based on postal code format and optional country
         let url;
         const cleanCode = postalCode.replace(/\s+/g, '');
         
-        // For US zip codes, use the zip parameter
-        if (/^\d{5}(-?\d{4})?$/.test(cleanCode)) {
+        // If country is explicitly provided, use it
+        if (countryCode) {
+            if (/^\d+$/.test(cleanCode)) {
+                // Numeric postal codes - use zip format
+                url = `http://api.openweathermap.org/data/2.5/weather?zip=${cleanCode},${countryCode}&appid=${this.apiKey}&units=imperial`;
+            } else {
+                // Alphanumeric postal codes - use q format
+                url = `http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(postalCode)},${countryCode}&appid=${this.apiKey}&units=imperial`;
+            }
+        }
+        // Auto-detect based on format (existing logic)
+        else if (/^\d{5}(-?\d{4})?$/.test(cleanCode)) {
+            // US zip codes
             url = `http://api.openweathermap.org/data/2.5/weather?zip=${cleanCode},US&appid=${this.apiKey}&units=imperial`;
         }
-        // For UK postcodes, use the q parameter with country code
         else if (/^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i.test(postalCode)) {
+            // UK postcodes
             url = `http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(postalCode)},GB&appid=${this.apiKey}&units=imperial`;
         }
-        // For Canadian postal codes
         else if (/^[A-Z]\d[A-Z]\s*\d[A-Z]\d$/i.test(postalCode)) {
+            // Canadian postal codes
             url = `http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(postalCode)},CA&appid=${this.apiKey}&units=imperial`;
         }
-        // For Australian postcodes (need city,country format, so this might not work perfectly)
         else if (/^\d{4}$/.test(cleanCode)) {
+            // 4-digit codes (ambiguous - could be AU or DK, default to AU)
             url = `http://api.openweathermap.org/data/2.5/weather?zip=${cleanCode},AU&appid=${this.apiKey}&units=imperial`;
         }
-        // For German postcodes
-        else if (/^\d{5}$/.test(cleanCode) && cleanCode !== postalCode) { // Not a US zip if it had spaces originally
+        else if (/^\d{5}$/.test(cleanCode) && cleanCode !== postalCode) {
+            // German postcodes (5 digits with spaces originally)
             url = `http://api.openweathermap.org/data/2.5/weather?zip=${cleanCode},DE&appid=${this.apiKey}&units=imperial`;
         }
-        // Generic fallback - try as location search
         else {
+            // Generic fallback - try as location search
             url = `http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(postalCode)}&appid=${this.apiKey}&units=imperial`;
         }
         
         try {
             const response = await axios.get(url, { timeout: 10000 });
-            return response.data;
+            const weatherData = response.data;
+            
+            // Try to get more detailed location info using geocoding API if state is missing
+            if (weatherData && !weatherData.sys?.state) {
+                try {
+                    const geocodingUrl = `http://api.openweathermap.org/geo/1.0/zip?zip=${encodeURIComponent(postalCode)}&appid=${this.apiKey}`;
+                    const geoResponse = await axios.get(geocodingUrl, { timeout: 5000 });
+                    const geoData = geoResponse.data;
+                    
+                    // Add state information from geocoding API if available
+                    if (geoData && geoData.state) {
+                        weatherData.sys = weatherData.sys || {};
+                        weatherData.sys.state = geoData.state;
+                    }
+                } catch (geocodingError) {
+                    // Geocoding failed, continue with original weather data
+                    console.log('Geocoding API call failed, using basic weather data');
+                }
+            }
+            
+            return weatherData;
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 // If it's a UK postcode and not found, try using the city name instead
@@ -504,7 +839,7 @@ class WeatherSystem {
                 .map(([userId, userData]) => ({
                     userId,
                     displayName: userData.displayName,
-                    location: userData.region, // Use privacy-friendly region
+                    location: this.getDisplayLocation(userData), // Use helper function for better location display
                     joinedAt: userData.joinedAt
                 }))
                 .sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt));
@@ -514,6 +849,92 @@ class WeatherSystem {
             console.error('Error getting weather leaderboard:', error);
             return [];
         }
+    }
+
+    getDisplayLocation(userData) {
+        // If region is just a country name, try to get the state from postal code
+        if (this.isCountryName(userData.region) && userData.postalCode) {
+            const stateFromPostal = this.getStateFromPostalCode(userData.postalCode, userData.country);
+            if (stateFromPostal) {
+                return stateFromPostal;
+            }
+        }
+        
+        // If we have a proper region (not a country name), use it
+        if (userData.region && !this.isCountryName(userData.region)) {
+            return userData.region;
+        }
+        
+        // Fallback to region or unknown
+        return userData.region || 'Unknown Location';
+    }
+
+    getStateFromPostalCode(postalCode, country) {
+        if (!postalCode) return null;
+        
+        const cleanCode = postalCode.replace(/\s+/g, '').toUpperCase();
+        
+        // US ZIP code to state mapping (first 3 digits determine state)
+        if (country === 'US' && /^\d{5}/.test(cleanCode)) {
+            const zip3 = parseInt(cleanCode.substring(0, 3));
+            
+            const zipToState = {
+                // Alabama: 350-369
+                350: 'Alabama', 351: 'Alabama', 352: 'Alabama', 354: 'Alabama', 355: 'Alabama',
+                356: 'Alabama', 357: 'Alabama', 358: 'Alabama', 359: 'Alabama', 360: 'Alabama',
+                361: 'Alabama', 362: 'Alabama', 363: 'Alabama', 364: 'Alabama', 365: 'Alabama',
+                366: 'Alabama', 367: 'Alabama', 368: 'Alabama', 369: 'Alabama',
+                // Alaska: 995-999
+                995: 'Alaska', 996: 'Alaska', 997: 'Alaska', 998: 'Alaska', 999: 'Alaska',
+                // Arizona: 850-865
+                850: 'Arizona', 851: 'Arizona', 852: 'Arizona', 853: 'Arizona', 854: 'Arizona',
+                855: 'Arizona', 856: 'Arizona', 857: 'Arizona', 858: 'Arizona', 859: 'Arizona',
+                860: 'Arizona', 863: 'Arizona', 864: 'Arizona', 865: 'Arizona',
+                // Arkansas: 716-729, 755-759
+                716: 'Arkansas', 717: 'Arkansas', 718: 'Arkansas', 719: 'Arkansas', 720: 'Arkansas',
+                721: 'Arkansas', 722: 'Arkansas', 723: 'Arkansas', 724: 'Arkansas', 725: 'Arkansas',
+                726: 'Arkansas', 727: 'Arkansas', 728: 'Arkansas', 729: 'Arkansas',
+                755: 'Arkansas', 756: 'Arkansas', 757: 'Arkansas', 758: 'Arkansas', 759: 'Arkansas',
+                // California: 900-966
+                900: 'California', 901: 'California', 902: 'California', 903: 'California', 904: 'California',
+                905: 'California', 906: 'California', 907: 'California', 908: 'California', 910: 'California',
+                911: 'California', 912: 'California', 913: 'California', 914: 'California', 915: 'California',
+                916: 'California', 917: 'California', 918: 'California', 919: 'California', 920: 'California',
+                921: 'California', 922: 'California', 923: 'California', 924: 'California', 925: 'California',
+                926: 'California', 927: 'California', 928: 'California', 930: 'California', 931: 'California',
+                932: 'California', 933: 'California', 934: 'California', 935: 'California', 936: 'California',
+                937: 'California', 938: 'California', 939: 'California', 940: 'California', 941: 'California',
+                942: 'California', 943: 'California', 944: 'California', 945: 'California', 946: 'California',
+                947: 'California', 948: 'California', 949: 'California', 950: 'California', 951: 'California',
+                952: 'California', 953: 'California', 954: 'California', 955: 'California', 956: 'California',
+                957: 'California', 958: 'California', 959: 'California', 960: 'California', 961: 'California',
+                // Connecticut: 060-069
+                60: 'Connecticut', 61: 'Connecticut', 62: 'Connecticut', 63: 'Connecticut', 
+                64: 'Connecticut', 65: 'Connecticut', 66: 'Connecticut', 67: 'Connecticut', 
+                68: 'Connecticut', 69: 'Connecticut',
+                // Maryland: 206-219
+                206: 'Maryland', 207: 'Maryland', 208: 'Maryland', 209: 'Maryland', 210: 'Maryland',
+                211: 'Maryland', 212: 'Maryland', 214: 'Maryland', 215: 'Maryland', 216: 'Maryland',
+                217: 'Maryland', 218: 'Maryland', 219: 'Maryland'
+            };
+            
+            return zipToState[zip3] || null;
+        }
+        
+        // UK postcode to region mapping (simplified)
+        if (country === 'GB' && /^[A-Z]{1,2}\d/.test(cleanCode)) {
+            const area = cleanCode.substring(0, 2);
+            const ukRegions = {
+                'CR': 'England', 'BR': 'England', 'SE': 'England', 'SW': 'England',
+                'E': 'England', 'EC': 'England', 'N': 'England', 'NW': 'England',
+                'W': 'England', 'WC': 'England', 'BT': 'Northern Ireland',
+                'G': 'Scotland', 'EH': 'Scotland', 'AB': 'Scotland',
+                'CF': 'Wales', 'SA': 'Wales', 'LL': 'Wales'
+            };
+            return ukRegions[area] || 'United Kingdom';
+        }
+        
+        return null;
     }
 
     async getSystemStats() {
@@ -615,7 +1036,7 @@ class WeatherSystem {
             }
         });
 
-        // Daily weather summary with notable events (8 PM)
+        // Daily weather summary with notable events (8 PM Eastern Time)
         cron.schedule('0 20 * * *', async () => {
             console.log('Running daily weather summary...');
             try {
@@ -629,9 +1050,11 @@ class WeatherSystem {
             } catch (error) {
                 console.error('Error in daily weather summary:', error);
             }
+        }, {
+            timezone: 'America/New_York'
         });
 
-        // Daily shitty weather championship announcement (6 PM)
+        // Daily shitty weather championship announcement (6 PM Eastern Time)
         cron.schedule('0 18 * * *', async () => {
             console.log('Running daily shitty weather championship...');
             try {
@@ -662,6 +1085,8 @@ class WeatherSystem {
             } catch (error) {
                 console.error('Error in daily shitty weather update:', error);
             }
+        }, {
+            timezone: 'America/New_York'
         });
 
         // Weekly weather leaderboard (Sundays at 8 PM)
@@ -713,9 +1138,24 @@ class WeatherSystem {
             } catch (error) {
                 console.error('Error in scheduled weather leaderboard:', error);
             }
+        }, {
+            timezone: 'America/New_York'
         });
 
-        console.log('Weather system scheduled tasks initialized');
+        // Daily data backup (2 AM Eastern Time)
+        cron.schedule('0 2 * * *', async () => {
+            console.log('Running daily data backup...');
+            try {
+                await this.dataProtection.createBackup('weatherData.json', 'daily-auto');
+                console.log('Daily weather data backup completed');
+            } catch (error) {
+                console.error('Error in daily backup:', error);
+            }
+        }, {
+            timezone: 'America/New_York'
+        });
+
+        console.log('Weather system scheduled tasks initialized (America/New_York timezone)');
     }
 
     getPrivacyFriendlyLocation(weatherData) {
@@ -1007,6 +1447,13 @@ class WeatherSystem {
             'ash': { points: 8, emoji: '🌋', name: 'Volcanic Ash' }
         };
 
+        // Lightning detection from thunderstorm conditions
+        const hasLightning = this.detectLightning(weather);
+        if (hasLightning.detected) {
+            score += hasLightning.points;
+            breakdown.push(`${hasLightning.emoji} ${hasLightning.description} (+${hasLightning.points})`);
+        }
+
         if (shittyConditions[conditions]) {
             const condition = shittyConditions[conditions];
             score += condition.points;
@@ -1248,7 +1695,15 @@ class WeatherSystem {
                     snowHours: 0,
                     windyHours: 0,
                     humidHours: 0,
-                    stormHours: 0
+                    stormHours: 0,
+                    lightningHours: 0,
+                    severeLightningHours: 0
+                },
+                lightningStrikes: {
+                    total: 0,
+                    severe: 0,
+                    moderate: 0,
+                    light: 0
                 },
                 tempExtremes: {
                     highest: weather.temp,
@@ -1259,8 +1714,8 @@ class WeatherSystem {
         }
         
         const userEvents = todayEvents.get(userId);
-        const temp = weather.temp;
-        const condition = weather.description.toLowerCase();
+        const temp = weather.main.temp;
+        const condition = weather.weather[0].description.toLowerCase();
         
         // Track temperature extremes
         if (temp > userEvents.tempExtremes.highest) {
@@ -1285,11 +1740,11 @@ class WeatherSystem {
             userEvents.events.snowHours++;
         }
         
-        if (weather.wind >= 15) {
+        if (weather.wind?.speed >= 15) {
             userEvents.events.windyHours++;
         }
         
-        if (weather.humidity >= 80) {
+        if (weather.main.humidity >= 80) {
             userEvents.events.humidHours++;
         }
         
@@ -1297,14 +1752,45 @@ class WeatherSystem {
             userEvents.events.stormHours++;
         }
         
+        // Track lightning activity
+        const lightningData = this.detectLightning(weather);
+        if (lightningData.detected) {
+            userEvents.events.lightningHours++;
+            userEvents.lightningStrikes.total++;
+            
+            // Track by intensity
+            if (lightningData.intensity === 'severe') {
+                userEvents.events.severeLightningHours++;
+                userEvents.lightningStrikes.severe++;
+            } else if (lightningData.intensity === 'moderate') {
+                userEvents.lightningStrikes.moderate++;
+            } else if (lightningData.intensity === 'light') {
+                userEvents.lightningStrikes.light++;
+            }
+        }
+        
         // Store the condition for variety tracking
         userEvents.conditions.push({
             time: new Date().getHours(),
             temp: temp,
-            condition: weather.description,
-            wind: weather.wind,
-            humidity: weather.humidity
+            condition: weather.weather[0].description,
+            wind: weather.wind?.speed || 0,
+            humidity: weather.main.humidity,
+            lightning: lightningData.detected ? lightningData.intensity : null
         });
+        
+        // Save lightning data to persistent storage after any lightning activity
+        if (lightningData.detected) {
+            // Save lightning data
+            this.saveLightningData().catch(error => {
+                console.error('Error saving lightning data:', error);
+            });
+            
+            // Record significant lightning events in history
+            this.recordLightningEvent(userId, userData, lightningData, weather).catch(error => {
+                console.error('Error recording lightning event:', error);
+            });
+        }
     }
 
     async generateDailyWeatherSummary() {
@@ -1402,6 +1888,41 @@ class WeatherSystem {
                     type: 'storm',
                     message: `⛈️ **${userEvents.displayName}** weathered **${events.stormHours} hours** of storms in **${userEvents.region}**!`,
                     severity: events.stormHours
+                });
+            }
+            
+            // Lightning activity
+            if (events.severeLightningHours >= 3) {
+                notableEvents.push({
+                    userId,
+                    type: 'severe_lightning',
+                    message: `⚡ **${userEvents.displayName}** survived **${events.severeLightningHours} hours** of severe lightning strikes in **${userEvents.region}**!`,
+                    severity: events.severeLightningHours + 10 // Higher priority for lightning
+                });
+            } else if (events.lightningHours >= 5) {
+                notableEvents.push({
+                    userId,
+                    type: 'lightning',
+                    message: `🌩️ **${userEvents.displayName}** endured **${events.lightningHours} hours** of lightning activity in **${userEvents.region}**!`,
+                    severity: events.lightningHours + 5 // Moderate priority boost
+                });
+            }
+            
+            // Lightning strike counts
+            const strikes = userEvents.lightningStrikes;
+            if (strikes.total >= 20) {
+                notableEvents.push({
+                    userId,
+                    type: 'lightning_strikes',
+                    message: `⚡ **${userEvents.displayName}** witnessed **${strikes.total} lightning events** (${strikes.severe} severe, ${strikes.moderate} moderate, ${strikes.light} light) in **${userEvents.region}**!`,
+                    severity: strikes.total + strikes.severe * 3 // Weighted by severity
+                });
+            } else if (strikes.total >= 10) {
+                notableEvents.push({
+                    userId,
+                    type: 'moderate_lightning_strikes',
+                    message: `🌩️ **${userEvents.displayName}** experienced **${strikes.total} lightning events** in **${userEvents.region}**!`,
+                    severity: strikes.total
                 });
             }
             
