@@ -1,0 +1,265 @@
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const weatherSystemAdapter = require('../../../services/shared/features/weatherSystemAdapter');
+const { migrateWeatherData } = require('../../../scripts/migrate-weather-data');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('weathersystem')
+        .setDescription('Manage weather system database migration')
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('status')
+                .setDescription('Check weather system status'))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('migrate')
+                .setDescription('Migrate from JSON to database'))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('switch')
+                .setDescription('Switch between JSON and database systems')
+                .addStringOption(option =>
+                    option
+                        .setName('system')
+                        .setDescription('Which system to use')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Database', value: 'database' },
+                            { name: 'JSON', value: 'json' }
+                        )))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('compare')
+                .setDescription('Compare data between JSON and database systems'))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('health')
+                .setDescription('Check health of both systems')),
+
+    async execute(interaction) {
+        // Check if user has admin permissions
+        if (!interaction.member.permissions.has('Administrator')) {
+            return interaction.reply({ 
+                content: '❌ You need Administrator permissions to use this command.',
+                ephemeral: true 
+            });
+        }
+
+        const subcommand = interaction.options.getSubcommand();
+        
+        try {
+            switch (subcommand) {
+                case 'status':
+                    await handleStatus(interaction);
+                    break;
+                case 'migrate':
+                    await handleMigrate(interaction);
+                    break;
+                case 'switch':
+                    await handleSwitch(interaction);
+                    break;
+                case 'compare':
+                    await handleCompare(interaction);
+                    break;
+                case 'health':
+                    await handleHealth(interaction);
+                    break;
+                default:
+                    await interaction.reply({ 
+                        content: '❌ Unknown subcommand', 
+                        ephemeral: true 
+                    });
+            }
+        } catch (error) {
+            console.error('[WEATHER SYSTEM CMD] Error:', error);
+            
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ 
+                    content: `❌ Error: ${error.message}`, 
+                    ephemeral: true 
+                });
+            } else {
+                await interaction.followUp({ 
+                    content: `❌ Error: ${error.message}`, 
+                    ephemeral: true 
+                });
+            }
+        }
+    }
+};
+
+async function handleStatus(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    const embed = new EmbedBuilder()
+        .setTitle('🌤️ Weather System Status')
+        .setColor(0x00AE86)
+        .addFields(
+            { 
+                name: 'Current System', 
+                value: weatherSystemAdapter.getCurrentSystemName(),
+                inline: true 
+            },
+            { 
+                name: 'Using Database', 
+                value: weatherSystemAdapter.isUsingDatabase() ? '✅ Yes' : '❌ No',
+                inline: true 
+            }
+        )
+        .setTimestamp();
+
+    try {
+        const userCount = await weatherSystemAdapter.getUserCount();
+        embed.addFields({ name: 'Active Users', value: userCount.toString(), inline: true });
+    } catch (error) {
+        embed.addFields({ name: 'Active Users', value: `Error: ${error.message}`, inline: true });
+    }
+
+    await interaction.editReply({ embeds: [embed] });
+}
+
+async function handleMigrate(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    if (weatherSystemAdapter.isUsingDatabase()) {
+        return await interaction.editReply({ 
+            content: '❌ Already using database system. Migration not needed.' 
+        });
+    }
+
+    try {
+        await interaction.editReply({ 
+            content: '🔄 Starting migration from JSON to database...' 
+        });
+
+        await migrateWeatherData();
+
+        const embed = new EmbedBuilder()
+            .setTitle('✅ Migration Completed')
+            .setDescription('Weather data has been successfully migrated from JSON to database.')
+            .setColor(0x00FF00)
+            .addFields(
+                { name: 'Next Steps', value: 'Use `/weathersystem switch system:Database` to start using the database system.' }
+            )
+            .setTimestamp();
+
+        await interaction.editReply({ content: null, embeds: [embed] });
+    } catch (error) {
+        await interaction.editReply({ 
+            content: `❌ Migration failed: ${error.message}` 
+        });
+    }
+}
+
+async function handleSwitch(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    const system = interaction.options.getString('system');
+    const currentSystem = weatherSystemAdapter.getCurrentSystemName().toLowerCase();
+
+    if (system === currentSystem) {
+        return await interaction.editReply({ 
+            content: `✅ Already using ${weatherSystemAdapter.getCurrentSystemName()} system.` 
+        });
+    }
+
+    try {
+        if (system === 'database') {
+            await weatherSystemAdapter.switchToDatabase();
+        } else {
+            await weatherSystemAdapter.switchToJson();
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle('✅ System Switched')
+            .setDescription(`Successfully switched to ${weatherSystemAdapter.getCurrentSystemName()} system.`)
+            .setColor(0x00FF00)
+            .addFields(
+                { name: 'Note', value: 'Weather service will need to be restarted to use the new system.' }
+            )
+            .setTimestamp();
+
+        await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+        await interaction.editReply({ 
+            content: `❌ Failed to switch systems: ${error.message}` 
+        });
+    }
+}
+
+async function handleCompare(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    if (weatherSystemAdapter.isUsingDatabase()) {
+        return await interaction.editReply({ 
+            content: '❌ Cannot compare data while using database system. Switch to JSON first.' 
+        });
+    }
+
+    try {
+        const comparison = await weatherSystemAdapter.compareData();
+
+        const embed = new EmbedBuilder()
+            .setTitle('📊 Data Comparison')
+            .setColor(0x0099FF)
+            .addFields(
+                { 
+                    name: 'JSON System', 
+                    value: `Users: ${comparison.json.userCount}\nLeaderboard: ${comparison.json.leaderboardEntries} entries`,
+                    inline: true 
+                },
+                { 
+                    name: 'Database System', 
+                    value: `Users: ${comparison.database.userCount}\nLeaderboard: ${comparison.database.leaderboardEntries} entries`,
+                    inline: true 
+                }
+            )
+            .setTimestamp();
+
+        await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+        await interaction.editReply({ 
+            content: `❌ Comparison failed: ${error.message}` 
+        });
+    }
+}
+
+async function handleHealth(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    try {
+        const health = await weatherSystemAdapter.healthCheck();
+
+        const embed = new EmbedBuilder()
+            .setTitle('🏥 System Health Check')
+            .setColor(0x0099FF)
+            .addFields(
+                { 
+                    name: 'Current System', 
+                    value: `${health.adapter.currentSystem} (${health.adapter.usingDatabase ? 'Database' : 'JSON'})`,
+                    inline: false 
+                },
+                { 
+                    name: 'JSON System', 
+                    value: health.json.available 
+                        ? `✅ Available (${health.json.userCount} users)`
+                        : `❌ Error: ${health.json.error}`,
+                    inline: true 
+                },
+                { 
+                    name: 'Database System', 
+                    value: health.database.available 
+                        ? `✅ Available (${health.database.userCount} users)`
+                        : `❌ Error: ${health.database.error}`,
+                    inline: true 
+                }
+            )
+            .setTimestamp();
+
+        await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+        await interaction.editReply({ 
+            content: `❌ Health check failed: ${error.message}` 
+        });
+    }
+}

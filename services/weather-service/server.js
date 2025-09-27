@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 
 // Import the existing weather system
-const WeatherSystem = require('../shared/features/weatherSystem');
+const weatherSystemAdapter = require('../shared/features/weatherSystemAdapter');
 
 const app = express();
 const PORT = process.env.WEATHER_SERVICE_PORT || 3001;
@@ -13,14 +13,16 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize weather system with config
-let weatherSystem;
-try {
-    const config = require('../../config.json');
-    weatherSystem = new WeatherSystem(null, config); // No client needed for service
-    console.log('[WEATHER SERVICE] Weather system initialized');
-} catch (error) {
-    console.error('[WEATHER SERVICE] Failed to initialize weather system:', error);
-    process.exit(1);
+let weatherSystem = weatherSystemAdapter;
+
+async function initializeWeatherService() {
+    try {
+        await weatherSystem.initialize();
+        console.log(`[WEATHER SERVICE] Weather system initialized (${weatherSystem.getCurrentSystemName()})`);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Failed to initialize weather system:', error);
+        process.exit(1);
+    }
 }
 
 // Middleware to verify service token
@@ -82,15 +84,24 @@ app.post('/admin', authenticateService, async (req, res) => {
 app.get('/weather/:userId', authenticateService, async (req, res) => {
     try {
         const { userId } = req.params;
-        const data = await weatherSystem.getWeatherData();
-        const user = data.users[userId];
+        const user = await weatherSystem.getUser(userId);
         
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const weather = await weatherSystem.fetchWeatherByPostalCode(user.postalCode, user.countryCode);
-        res.json({ user, weather });
+        // Convert database format to expected format
+        const userFormatted = {
+            displayName: user.display_name,
+            postalCode: user.postal_code,
+            city: user.city,
+            country: user.country,
+            region: user.region,
+            countryCode: user.country_code
+        };
+
+        const weather = await weatherSystem.fetchWeatherByPostalCode(user.postal_code, user.country_code);
+        res.json({ user: userFormatted, weather });
     } catch (error) {
         console.error('[WEATHER SERVICE] Error fetching weather:', error);
         res.status(500).json({ error: 'Failed to fetch weather data' });
@@ -99,7 +110,7 @@ app.get('/weather/:userId', authenticateService, async (req, res) => {
 
 app.get('/leaderboard', authenticateService, async (req, res) => {
     try {
-        const leaderboard = await weatherSystem.getWeatherLeaderboard();
+        const leaderboard = await weatherSystem.getShittyWeatherLeaderboard();
         res.json(leaderboard);
     } catch (error) {
         console.error('[WEATHER SERVICE] Error fetching leaderboard:', error);
@@ -110,8 +121,39 @@ app.get('/leaderboard', authenticateService, async (req, res) => {
 app.post('/join', authenticateService, async (req, res) => {
     try {
         const { userId, zipCode, displayName, countryCode } = req.body;
-        const result = await weatherSystem.setUserLocation(userId, zipCode, displayName, countryCode);
-        res.json({ success: true, data: result });
+        
+        // Fetch location data from OpenWeatherMap API using the postal code
+        const locationData = await weatherSystem.fetchWeatherByPostalCode(zipCode, countryCode);
+        
+        if (!locationData) {
+            return res.status(400).json({ success: false, message: 'Invalid postal code or location not found' });
+        }
+        
+        // Create user data for database
+        const userData = {
+            userId: userId,
+            discordUserId: userId,
+            displayName: displayName,
+            postalCode: zipCode,
+            city: locationData.name,
+            country: locationData.sys?.country || countryCode,
+            region: locationData.sys?.country || 'Unknown',
+            countryCode: locationData.sys?.country || countryCode,
+            adminAdded: false,
+            addedBy: null
+        };
+        
+        const result = await weatherSystem.addUser(userData);
+        
+        // Return the format expected by the weather command
+        const responseData = {
+            weather: locationData,
+            location: `${locationData.name}, ${locationData.sys?.country || countryCode}`,
+            user: userData,
+            addResult: result
+        };
+        
+        res.json({ success: true, data: responseData });
     } catch (error) {
         console.error('[WEATHER SERVICE] Error joining weather system:', error);
         res.status(500).json({ success: false, message: error.message });
@@ -121,8 +163,8 @@ app.post('/join', authenticateService, async (req, res) => {
 app.delete('/leave/:userId', authenticateService, async (req, res) => {
     try {
         const { userId } = req.params;
-        const success = await weatherSystem.removeUserLocation(userId);
-        res.json({ success });
+        const result = await weatherSystem.removeUser(userId);
+        res.json({ success: result.success, message: result.message });
     } catch (error) {
         console.error('[WEATHER SERVICE] Error leaving weather system:', error);
         res.status(500).json({ success: false, message: error.message });
@@ -162,6 +204,38 @@ app.post('/award-points', authenticateService, async (req, res) => {
     }
 });
 
+// Get system statistics
+app.get('/stats', authenticateService, async (req, res) => {
+    try {
+        const userCount = await weatherSystem.getUserCount();
+        const leaderboard = await weatherSystem.getShittyWeatherLeaderboard(5);
+        
+        const stats = {
+            totalUsers: userCount,
+            activeUsers: userCount, // All returned users are active
+            topPlayers: leaderboard.length,
+            systemStatus: 'operational'
+        };
+        
+        res.json(stats);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting stats:', error);
+        res.status(500).json({ error: 'Failed to get statistics' });
+    }
+});
+
+// Get last shitty weather award
+app.get('/shitty/last-award', authenticateService, async (req, res) => {
+    try {
+        // This would need to be implemented in the database system
+        // For now, return null indicating no recent award
+        res.json(null);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting last award:', error);
+        res.status(500).json({ error: 'Failed to get last award' });
+    }
+});
+
 // Import admin handlers from separate file
 const {
     setWeatherSystem,
@@ -176,9 +250,18 @@ const {
 setWeatherSystem(weatherSystem);
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`[WEATHER SERVICE] Server running on port ${PORT}`);
-    console.log(`[WEATHER SERVICE] Health check: http://localhost:${PORT}/health`);
+async function startServer() {
+    await initializeWeatherService();
+    
+    app.listen(PORT, () => {
+        console.log(`[WEATHER SERVICE] Server running on port ${PORT}`);
+        console.log(`[WEATHER SERVICE] Health check: http://localhost:${PORT}/health`);
+    });
+}
+
+startServer().catch(error => {
+    console.error('[WEATHER SERVICE] Failed to start server:', error);
+    process.exit(1);
 });
 
 // Graceful shutdown

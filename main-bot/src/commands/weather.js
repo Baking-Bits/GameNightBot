@@ -287,7 +287,7 @@ module.exports = {
                 .setTimestamp();
 
             // Add weather alerts if conditions are severe
-            const alert = weatherSystem.checkSevereWeather(weather, { city: result.location });
+            const alert = serviceManager.checkSevereWeather(weather, { city: result.location });
             if (alert) {
                 embed.addFields({
                     name: '⚠️ Weather Alert',
@@ -367,7 +367,7 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
 
         try {
-            const stats = await weatherSystem.getSystemStats();
+            const stats = await serviceManager.getSystemStats();
             
             if (!stats) {
                 return await interaction.editReply({
@@ -468,7 +468,7 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const leaderboard = await weatherSystem.getShittyWeatherLeaderboard();
+            const leaderboard = await serviceManager.getShittyWeatherLeaderboard();
             
             if (leaderboard.length === 0) {
                 const embed = new EmbedBuilder()
@@ -497,7 +497,7 @@ module.exports = {
             embed.setDescription(`**Hall of Shitty Weather Champions**\n*Who can endure the worst conditions?*\n\n${description}`);
             
             // Add recent winner breakdown if available
-            const recentAward = await weatherSystem.getLastShittyWeatherAward();
+            const recentAward = await serviceManager.getLastShittyWeatherAward();
             if (recentAward && recentAward.breakdown && recentAward.breakdown.length > 0) {
                 const timeSince = new Date() - new Date(recentAward.timestamp);
                 const hoursAgo = Math.floor(timeSince / (1000 * 60 * 60));
@@ -543,7 +543,7 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const result = await weatherSystem.awardShittyWeatherPoints();
+            const result = await serviceManager.awardShittyWeatherPoints();
             
             if (!result || !result.award) {
                 return await interaction.editReply({
@@ -695,7 +695,7 @@ module.exports = {
                 });
             }
 
-            const shittyLeaderboard = await weatherSystem.getShittyWeatherLeaderboard();
+            const shittyLeaderboard = await bot.serviceManager.getShittyWeatherLeaderboard();
             
             let message = '🌤️ **WEEKLY WEATHER TRACKER CELEBRATION** 🌤️\n\n';
             message += '**Active Weather Trackers:**\n';

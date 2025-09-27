@@ -20,6 +20,12 @@ async function initializeDatabase() {
                 PRIMARY KEY (user_id, guild_id, timestamp)
             )
         `);
+        
+        // Initialize weather database tables
+        const { initializeWeatherDatabase } = require('./weather');
+        await initializeWeatherDatabase();
+        
+        console.log('[DB] Database initialized with weather tables');
     } catch (error) {
         console.error('Error initializing database:', error);
     }

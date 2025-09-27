@@ -15,15 +15,16 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
             return { success: false, message: validation.message };
         }
 
-        const data = await weatherSystem.getWeatherData();
+        // Check if user exists in database
+        const existingUser = await weatherSystem.getUser(userId);
         
         // Check if user exists and is active
-        if (data.users[userId] && data.users[userId].isActive) {
+        if (existingUser && existingUser.is_active) {
             return { success: false, message: 'User is already active in the weather system.' };
         }
         
         // If user exists but is inactive, we'll reactivate them
-        const isReactivation = data.users[userId] && !data.users[userId].isActive;
+        const isReactivation = existingUser && !existingUser.is_active;
 
         let locationInfo;
         try {
@@ -38,45 +39,22 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
             return { success: false, message: `Could not validate postal code ${postalCode}${countryText}. Please check it's correct.` };
         }
 
-        const now = new Date().toISOString();
-        
-        if (isReactivation) {
-            // Reactivate existing user - preserve original joinedAt but update other fields
-            data.users[userId].postalCode = postalCode;
-            data.users[userId].zipCode = postalCode;
-            data.users[userId].displayName = displayName || data.users[userId].displayName || `User-${userId.slice(-4)}`;
-            data.users[userId].city = locationInfo.city;
-            data.users[userId].country = locationInfo.country;
-            data.users[userId].region = locationInfo.region;
-            data.users[userId].lastWeatherCheck = now;
-            data.users[userId].isActive = true;
-            data.users[userId].updatedAt = now;
-            data.users[userId].reactivatedAt = now;
-            data.users[userId].reactivatedBy = adminUserId;
-            data.users[userId].countryCode = countryCode;
-            // Remove removedAt timestamp
-            delete data.users[userId].removedAt;
-        } else {
-            // Create new user
-            data.users[userId] = {
-                postalCode: postalCode,
-                zipCode: postalCode,
-                discordUserId: userId,
-                displayName: displayName || `User-${userId.slice(-4)}`, // Store the display name
-                city: locationInfo.city,
-                country: locationInfo.country,
-                region: locationInfo.region,
-                joinedAt: now,
-                lastWeatherCheck: now,
-                isActive: true,
-                updatedAt: now,
-                adminAdded: true,
-                addedBy: adminUserId,
-                countryCode: countryCode
-            };
-        }
+        // Create user data for database
+        const userData = {
+            userId: userId,
+            discordUserId: userId,
+            displayName: displayName || `User-${userId.slice(-4)}`,
+            postalCode: postalCode,
+            city: locationInfo.city,
+            country: locationInfo.country,
+            countryCode: countryCode,
+            region: locationInfo.region,
+            adminAdded: true,
+            addedBy: adminUserId
+        };
 
-        await weatherSystem.saveWeatherData(data);
+        // Add user to database (handles both new and reactivation)
+        await weatherSystem.addUser(userData);
 
         const responseTitle = isReactivation ? '✅ User Reactivated Successfully' : '✅ User Added Successfully';
         const actionText = isReactivation ? 'Reactivated By' : 'Added By';
@@ -121,10 +99,10 @@ async function handleRemoveUser(userId, adminUserId) {
 
 async function handleListUsers() {
     try {
-        const data = await weatherSystem.getWeatherData();
-        const users = Object.entries(data.users);
+        const users = await weatherSystem.getAllUsers();
+        const userEntries = Object.entries(users);
         
-        if (users.length === 0) {
+        if (userEntries.length === 0) {
             return {
                 success: true,
                 title: '📋 Weather System Users',
@@ -134,9 +112,15 @@ async function handleListUsers() {
         }
 
         let description = '';
-        users.forEach(([userId, userData], index) => {
+        const leaderboard = await weatherSystem.getShittyWeatherLeaderboard();
+        const scoreMap = {};
+        leaderboard.forEach(entry => {
+            scoreMap[entry.userId] = entry.totalPoints;
+        });
+
+        userEntries.forEach(([userId, userData], index) => {
             const status = userData.isActive ? '✅ Active' : '❌ Inactive';
-            const score = data.shittyWeatherScores?.[userId] || 0;
+            const score = scoreMap[userId] || 0;
             description += `${index + 1}. <@${userId}>\n`;
             description += `   ${userData.region} | ${status} | ${score} points\n\n`;
         });
@@ -147,8 +131,8 @@ async function handleListUsers() {
             color: '#3498DB',
             description: description,
             fields: [
-                { name: 'Total Users', value: users.length.toString(), inline: true },
-                { name: 'Active Users', value: users.filter(([_, user]) => user.isActive).length.toString(), inline: true }
+                { name: 'Total Users', value: userEntries.length.toString(), inline: true },
+                { name: 'Active Users', value: userEntries.filter(([_, user]) => user.isActive).length.toString(), inline: true }
             ]
         };
     } catch (error) {
@@ -159,17 +143,31 @@ async function handleListUsers() {
 
 async function handleSetActive(userId, active, adminUserId) {
     try {
-        const data = await weatherSystem.getWeatherData();
+        const user = await weatherSystem.getUser(userId);
         
-        if (!data.users[userId]) {
+        if (!user) {
             return { success: false, message: 'User not found in the weather system.' };
         }
 
-        data.users[userId].isActive = active;
-        data.users[userId].updatedAt = new Date().toISOString();
-        data.users[userId].lastModifiedBy = adminUserId;
-
-        await weatherSystem.saveWeatherData(data);
+        if (active) {
+            // Reactivate user - use addUser which handles reactivation
+            const userData = {
+                userId: userId,
+                discordUserId: userId,
+                displayName: user.display_name,
+                postalCode: user.postal_code,
+                city: user.city,
+                country: user.country,
+                countryCode: user.country_code,
+                region: user.region,
+                adminAdded: user.admin_added,
+                addedBy: adminUserId
+            };
+            await weatherSystem.addUser(userData);
+        } else {
+            // Deactivate user
+            await weatherSystem.removeUser(userId);
+        }
 
         const statusText = active ? 'Active' : 'Inactive';
         const emoji = active ? '✅' : '❌';
@@ -188,21 +186,19 @@ async function handleSetActive(userId, active, adminUserId) {
 
 async function handleSetScore(userId, points, adminUserId) {
     try {
-        const data = await weatherSystem.getWeatherData();
+        const user = await weatherSystem.getUser(userId);
         
-        if (!data.users[userId]) {
+        if (!user) {
             return { success: false, message: 'User not found in the weather system.' };
         }
 
-        // Initialize shittyWeatherScores if it doesn't exist
-        if (!data.shittyWeatherScores) {
-            data.shittyWeatherScores = {};
-        }
+        // Get current score from leaderboard
+        const leaderboard = await weatherSystem.getShittyWeatherLeaderboard();
+        const userScore = leaderboard.find(entry => entry.userId === userId);
+        const oldScore = userScore ? userScore.totalPoints : 0;
 
-        const oldScore = data.shittyWeatherScores[userId] || 0;
-        data.shittyWeatherScores[userId] = points;
-
-        await weatherSystem.saveWeatherData(data);
+        // Set new score (this will need to be implemented in the database system)
+        await weatherSystem.updateShittyWeatherScore(userId, points - oldScore);
 
         return {
             success: true,

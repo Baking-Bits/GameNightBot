@@ -26,7 +26,6 @@ module.exports = {
                         .setDescription('Data file to check')
                         .setRequired(true)
                         .addChoices(
-                            { name: 'Weather Data', value: 'weatherData.json' },
                             { name: 'Meal History', value: 'mealHistory.json' },
                             { name: 'Workout History', value: 'workoutHistory.json' },
                             { name: 'Snack History', value: 'snackHistory.json' }
@@ -43,7 +42,6 @@ module.exports = {
                         .setDescription('Data file to restore')
                         .setRequired(true)
                         .addChoices(
-                            { name: 'Weather Data', value: 'weatherData.json' },
                             { name: 'Meal History', value: 'mealHistory.json' },
                             { name: 'Workout History', value: 'workoutHistory.json' },
                             { name: 'Snack History', value: 'snackHistory.json' }

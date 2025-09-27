@@ -7,7 +7,6 @@ class DataProtection {
         this.dataDir = dataDir;
         this.backupDir = path.join(dataDir, 'backups');
         this.protectedFiles = [
-            'weatherData.json',
             'mealHistory.json',
             'workoutHistory.json',
             'snackHistory.json'
@@ -68,25 +67,6 @@ class DataProtection {
      * Check if data contains real user information (not just test data)
      */
     hasRealUserData(data, filename) {
-        if (filename === 'weatherData.json') {
-            const users = data.users || {};
-            const userIds = Object.keys(users);
-            
-            // Check for real users (not test users)
-            const realUsers = userIds.filter(id => 
-                !id.includes('test') && 
-                !id.includes('debug') && 
-                !id.includes('mock') &&
-                !users[id].displayName?.toLowerCase().includes('test') &&
-                !users[id].displayName?.toLowerCase().includes('debug')
-            );
-
-            const hasScores = Object.keys(data.shittyWeatherScores || {}).length > 0;
-            const hasHistory = (data.shittyWeatherHistory || []).length > 0;
-
-            return realUsers.length > 0 || hasScores || hasHistory;
-        }
-
         // For meal/workout data, check if there are actual entries
         if (filename.includes('History.json')) {
             return (data.meals || data.workouts || data.snacks || []).length > 0;

@@ -6,8 +6,9 @@ const { loadEvents } = require('./utils/eventLoader');
 const { loadCommands } = require('./utils/commandLoader');
 const localaiRelay = require('../../services/shared/ai/localaiRelay');
 const WellnessSystem = require('../../services/shared/features/wellnessSystem');
-const WeatherSystem = require('../../services/shared/features/weatherSystem');
+// WeatherSystem import removed - now using database system via ServiceManager
 const ServiceManager = require('./services/ServiceManager');
+const StatusMonitor = require('./services/StatusMonitor');
 const config = require('../../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
@@ -28,8 +29,9 @@ class VoiceTimeTracker {
         this.statusUpdateInterval = 5 * 60 * 1000; // Default to 5 minutes
         this.config = config;
         this.wellnessSystem = null; // Will be initialized after client is ready
-        this.weatherSystem = null; // Will be initialized after client is ready
+        // Weather system now handled by ServiceManager and database
         this.serviceManager = new ServiceManager(); // Initialize service manager
+        this.statusMonitor = new StatusMonitor(this, this.config); // Pass bot instance instead of client
         console.log('[BOT] ServiceManager attached to bot instance:', !!this.serviceManager);
     }
 
@@ -71,13 +73,13 @@ class VoiceTimeTracker {
                 console.log('[ADMIN] Wellness system not initialized - channel ID not configured in config.json');
             }
 
-            // Initialize Weather system
+            // Initialize Weather system scheduling (using ServiceManager + Database)
             if (this.config.weatherChannelId && this.config.weatherApiKey && 
                 this.config.weatherChannelId !== "CHANNEL_ID_HERE" && 
                 this.config.weatherApiKey !== "YOUR_API_KEY_HERE") {
                 try {
-                    this.weatherSystem = new WeatherSystem(this.client, this.config);
-                    this.client.weatherSystem = this.weatherSystem; // Make available to commands
+                    // Initialize database-aware weather scheduling
+                    this.initializeWeatherScheduling();
                     console.log('[WEATHER] Weather system initialized successfully');
                 } catch (error) {
                     console.error('[WEATHER] Failed to initialize Weather system:', error);
@@ -97,6 +99,16 @@ class VoiceTimeTracker {
 
             console.log('Cached all guild members.');
             console.log(`Cached members: ${this.client.cachedMembers.size}`);
+
+            // Initialize Status Monitor
+            if (this.config.statusMonitoring?.enabled) {
+                try {
+                    await this.statusMonitor.initialize();
+                    console.log('[STATUS MONITOR] Status monitoring initialized successfully');
+                } catch (error) {
+                    console.error('[STATUS MONITOR] Failed to initialize status monitoring:', error);
+                }
+            }
 
             // Load event-role associations from DB and set up eventRoleMap
             const eventRoles = await this.db.getAllEventRoles();
@@ -137,6 +149,54 @@ class VoiceTimeTracker {
         } catch (error) {
             console.error('Error during login:', error);
         }
+    }
+
+    initializeWeatherScheduling() {
+        const cron = require('node-cron');
+        
+        // Hourly weather check (every hour)
+        cron.schedule('0 * * * *', async () => {
+            console.log('[WEATHER SCHEDULE] Running hourly weather check...');
+            try {
+                if (this.serviceManager) {
+                    const result = await this.serviceManager.checkAllUsersWeather();
+                    console.log('[WEATHER SCHEDULE] Hourly check completed:', result.summary || 'OK');
+                }
+            } catch (error) {
+                console.error('[WEATHER SCHEDULE] Error in hourly weather check:', error);
+            }
+        });
+
+        // Daily shitty weather points (8 PM)
+        cron.schedule('0 20 * * *', async () => {
+            console.log('[WEATHER SCHEDULE] Running daily shitty weather points...');
+            try {
+                if (this.serviceManager) {
+                    const result = await this.serviceManager.awardShittyWeatherPoints();
+                    console.log('[WEATHER SCHEDULE] Daily points awarded:', result.summary || 'OK');
+                }
+            } catch (error) {
+                console.error('[WEATHER SCHEDULE] Error awarding daily points:', error);
+            }
+        });
+
+        console.log('[WEATHER SCHEDULE] Weather system scheduled tasks initialized');
+    }
+
+    async shutdown() {
+        console.log('[BOT] Shutting down...');
+        
+        // Shutdown status monitor first to update final status
+        if (this.statusMonitor) {
+            await this.statusMonitor.shutdown();
+        }
+        
+        // Destroy Discord client
+        if (this.client) {
+            this.client.destroy();
+        }
+        
+        console.log('[BOT] Shutdown complete');
     }
 
     // startServiceStatusUpdates() {

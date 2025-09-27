@@ -183,6 +183,57 @@ class ServiceManager {
     }
 
     /**
+     * Get system statistics for weather system
+     */
+    async getSystemStats() {
+        return this.makeServiceRequest('weather', '/stats');
+    }
+
+    /**
+     * Get last shitty weather award details
+     */
+    async getLastShittyWeatherAward() {
+        return this.makeServiceRequest('weather', '/shitty/last-award');
+    }
+
+    /**
+     * Check severe weather conditions (client-side utility)
+     */
+    checkSevereWeather(weather, location) {
+        // This is a utility function that doesn't need API call
+        if (!weather || !weather.weather || !weather.weather[0]) {
+            return null;
+        }
+
+        const condition = weather.weather[0].main.toLowerCase();
+        const description = weather.weather[0].description;
+        const windSpeed = weather.wind?.speed || 0;
+        const temp = weather.main?.temp || 70;
+
+        // Check for severe conditions
+        if (condition.includes('thunderstorm') || condition.includes('storm')) {
+            return `⛈️ **Thunderstorm Alert**: ${description}`;
+        }
+        if (condition.includes('tornado')) {
+            return `🌪️ **Tornado Warning**: ${description}`;
+        }
+        if (windSpeed > 25) { // > 25 mph winds
+            return `💨 **High Wind Alert**: ${Math.round(windSpeed)} mph winds`;
+        }
+        if (temp > 100) {
+            return `🔥 **Extreme Heat**: ${Math.round(temp)}°F`;
+        }
+        if (temp < 0) {
+            return `🥶 **Extreme Cold**: ${Math.round(temp)}°F`;
+        }
+        if (condition.includes('blizzard')) {
+            return `🌨️ **Blizzard Warning**: ${description}`;
+        }
+
+        return null;
+    }
+
+    /**
      * Get overall service status for monitoring
      */
     getServicesStatus() {
