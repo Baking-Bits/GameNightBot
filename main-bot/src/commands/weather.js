@@ -40,34 +40,11 @@ module.exports = {
             subcommand
                 .setName('current')
                 .setDescription('Get your current weather'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('leaderboard')
-                .setDescription('View weather tracker leaderboard'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('stats')
-                .setDescription('View weather system statistics (Admin only)'))
+
         .addSubcommand(subcommand =>
             subcommand
                 .setName('shitty')
-                .setDescription('View the Shitty Weather Championship leaderboard'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('award')
-                .setDescription('Manually award shitty weather points (Admin only)'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('trigger-update')
-                .setDescription('Manually trigger daily weather update message (Admin only)'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('trigger-celebration')
-                .setDescription('Manually trigger weekly celebration message (Admin only)'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('trigger-alerts')
-                .setDescription('Manually trigger weather alert check (Admin only)')),
+                .setDescription('View the Shitty Weather Championship leaderboard')),
 
     async execute(interaction, bot) {
         const subcommand = interaction.options.getSubcommand();
@@ -94,30 +71,13 @@ module.exports = {
                 case 'current':
                     await this.handleCurrent(interaction, bot.serviceManager);
                     break;
-                case 'leaderboard':
-                    await this.handleLeaderboard(interaction, bot.serviceManager);
-                    break;
-                case 'stats':
-                    await this.handleStats(interaction, bot.serviceManager);
-                    break;
+
                 case 'shitty':
                     await this.handleShittyLeaderboard(interaction, bot.serviceManager);
                     break;
-                case 'award':
-                    await this.handleManualAward(interaction, bot.serviceManager);
-                    break;
-                case 'trigger-update':
-                    await this.handleTriggerUpdate(interaction, bot);
-                    break;
-                case 'trigger-celebration':
-                    await this.handleTriggerCelebration(interaction, bot);
-                    break;
-                case 'trigger-alerts':
-                    await this.handleTriggerAlerts(interaction, bot);
-                    break;
                 default:
                     await interaction.reply({
-                        content: '❌ Unknown weather command.',
+                        content: '❌ Unknown weather command. For admin functions, use `/weatheradmin`.',
                         flags: 64 // MessageFlags.Ephemeral
                     });
             }
@@ -243,16 +203,19 @@ module.exports = {
         try {
             const response = await serviceManager.getCurrentWeatherForUser(userId);
             
-            if (!response.user) {
+            if (!response || !response.success || !response.user) {
                 return await interaction.editReply({
                     content: '❌ You are not in the weather tracking system. Use `/weather join` to get started!'
                 });
             }
 
             const weather = response.weather;
-            const temp = Math.round(weather.main.temp);
-            const feelsLike = Math.round(weather.main.feels_like);
-            const conditions = weather.weather[0];
+            const user = response.user;
+            
+            // Safely get temperature values with fallbacks
+            const temp = weather.temperature !== 'N/A' ? weather.temperature : null;
+            const feelsLike = weather.main?.feels_like ? Math.round(weather.main.feels_like) : null;
+            const conditions = weather.weather?.[0] || { description: weather.description || 'Unknown', main: 'Unknown' };
             
             // Weather condition emoji mapping
             const weatherEmojis = {
@@ -272,29 +235,19 @@ module.exports = {
             const weatherEmoji = weatherEmojis[conditions.description] || '🌤️';
             
             const embed = new EmbedBuilder()
-                .setColor(this.getWeatherColor(temp))
+                .setColor(this.getWeatherColor(temp || 70))
                 .setTitle(`${weatherEmoji} Current Weather`)
-                .setDescription(`Weather for **${result.displayName}** in ${result.location}`)
+                .setDescription(`Weather for **${user.displayName}** in ${user.location}`)
                 .addFields(
-                    { name: '🌡️ Temperature', value: formatTemperature(temp), inline: true },
-                    { name: '🤚 Feels Like', value: formatTemperature(feelsLike), inline: true },
+                    { name: '🌡️ Temperature', value: temp ? formatTemperature(temp) : 'N/A', inline: true },
+                    { name: '🤚 Feels Like', value: feelsLike ? formatTemperature(feelsLike) : 'N/A', inline: true },
                     { name: '☁️ Conditions', value: conditions.description, inline: true },
-                    { name: '💨 Wind Speed', value: `${Math.round(weather.wind?.speed || 0)} mph`, inline: true },
-                    { name: '💧 Humidity', value: `${weather.main.humidity}%`, inline: true },
-                    { name: '🔍 Visibility', value: `${Math.round((weather.visibility || 10000) / 1609.34)} mi`, inline: true }
+                    { name: '💨 Wind Speed', value: `${Math.round(weather.windSpeed || 0)} mph`, inline: true },
+                    { name: '💧 Humidity', value: `${weather.humidity || 0}%`, inline: true },
+                    { name: '🔍 Visibility', value: `${Math.round((weather.main?.visibility || 10000) / 1609.34)} mi`, inline: true }
                 )
                 .setFooter({ text: 'Weather updates every 4 hours' })
                 .setTimestamp();
-
-            // Add weather alerts if conditions are severe
-            const alert = serviceManager.checkSevereWeather(weather, { city: result.location });
-            if (alert) {
-                embed.addFields({
-                    name: '⚠️ Weather Alert',
-                    value: alert,
-                    inline: false
-                });
-            }
 
             await interaction.editReply({ embeds: [embed] });
         } catch (error) {
@@ -304,56 +257,7 @@ module.exports = {
         }
     },
 
-    async handleLeaderboard(interaction, serviceManager) {
-        await interaction.deferReply();
 
-        try {
-            const leaderboard = await serviceManager.getWeatherLeaderboard();
-            
-            if (leaderboard.length === 0) {
-                const embed = new EmbedBuilder()
-                    .setColor(0x95A5A6)
-                    .setTitle('🌤️ Weather Tracker Leaderboard')
-                    .setDescription('No active weather trackers yet!\n\nUse `/weather join` to be the first!')
-                    .setTimestamp();
-
-                return await interaction.editReply({ embeds: [embed] });
-            }
-
-            const embed = new EmbedBuilder()
-                .setColor(0x3498DB)
-                .setTitle('🌤️ Weather Tracker Leaderboard')
-                .setDescription('Active weather trackers in our community')
-                .setTimestamp();
-
-            let description = '';
-            leaderboard.forEach((user, index) => {
-                const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📍';
-                const joinDate = new Date(user.joinedAt).toLocaleDateString();
-                description += `${emoji} **${user.displayName}** - ${user.location}\n*Joined: ${joinDate}*\n\n`;
-            });
-
-            embed.setDescription(description);
-            embed.addFields(
-                {
-                    name: '📊 Statistics',
-                    value: `Total active trackers: **${leaderboard.length}**`,
-                    inline: false
-                },
-                {
-                    name: '💩 Want More Fun?',
-                    value: 'Check out `/weather shitty` for the Shitty Weather Championship!\n*Compete for who has the worst weather!*\n*Works worldwide - US, UK, Canada, Australia, etc.*',
-                    inline: false
-                }
-            );
-
-            await interaction.editReply({ embeds: [embed] });
-        } catch (error) {
-            await interaction.editReply({
-                content: `❌ Failed to get leaderboard: ${error.message}`
-            });
-        }
-    },
 
     async handleStats(interaction, serviceManager) {
         // Check if user has admin permissions
@@ -468,14 +372,76 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const leaderboard = await serviceManager.getShittyWeatherLeaderboard();
+            const [bestSingleDay, topWeeklyAverages] = await Promise.all([
+                serviceManager.getBestSingleDay(),
+                serviceManager.getTopWeeklyAverages()
+            ]);
             
-            if (leaderboard.length === 0) {
+            // Handle null/undefined results
+            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const weeklyData = topWeeklyAverages || [];
+            
+            if (bestDayData.length === 0 && weeklyData.length === 0) {
+                // Fall back to showing existing cumulative points until daily data accumulates
+                const regularLeaderboard = await serviceManager.getShittyWeatherLeaderboard();
+                
+                if (!regularLeaderboard || regularLeaderboard.length === 0) {
+                    const embed = new EmbedBuilder()
+                        .setColor(0x95A5A6)
+                        .setTitle('💩 Shitty Weather Championship')
+                        .setDescription('**No champions yet - be the first!**')
+                        .addFields(
+                            {
+                                name: '🎮 Join the Competition!',
+                                value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*',
+                                inline: false
+                            },
+                            {
+                                name: '🏆 How It Works',
+                                value: '• Points awarded every 4 hours for bad weather\n• Daily and weekly competitions for fair play\n• Everyone gets a chance to compete\n• New players can win immediately\n• Worst weather wins the most points!',
+                                inline: false
+                            }
+                        )
+                        .setTimestamp();
+
+                    return await interaction.editReply({ embeds: [embed] });
+                }
+                
+                // Show current champions with explanation that fair competition is starting
                 const embed = new EmbedBuilder()
-                    .setColor(0x95A5A6)
-                    .setTitle('💩 Shitty Weather Championship')
-                    .setDescription('**No champions yet - be the first!**\n\n🎮 **Ready to compete?**\nUse `/weather join <postal_code>` to join the fun!\n\n🏆 **How it works:**\n• Points awarded every 4 hours\n• Worst weather wins points\n• Your postal code stays private\n• Only general region is shown\n• Works worldwide (US, UK, Canada, etc.)\n\n*The shittier your weather, the more points you get!*')
+                    .setColor(0x8B4513)
+                    .setTitle('💩 Shitty Weather Championship 🏆')
+                    .setDescription('**Current Champions** *(Fair competition system starting)*\n*New daily & weekly competitions will show here as data accumulates*')
                     .setTimestamp();
+
+                let description = '';
+                regularLeaderboard.slice(0, 5).forEach((user, index) => {
+                    const emoji = index === 0 ? '👑💩' : index === 1 ? '🥈💧' : index === 2 ? '🥉❄️' : '💩';
+                    const status = user.isActive ? '' : ' *(inactive)*';
+                    const displayName = user.displayName || user.display_name || `User-${(user.userId || user.user_id).slice(-4)}`;
+                    const region = user.region || 'Unknown Region';
+                    const points = user.totalPoints || user.total_points || 0;
+                    description += `${emoji} **${displayName}** - ${region}${status}\n`;
+                    description += `   🎖️ **${points}** total points\n\n`;
+                });
+
+                embed.addFields(
+                    {
+                        name: '🏆 Current Standings',
+                        value: description,
+                        inline: false
+                    },
+                    {
+                        name: '🔄 Fair Competition Active!',
+                        value: '*New daily and weekly competition data will appear here as it accumulates*\n*Everyone gets a fair chance - new players can compete immediately!*',
+                        inline: false
+                    },
+                    {
+                        name: '🎮 Join the Competition!',
+                        value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*',
+                        inline: false
+                    }
+                );
 
                 return await interaction.editReply({ embeds: [embed] });
             }
@@ -483,48 +449,133 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(0x8B4513) // Brown color for shitty weather
                 .setTitle('💩 Shitty Weather Championship 🏆')
-                .setDescription('**Hall of Shitty Weather Champions**\n*Who can endure the worst conditions?*')
+                .setDescription('**Fair Competition - Everyone Gets a Chance!**\n*New daily and weekly windows for fair play*')
                 .setTimestamp();
 
-            let description = '';
-            leaderboard.slice(0, 10).forEach((user, index) => {
-                const emoji = index === 0 ? '👑💩' : index === 1 ? '🥈💧' : index === 2 ? '🥉❄️' : '💩';
-                const status = user.isActive ? '' : ' *(inactive)*';
-                description += `${emoji} **${user.displayName}** - ${user.region}${status}\n`;
-                description += `   🎖️ **${user.points}** shitty weather points\n\n`;
-            });
-
-            embed.setDescription(`**Hall of Shitty Weather Champions**\n*Who can endure the worst conditions?*\n\n${description}`);
-            
-            // Add recent winner breakdown if available
-            const recentAward = await serviceManager.getLastShittyWeatherAward();
-            if (recentAward && recentAward.breakdown && recentAward.breakdown.length > 0) {
-                const timeSince = new Date() - new Date(recentAward.timestamp);
-                const hoursAgo = Math.floor(timeSince / (1000 * 60 * 60));
-                const timeDisplay = hoursAgo < 1 ? 'Just now' : hoursAgo === 1 ? '1 hour ago' : `${hoursAgo} hours ago`;
+            // Best Single Day Section (Last 30 days)
+            if (bestDayData.length > 0) {
+                const winner = bestDayData[0];
+                const displayName = winner.display_name || (winner.user_id ? `User-${winner.user_id.slice(-4)}` : 'Unknown User');
+                const region = winner.region || 'Unknown Region';
+                const date = new Date(winner.date).toLocaleDateString();
                 
+                let pointsBreakdown = '';
+                if (winner.points_breakdown) {
+                    try {
+                        const breakdown = typeof winner.points_breakdown === 'string' ? JSON.parse(winner.points_breakdown) : winner.points_breakdown;
+                        const breakdownItems = [];
+                        if (breakdown.temperature) breakdownItems.push(`🌡️ Extreme temps (${breakdown.temperature}pts)`);
+                        if (breakdown.precipitation) breakdownItems.push(`🌧️ Rain/snow (${breakdown.precipitation}pts)`);
+                        if (breakdown.wind) breakdownItems.push(`💨 High winds (${breakdown.wind}pts)`);
+                        if (breakdown.humidity) breakdownItems.push(`💧 Base humidity (${breakdown.humidity}pts)`);
+                        if (breakdown.high_humidity) breakdownItems.push(`💧 Extra humid >80% (${breakdown.high_humidity}pts)`);
+                        if (breakdown.special && breakdown.special > 0) breakdownItems.push(`⚡ Special weather (${breakdown.special}pts)`);
+                        pointsBreakdown = breakdownItems.length > 0 ? breakdownItems.join('\n') : 'Points from various weather conditions';
+                    } catch (e) {
+                        pointsBreakdown = 'Points from various weather conditions';
+                    }
+                }
+
                 embed.addFields({
-                    name: `🏆 Recent Winner: ${recentAward.displayName} (${timeDisplay})`,
-                    value: `${recentAward.score} points from: ${recentAward.breakdown.slice(0, 3).join(', ')}${recentAward.breakdown.length > 3 ? '...' : ''}`,
+                    name: `🏆 Best Single Day Winner (Last 30 Days)`,
+                    value: `👑 **${displayName}** from ${region}\n📅 ${date} - **${winner.total_points} points**\n${pointsBreakdown}`,
                     inline: false
                 });
             }
 
-            embed.addFields(
-                {
-                    name: '📊 How It Works',
-                    value: 'Points awarded every 4 hours for:\n• Extreme temperatures (hot/cold)\n• Storms, rain, snow\n• High winds & poor visibility\n• Miserable combinations',
+            // Top Weekly Averages Section (Last 7 days)
+            if (weeklyData.length > 0) {
+                let weeklyDescription = '';
+                weeklyData.slice(0, 5).forEach((user, index) => {
+                    const emoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                    const displayName = user.display_name || `User-${user.user_id.slice(-4)}`;
+                    const region = user.region || 'Unknown Region';
+                    const average = parseFloat(user.avg_points).toFixed(1);
+                    
+                    // Analyze their daily details to find most common point sources
+                    let topPointSources = '';
+                    if (user.daily_details) {
+                        const pointTotals = {
+                            temperature: 0,
+                            precipitation: 0, 
+                            wind: 0,
+                            humidity: 0,
+                            high_humidity: 0,
+                            special: 0
+                        };
+                        
+                        try {
+                            const dailyDetails = typeof user.daily_details === 'string' ? JSON.parse(user.daily_details) : user.daily_details;
+                            dailyDetails.forEach(day => {
+                                if (day.breakdown) {
+                                    const breakdown = typeof day.breakdown === 'string' ? JSON.parse(day.breakdown) : day.breakdown;
+                                    Object.keys(pointTotals).forEach(key => {
+                                        if (breakdown[key]) {
+                                            pointTotals[key] += breakdown[key];
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            // Find top 2 point sources
+                            const sortedSources = Object.entries(pointTotals)
+                                .filter(([key, value]) => value > 0)
+                                .sort(([,a], [,b]) => b - a)
+                                .slice(0, 2);
+                            
+                            if (sortedSources.length > 0) {
+                                const sourceEmojis = {
+                                    temperature: '🌡️',
+                                    precipitation: '🌧️', 
+                                    wind: '💨',
+                                    humidity: '💧',
+                                    high_humidity: '💧',
+                                    special: '⚡'
+                                };
+                                
+                                const sourceNames = {
+                                    temperature: 'extreme temps',
+                                    precipitation: 'rain/snow',
+                                    wind: 'high winds', 
+                                    humidity: 'humidity',
+                                    high_humidity: 'extra humid',
+                                    special: 'special conditions'
+                                };
+                                
+                                topPointSources = sortedSources.map(([source, points]) => 
+                                    `${sourceEmojis[source]} ${sourceNames[source]} (${points}pts)`
+                                ).join(', ');
+                            }
+                        } catch (e) {
+                            // If parsing fails, show generic message
+                            topPointSources = 'various conditions';
+                        }
+                    }
+                    
+                    weeklyDescription += `${emoji} **${displayName}** - ${region}\n`;
+                    weeklyDescription += `   📊 **${average} points/day** (${user.days_active} days active)\n`;
+                    if (topPointSources) {
+                        weeklyDescription += `   ${topPointSources}\n`;
+                    }
+                    weeklyDescription += '\n';
+                });
+
+                embed.addFields({
+                    name: '📈 Top Weekly Averages (Last 7 Days)',
+                    value: weeklyDescription,
                     inline: false
-                },
-                {
-                    name: '🎮 Join the Competition!',
-                    value: '*Use `/weather join <postal_code>` to start competing!*\n*The worse your weather, the more points you get!*\n*Your postal code stays private - only general region shown.*',
-                    inline: false
-                }
-            );
+                });
+            }
+
+            embed.addFields({
+                name: '🎮 Join the Competition!',
+                value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*',
+                inline: false
+            });
 
             await interaction.editReply({ embeds: [embed] });
         } catch (error) {
+            console.error('Error in handleShittyLeaderboard:', error);
             await interaction.editReply({
                 content: `❌ Failed to get shitty weather leaderboard: ${error.message}`
             });
@@ -624,29 +675,49 @@ module.exports = {
                 });
             }
 
-            // Trigger the daily weather update (6 PM message)
-            const leaderboard = await bot.serviceManager.getShittyWeatherLeaderboard();
-            if (leaderboard.length === 0) {
+            // Trigger the daily weather update (6 PM message) - Use fair competition data
+            const [bestSingleDay, topWeeklyAverages] = await Promise.all([
+                bot.serviceManager.getBestSingleDay(),
+                bot.serviceManager.getTopWeeklyAverages()
+            ]);
+            
+            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const weeklyData = topWeeklyAverages || [];
+            
+            if (bestDayData.length === 0 && weeklyData.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ No users in the weather system to create daily update.'
+                    content: '❌ No fair competition data available yet for daily update.'
                 });
             }
 
-            const topUser = leaderboard[0];
             let message = `💩 **DAILY SHITTY WEATHER UPDATE** 💩\n\n`;
-            message += `🏆 Current Shitty Weather Champion: **${topUser.displayName}** from **${topUser.region}**\n`;
-            message += `🎖️ Total Points: **${topUser.points}**\n\n`;
             
-            if (leaderboard.length > 1) {
-                message += `🥈 Top Contenders:\n`;
-                leaderboard.slice(1, 4).forEach((user, index) => {
-                    message += `${index + 2}. ${user.displayName} (${user.points} pts)\n`;
-                });
-                message += '\n';
+            // Show best single day winner
+            if (bestDayData.length > 0) {
+                const winner = bestDayData[0];
+                const displayName = winner.display_name || `User-${winner.user_id.slice(-4)}`;
+                const region = winner.region || 'Unknown Region';
+                const date = new Date(winner.date).toLocaleDateString();
+                
+                message += `🏆 **Best Single Day Winner (Last 30 Days)**\n`;
+                message += `👑 **${displayName}** from **${region}** - **${winner.total_points} points**\n`;
+                message += `📅 ${date}\n\n`;
+            }
+            
+            // Show top weekly average
+            if (weeklyData.length > 0) {
+                const topWeekly = weeklyData[0];
+                const displayName = topWeekly.display_name || `User-${topWeekly.user_id.slice(-4)}`;
+                const region = topWeekly.region || 'Unknown Region';
+                const average = parseFloat(topWeekly.avg_points).toFixed(1);
+                
+                message += `📈 **Top Weekly Average Leader**\n`;
+                message += `🥇 **${displayName}** from **${region}** - **${average} points/day**\n`;
+                message += `(${topWeekly.days_active} days active)\n\n`;
             }
             
             message += `⏰ *Next shitty weather points awarded in ${4 - (new Date().getHours() % 4)} hours!*\n`;
-            message += `📊 *Use \`/weather shitty\` to see the full leaderboard!*\n`;
+            message += `📊 *Use \`/weather shitty\` to see the full fair competition leaderboard!*\n`;
             message += `🎮 *New to the game? Join with \`/weather join <postal_code>\` and compete!*`;
 
             await channel.send(message);
@@ -760,14 +831,12 @@ module.exports = {
 
             // Trigger weather alerts and shitty weather awards (every 4 hours message)
             console.log('[WEATHER TRIGGER-ALERTS] Checking all users weather...');
-            const { weatherUpdates, alerts } = await bot.serviceManager.checkAllUsersWeather();
-            console.log('[WEATHER TRIGGER-ALERTS] Weather check completed:', {
-                totalUpdates: weatherUpdates?.length || 0,
-                totalAlerts: alerts?.length || 0
-            });
+            const weatherResult = await bot.serviceManager.checkAllUsersWeather();
+            console.log('[WEATHER TRIGGER-ALERTS] Weather check completed:', weatherResult);
             
-            if (alerts.length > 0) {
-                const alertMessage = `🚨 **Weather Alerts** 🚨\n\n${alerts.map(a => a.alert).join('\n\n')}`;
+            // Handle alerts if they exist in the result
+            if (weatherResult.alerts && weatherResult.alerts.length > 0) {
+                const alertMessage = `🚨 **Weather Alerts** 🚨\n\n${weatherResult.alerts.map(a => a.alert).join('\n\n')}`;
                 await channel.send(alertMessage);
             }
 
@@ -780,27 +849,54 @@ module.exports = {
                 const scoreEmojis = ['💩', '🌧️', '❄️', '🌪️', '⛈️'];
                 const emoji = scoreEmojis[Math.min(Math.floor(award.score / 2), scoreEmojis.length - 1)] || '💩';
                 
-                let message = `${emoji} **SHITTY WEATHER CHAMPION** ${emoji}\n\n`;
-                message += `🏆 **${award.displayName}** from **${award.region}** wins this round!\n`;
-                message += `**Weather Score:** ${award.score} points\n`;
-                message += `**Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
-                if (award.weather.wind > 0) message += `**Wind:** ${award.weather.wind} mph\n`;
-                message += `**Humidity:** ${award.weather.humidity}%\n\n`;
-                message += `🎖️ **Total Shitty Weather Points:** ${award.totalPoints}\n\n`;
-                message += `*The worse your weather, the more points you get!*\n`;
-                message += `*Want to join the competition? Use \`/weather join <postal_code>\`!* 💩`;
+                // Check for severe weather (5+ points) - show special message
+                if (award.score >= 5) {
+                    let message = `🌪️ **SEVERE WEATHER ALERT** ⚡\n\n`;
+                    message += `🏆 **${award.displayName}** from **${award.region}** earned **${award.score} points** for severe conditions!\n\n`;
+                    message += `🌡️ **Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
+                    if (award.weather.wind > 15) message += `💨 **High Winds:** ${award.weather.wind} mph\n`;
+                    message += `💧 **Humidity:** ${award.weather.humidity}%\n\n`;
+                    
+                    // Show what earned the points
+                    if (award.weather.description.includes('tornado')) {
+                        message += `🌪️ **TORNADO CONDITIONS** - Extreme weather bonus!\n`;
+                    } else if (award.weather.description.includes('blizzard')) {
+                        message += `❄️ **BLIZZARD CONDITIONS** - Severe snow bonus!\n`;
+                    } else if (award.weather.wind > 25) {
+                        message += `💨 **HIGH WIND CONDITIONS** - Dangerous wind speeds!\n`;
+                    } else if (award.weather.description.includes('thunderstorm')) {
+                        message += `⛈️ **SEVERE THUNDERSTORM** - Heavy rain and lightning!\n`;
+                    }
+                    
+                    message += `🎖️ **Total Points:** ${award.totalPoints}\n\n`;
+                    message += `*Severe weather = more points! Stay safe out there!*\n`;
+                    message += `*Join the competition: \`/weather join <postal_code>\`* 🌪️`;
+                    
+                    await channel.send(message);
+                } else {
+                    // Regular shitty weather message
+                    let message = `${emoji} **SHITTY WEATHER CHAMPION** ${emoji}\n\n`;
+                    message += `🏆 **${award.displayName}** from **${award.region}** wins this round!\n`;
+                    message += `**Weather Score:** ${award.score} points\n`;
+                    message += `**Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
+                    if (award.weather.wind > 0) message += `**Wind:** ${award.weather.wind} mph\n`;
+                    message += `**Humidity:** ${award.weather.humidity}%\n\n`;
+                    message += `🎖️ **Total Shitty Weather Points:** ${award.totalPoints}\n\n`;
+                    message += `*The worse your weather, the more points you get!*\n`;
+                    message += `*Want to join the competition? Use \`/weather join <postal_code>\`!* 💩`;
 
-                await channel.send(message);
+                    await channel.send(message);
+                }
             }
             
             let resultMessage = `✅ Weather alerts and shitty weather award process completed!\n\n`;
             resultMessage += `📊 **Results:**\n`;
-            resultMessage += `• Weather updates checked: ${weatherUpdates.length}\n`;
-            resultMessage += `• Weather alerts sent: ${alerts.length}\n`;
-            resultMessage += `• Shitty weather award: ${shittyWeatherResult ? '✅ Awarded' : '❌ No winner'}\n`;
+            resultMessage += `• Weather updates: ${weatherResult.totalUpdates || 0} checked\n`;
+            resultMessage += `• Weather alerts: ${weatherResult.totalAlerts || 0} sent\n`;
+            resultMessage += `• Shitty weather points: ${shittyWeatherResult.success ? '✅ Awarded' : '❌ Failed'}\n`;
             
-            if (shittyWeatherResult && shittyWeatherResult.award) {
-                resultMessage += `• Winner: ${shittyWeatherResult.award.displayName} (${shittyWeatherResult.award.score} pts)`;
+            if (shittyWeatherResult && shittyWeatherResult.totalPoints) {
+                resultMessage += `• Points awarded: ${shittyWeatherResult.totalPoints} to ${shittyWeatherResult.usersProcessed} users`;
             }
             
             await interaction.editReply({

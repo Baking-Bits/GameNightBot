@@ -1,4 +1,30 @@
 {
-  "snacks": [],
-  "lastGenerated": null
+  "snacks": [
+    {
+      "name": "Chia Seed Pudding Parfait",
+      "type": "snack",
+      "ingredients": [
+        "2 tablespoons chia seeds",
+        "1/2 cup unsweetened almond milk",
+        "1 tablespoon honey or maple syrup",
+        "1/2 cup mixed berries (fresh or frozen)",
+        "1 tablespoon nuts (almonds, walnuts, or pecans)"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "A creamy, delicious parfait made with chia seeds and mixed berries, perfect for a quick energy boost.",
+      "instructions": [
+        "In a small bowl or mason jar, mix chia seeds, almond milk, and honey.",
+        "Stir well to combine and let sit for 5 minutes to thicken.",
+        "Layer with mixed berries and nuts on top.",
+        "Store in the refrigerator until ready to eat."
+      ],
+      "benefits": "Chia seeds are packed with fiber, protein, and omega-3 fatty acids, providing sustained energy. Berries offer antioxidants, while nuts give healthy fats and additional protein, making this snack balanced and satisfying.",
+      "generatedAt": "2025-09-27T19:01:51.991Z",
+      "id": "1758999711991",
+      "isAIGenerated": true,
+      "responseTimeMs": 111901
+    }
+  ],
+  "lastGenerated": "2025-09-27T19:01:51.991Z"
 }

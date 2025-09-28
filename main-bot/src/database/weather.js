@@ -108,6 +108,40 @@ async function initializeWeatherDatabase() {
             )
         `);
 
+        // Daily shitty weather points tracking
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS daily_weather_points (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(255) NOT NULL,
+                date DATE NOT NULL,
+                total_points INT DEFAULT 0,
+                points_breakdown JSON,
+                weather_summary VARCHAR(500),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY unique_user_date (user_id, date),
+                INDEX idx_user_id (user_id),
+                INDEX idx_date (date),
+                INDEX idx_points (total_points),
+                FOREIGN KEY (user_id) REFERENCES weather_users(user_id) ON DELETE CASCADE
+            )
+        `);
+
+        // Weekly/Monthly competition results
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS competition_periods (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                period_type ENUM('weekly', 'monthly') NOT NULL,
+                start_date DATE NOT NULL,
+                end_date DATE NOT NULL,
+                results JSON,
+                announced BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_period_dates (period_type, start_date, end_date),
+                INDEX idx_announced (announced)
+            )
+        `);
+
         // API usage tracking table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS weather_api_usage (
@@ -320,13 +354,137 @@ async function getApiUsage(date = new Date()) {
     try {
         const dateStr = date.toISOString().split('T')[0];
         const result = await pool.query(
-            'SELECT calls_count FROM weather_api_usage WHERE date = ?',
+            'SELECT calls_count, date FROM weather_api_usage WHERE date = ?',
             [dateStr]
         );
         
-        return result[0]?.calls_count || 0;
+        const callsToday = result[0]?.calls_count || 0;
+        
+        return {
+            calls_today: callsToday,
+            date: dateStr,
+            success: true
+        };
     } catch (error) {
         console.error('[WEATHER DB] Error getting API usage:', error);
+        throw error;
+    }
+}
+
+// Daily Point Tracking Functions
+async function addDailyPoints(userId, points, pointsBreakdown, weatherSummary, date = new Date()) {
+    try {
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const result = await pool.query(`
+            INSERT INTO daily_weather_points (user_id, date, total_points, points_breakdown, weather_summary)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                total_points = total_points + VALUES(total_points),
+                points_breakdown = JSON_MERGE_PATCH(COALESCE(points_breakdown, '{}'), VALUES(points_breakdown)),
+                weather_summary = CONCAT(COALESCE(weather_summary, ''), ' | ', VALUES(weather_summary)),
+                updated_at = CURRENT_TIMESTAMP
+        `, [userId, dateStr, points, JSON.stringify(pointsBreakdown), weatherSummary]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error adding daily points:', error);
+        throw error;
+    }
+}
+
+async function getBestSingleDay(days = 30) {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                dp.user_id,
+                wu.display_name,
+                wu.region,
+                dp.date,
+                dp.total_points,
+                dp.points_breakdown,
+                dp.weather_summary
+            FROM daily_weather_points dp
+            JOIN weather_users wu ON dp.user_id = wu.user_id
+            WHERE dp.date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                AND wu.is_active = TRUE
+            ORDER BY dp.total_points DESC
+            LIMIT 1
+        `, [days]);
+        
+        return result[0] || null;
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting best single day:', error);
+        throw error;
+    }
+}
+
+async function getTopWeeklyAverages(days = 7, limit = 5) {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                dp.user_id,
+                wu.display_name,
+                wu.region,
+                AVG(dp.total_points) as avg_points,
+                COUNT(dp.date) as days_active,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'date', dp.date,
+                        'points', dp.total_points,
+                        'breakdown', dp.points_breakdown,
+                        'summary', dp.weather_summary
+                    )
+                ) as daily_details
+            FROM daily_weather_points dp
+            JOIN weather_users wu ON dp.user_id = wu.user_id
+            WHERE dp.date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                AND wu.is_active = TRUE
+            GROUP BY dp.user_id, wu.display_name, wu.region
+            ORDER BY avg_points DESC, days_active DESC
+            LIMIT ?
+        `, [days, limit]);
+        
+        // Convert BigInt values to regular numbers for JSON serialization
+        return result.map(row => ({
+            ...row,
+            days_active: Number(row.days_active)
+        }));
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting weekly averages:', error);
+        throw error;
+    }
+}
+
+async function getWeeklyResults(startDate, endDate) {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                dp.user_id,
+                wu.display_name,
+                wu.region,
+                SUM(dp.total_points) as week_total,
+                AVG(dp.total_points) as daily_avg,
+                COUNT(dp.date) as days_active,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'date', dp.date,
+                        'points', dp.total_points,
+                        'summary', dp.weather_summary
+                    )
+                ) as daily_breakdown
+            FROM daily_weather_points dp
+            JOIN weather_users wu ON dp.user_id = wu.user_id
+            WHERE dp.date BETWEEN ? AND ?
+                AND wu.is_active = TRUE
+            GROUP BY dp.user_id, wu.display_name, wu.region
+            ORDER BY week_total DESC
+            LIMIT 10
+        `, [startDate, endDate]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting weekly results:', error);
         throw error;
     }
 }
@@ -342,5 +500,9 @@ module.exports = {
     updateShittyWeatherScore,
     addShittyWeatherAward,
     updateApiUsage,
-    getApiUsage
+    getApiUsage,
+    addDailyPoints,
+    getBestSingleDay,
+    getTopWeeklyAverages,
+    getWeeklyResults
 };

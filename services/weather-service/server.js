@@ -39,12 +39,23 @@ const authenticateService = (req, res, next) => {
 
 // Health check endpoint (no auth required)
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
-        service: 'weather', 
-        timestamp: new Date().toISOString(),
-        version: require('./package.json').version
-    });
+    console.log('[WEATHER SERVICE] Health check requested');
+    try {
+        res.status(200).json({ 
+            status: 'healthy', 
+            service: 'weather-service',
+            timestamp: new Date().toISOString(),
+            database: 'connected',
+            version: require('./package.json').version
+        });
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Health check error:', error);
+        res.status(500).json({ 
+            status: 'unhealthy', 
+            error: error.message,
+            timestamp: new Date().toISOString() 
+        });
+    }
 });
 
 // Admin endpoint (handles all admin operations)
@@ -84,27 +95,62 @@ app.post('/admin', authenticateService, async (req, res) => {
 app.get('/weather/:userId', authenticateService, async (req, res) => {
     try {
         const { userId } = req.params;
+        console.log(`[WEATHER SERVICE] Getting current weather for user: ${userId}`);
+        
         const user = await weatherSystem.getUser(userId);
         
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            console.log(`[WEATHER SERVICE] User not found: ${userId}`);
+            return res.status(404).json({ 
+                success: false,
+                error: 'User not found in weather system' 
+            });
         }
 
-        // Convert database format to expected format
-        const userFormatted = {
-            displayName: user.display_name,
-            postalCode: user.postal_code,
-            city: user.city,
-            country: user.country,
-            region: user.region,
-            countryCode: user.country_code
-        };
+        console.log(`[WEATHER SERVICE] Found user: ${user.display_name}`);
 
-        const weather = await weatherSystem.fetchWeatherByPostalCode(user.postal_code, user.country_code);
-        res.json({ user: userFormatted, weather });
+        // Fetch current weather using the adapter
+        const weatherData = await weatherSystemAdapter.fetchWeatherByPostalCode(
+            user.postal_code, 
+            user.country_code || 'US'
+        );
+        
+        if (!weatherData) {
+            console.log(`[WEATHER SERVICE] Failed to fetch weather data for ${user.display_name}`);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to fetch weather data'
+            });
+        }
+
+        console.log(`[WEATHER SERVICE] Weather data fetched successfully for ${user.display_name}`);
+
+        // Return in expected format
+        res.json({
+            success: true,
+            user: {
+                displayName: user.display_name,
+                location: user.region
+            },
+            weather: {
+                temperature: weatherData.main?.temp ? Math.round(weatherData.main.temp) : 'N/A',
+                description: weatherData.weather?.[0]?.description || 'Unknown conditions',
+                humidity: weatherData.main?.humidity || 0,
+                windSpeed: weatherData.wind?.speed || 0,
+                city: weatherData.name || user.city,
+                country: weatherData.sys?.country || user.country_code,
+                main: weatherData.main || {},
+                weather: weatherData.weather || []
+            }
+        });
+        
     } catch (error) {
         console.error('[WEATHER SERVICE] Error fetching weather:', error);
-        res.status(500).json({ error: 'Failed to fetch weather data' });
+        res.status(500).json({ 
+            success: false,
+            error: 'Internal server error',
+            details: error.message 
+        });
     }
 });
 
@@ -224,6 +270,27 @@ app.get('/stats', authenticateService, async (req, res) => {
     }
 });
 
+// Get API usage statistics
+app.get('/api-usage', authenticateService, async (req, res) => {
+    try {
+        const apiUsage = await weatherSystem.getApiUsage();
+        const dailyLimit = 1000; // OpenWeatherMap free tier limit
+        
+        const response = {
+            success: true,
+            callsToday: apiUsage.calls_today || 0,
+            dailyLimit: dailyLimit,
+            usagePercentage: Math.round(((apiUsage.calls_today || 0) / dailyLimit) * 100),
+            lastUpdated: apiUsage.date || new Date().toISOString().split('T')[0]
+        };
+        
+        res.json(response);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting API usage:', error);
+        res.status(500).json({ error: 'Failed to get API usage statistics' });
+    }
+});
+
 // Get last shitty weather award
 app.get('/shitty/last-award', authenticateService, async (req, res) => {
     try {
@@ -233,6 +300,28 @@ app.get('/shitty/last-award', authenticateService, async (req, res) => {
     } catch (error) {
         console.error('[WEATHER SERVICE] Error getting last award:', error);
         res.status(500).json({ error: 'Failed to get last award' });
+    }
+});
+
+// Get best single day performance in last 30 days
+app.get('/shitty/best-single-day', authenticateService, async (req, res) => {
+    try {
+        const result = await weatherSystem.getBestSingleDay();
+        res.json(result);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting best single day:', error);
+        res.status(500).json({ error: 'Failed to get best single day' });
+    }
+});
+
+// Get top 5 weekly averages for last 7 days
+app.get('/shitty/weekly-averages', authenticateService, async (req, res) => {
+    try {
+        const result = await weatherSystem.getTopWeeklyAverages();
+        res.json(result);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting weekly averages:', error);
+        res.status(500).json({ error: 'Failed to get weekly averages' });
     }
 });
 

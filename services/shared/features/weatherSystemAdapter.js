@@ -57,6 +57,14 @@ class WeatherSystemAdapter {
         return await this.currentSystem.updateShittyWeatherScore(userId, pointsToAdd, awardData);
     }
 
+    async getBestSingleDay() {
+        return await this.currentSystem.getBestSingleDay();
+    }
+
+    async getTopWeeklyAverages() {
+        return await this.currentSystem.getTopWeeklyAverages();
+    }
+
     async updateApiUsage() {
         return await this.currentSystem.updateApiUsage();
     }

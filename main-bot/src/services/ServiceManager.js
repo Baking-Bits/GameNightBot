@@ -40,13 +40,17 @@ class ServiceManager {
         for (const [serviceName, serviceConfig] of Object.entries(this.services)) {
             try {
                 const response = await axios.get(`${serviceConfig.baseUrl}/health`, {
-                    timeout: 5000
+                    timeout: 5000,
+                    headers: {
+                        'Authorization': `Bearer ${process.env.SERVICE_TOKEN || 'dev-token'}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
-                serviceConfig.healthy = response.status === 200;
+                serviceConfig.healthy = response.status === 200 && response.data.status === 'healthy';
                 serviceConfig.lastHealthCheck = new Date();
                 
-                if (serviceConfig.healthy && response.data.status === 'healthy') {
+                if (serviceConfig.healthy) {
                     console.log(`[SERVICE MANAGER] ${serviceName} service is healthy`);
                 } else {
                     console.warn(`[SERVICE MANAGER] ${serviceName} service responded but status is not healthy:`, response.data);
@@ -194,6 +198,27 @@ class ServiceManager {
      */
     async getLastShittyWeatherAward() {
         return this.makeServiceRequest('weather', '/shitty/last-award');
+    }
+
+    /**
+     * Get best single day performance in last 30 days
+     */
+    async getBestSingleDay() {
+        return this.makeServiceRequest('weather', '/shitty/best-single-day');
+    }
+
+    /**
+     * Get top 5 weekly averages for last 7 days
+     */
+    async getTopWeeklyAverages() {
+        return this.makeServiceRequest('weather', '/shitty/weekly-averages');
+    }
+
+    /**
+     * Get API usage statistics
+     */
+    async getApiUsage() {
+        return this.makeServiceRequest('weather', '/api-usage');
     }
 
     /**

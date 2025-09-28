@@ -154,33 +154,136 @@ class VoiceTimeTracker {
     initializeWeatherScheduling() {
         const cron = require('node-cron');
         
-        // Hourly weather check (every hour)
+        // Hourly weather check and point awarding (every hour)
         cron.schedule('0 * * * *', async () => {
-            console.log('[WEATHER SCHEDULE] Running hourly weather check...');
+            console.log('[WEATHER SCHEDULE] Running hourly weather check and point awarding...');
             try {
                 if (this.serviceManager) {
-                    const result = await this.serviceManager.checkAllUsersWeather();
-                    console.log('[WEATHER SCHEDULE] Hourly check completed:', result.summary || 'OK');
+                    // Check all users weather first
+                    const weatherResult = await this.serviceManager.checkAllUsersWeather();
+                    console.log('[WEATHER SCHEDULE] Weather check completed:', weatherResult.summary || 'OK');
+                    
+                    // Award shitty weather points based on current conditions
+                    const pointsResult = await this.serviceManager.awardShittyWeatherPoints();
+                    console.log('[WEATHER SCHEDULE] Points awarded:', pointsResult.summary || 'OK');
+                    
+                    // Send alert messages to channel if severe weather points awarded
+                    if (pointsResult && pointsResult.award && pointsResult.award.score >= 5 && this.config?.weatherChannelId) {
+                        const channel = this.client.channels.cache.get(this.config.weatherChannelId);
+                        if (channel) {
+                            await this.sendSevereWeatherAlert(channel, pointsResult.award);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('[WEATHER SCHEDULE] Error in hourly weather check:', error);
             }
         });
 
-        // Daily shitty weather points (8 PM)
-        cron.schedule('0 20 * * *', async () => {
-            console.log('[WEATHER SCHEDULE] Running daily shitty weather points...');
+        // Daily weather update message (6 PM)
+        cron.schedule('0 18 * * *', async () => {
+            console.log('[WEATHER SCHEDULE] Sending daily weather update message...');
             try {
-                if (this.serviceManager) {
-                    const result = await this.serviceManager.awardShittyWeatherPoints();
-                    console.log('[WEATHER SCHEDULE] Daily points awarded:', result.summary || 'OK');
+                if (this.serviceManager && this.config?.weatherChannelId) {
+                    const channel = this.client.channels.cache.get(this.config.weatherChannelId);
+                    if (channel) {
+                        await this.sendDailyWeatherUpdate(channel);
+                        console.log('[WEATHER SCHEDULE] Daily update message sent');
+                    }
                 }
             } catch (error) {
-                console.error('[WEATHER SCHEDULE] Error awarding daily points:', error);
+                console.error('[WEATHER SCHEDULE] Error sending daily update:', error);
             }
         });
 
+        // Note: Shitty weather points are now awarded every hour with weather checks
+
         console.log('[WEATHER SCHEDULE] Weather system scheduled tasks initialized');
+    }
+
+    async sendDailyWeatherUpdate(channel) {
+        try {
+            const [bestSingleDay, topWeeklyAverages] = await Promise.all([
+                this.serviceManager.getBestSingleDay(),
+                this.serviceManager.getTopWeeklyAverages()
+            ]);
+            
+            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const weeklyData = topWeeklyAverages || [];
+            
+            if (bestDayData.length === 0 && weeklyData.length === 0) {
+                return; // Skip if no fair competition data
+            }
+
+            let message = `💩 **DAILY SHITTY WEATHER UPDATE** 💩\n\n`;
+            
+            // Show best single day winner
+            if (bestDayData.length > 0) {
+                const winner = bestDayData[0];
+                const displayName = winner.display_name || `User-${winner.user_id.slice(-4)}`;
+                const region = winner.region || 'Unknown Region';
+                const date = new Date(winner.date).toLocaleDateString();
+                
+                message += `🏆 **Best Single Day Winner (Last 30 Days)**\n`;
+                message += `👑 **${displayName}** from **${region}** - **${winner.total_points} points**\n`;
+                message += `📅 ${date}\n\n`;
+            }
+            
+            // Show top weekly average
+            if (weeklyData.length > 0) {
+                const topWeekly = weeklyData[0];
+                const displayName = topWeekly.display_name || `User-${topWeekly.user_id.slice(-4)}`;
+                const region = topWeekly.region || 'Unknown Region';
+                const average = parseFloat(topWeekly.avg_points).toFixed(1);
+                
+                message += `📈 **Top Weekly Average Leader**\n`;
+                message += `🥇 **${displayName}** from **${region}** - **${average} points/day**\n`;
+                message += `(${topWeekly.days_active} days active)\n\n`;
+            }
+            
+            message += `⏰ *Shitty weather points awarded every hour!*\n`;
+            message += `📊 *Use \`/weather shitty\` to see the full fair competition leaderboard!*\n`;
+            message += `🎮 *New to the game? Join with \`/weather join <postal_code>\` and compete!*`;
+
+            await channel.send(message);
+        } catch (error) {
+            console.error('[WEATHER SCHEDULE] Error sending daily update:', error);
+        }
+    }
+
+    async sendSevereWeatherAlert(channel, award) {
+        try {
+            // Helper function to format temperature 
+            const formatTemperature = (fahrenheit) => {
+                const celsius = ((fahrenheit - 32) * 5/9);
+                return `${Math.round(fahrenheit)}°F (${Math.round(celsius)}°C)`;
+            };
+
+            let message = `🌪️ **SEVERE WEATHER ALERT** ⚡\n\n`;
+            message += `🏆 **${award.displayName}** from **${award.region}** earned **${award.score} points** for severe conditions!\n\n`;
+            message += `🌡️ **Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
+            if (award.weather.wind > 15) message += `💨 **High Winds:** ${award.weather.wind} mph\n`;
+            message += `💧 **Humidity:** ${award.weather.humidity}%\n\n`;
+            
+            // Show what earned the points
+            if (award.weather.description.includes('tornado')) {
+                message += `🌪️ **TORNADO CONDITIONS** - Extreme weather bonus!\n`;
+            } else if (award.weather.description.includes('blizzard')) {
+                message += `❄️ **BLIZZARD CONDITIONS** - Severe snow bonus!\n`;
+            } else if (award.weather.wind > 25) {
+                message += `💨 **HIGH WIND CONDITIONS** - Dangerous wind speeds!\n`;
+            } else if (award.weather.description.includes('thunderstorm')) {
+                message += `⛈️ **SEVERE THUNDERSTORM** - Heavy rain and lightning!\n`;
+            }
+            
+            message += `🎖️ **Total Points:** ${award.totalPoints}\n\n`;
+            message += `*Severe weather = more points! Stay safe out there!*\n`;
+            message += `*Join the competition: \`/weather join <postal_code>\`* 🌪️`;
+            
+            await channel.send(message);
+        } catch (error) {
+            console.error('[WEATHER SCHEDULE] Error sending severe weather alert:', error);
+        }
     }
 
     async shutdown() {
