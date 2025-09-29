@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('wellness')
-        .setDescription('Health and fitness system - meals, snacks, and workouts')
+        .setDescription('Generate meals, snacks, and workouts on demand')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('generate')
@@ -25,44 +25,6 @@ module.exports = {
                         .setDescription('Specific ingredients or workout type (e.g., "apple snack", "chicken dinner", "cardio legs")')
                         .setRequired(false)
                 )
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('history')
-                .setDescription('View recent meal plan and workout history')
-                .addStringOption(option =>
-                    option
-                        .setName('type')
-                        .setDescription('Type of history to view')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: 'Meals', value: 'meals' },
-                            { name: 'Snacks', value: 'snacks' },
-                            { name: 'Workouts', value: 'workouts' }
-                        )
-                )
-                .addIntegerOption(option =>
-                    option
-                        .setName('count')
-                        .setDescription('Number of items to show (default: 5)')
-                        .setMinValue(1)
-                        .setMaxValue(20)
-                )
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('toggle')
-                .setDescription('Toggle the automatic meal plan and workout schedule')
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('schedule')
-                .setDescription('View the current schedule for meals, snacks, and workouts')
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('adminstats')
-                .setDescription('View system performance statistics (admin only)')
         ),
 
     async execute(interaction, { wellnessSystem, config }) {
@@ -73,26 +35,14 @@ module.exports = {
                 case 'generate':
                     await handleGenerate(interaction, wellnessSystem);
                     break;
-                case 'history':
-                    await handleHistory(interaction, wellnessSystem);
-                    break;
-                case 'toggle':
-                    await handleToggle(interaction, wellnessSystem);
-                    break;
-                case 'schedule':
-                    await handleSchedule(interaction, config);
-                    break;
-                case 'adminstats':
-                    await handleAdminStats(interaction, wellnessSystem, config);
-                    break;
                 default:
                     await interaction.reply({
-                        content: 'Unknown subcommand. Please use one of: generate, history, toggle, or schedule.',
+                        content: 'Unknown subcommand. Please use: generate.',
                         ephemeral: true
                     });
             }
         } catch (error) {
-            console.error('Error in aimealplan command:', error);
+            console.error('Error in wellness command:', error);
             
             if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply({
@@ -113,7 +63,7 @@ async function handleGenerate(interaction, wellnessSystem) {
     const requirements = interaction.options.getString('requirements');
     
     await interaction.deferReply();
-    
+
     try {
         let result;
         switch (type) {
@@ -126,6 +76,11 @@ async function handleGenerate(interaction, wellnessSystem) {
             case 'workout':
                 result = await wellnessSystem.generateWorkout(requirements);
                 break;
+            default:
+                await interaction.editReply({
+                    content: 'Invalid type specified. Please choose meal, snack, or workout.'
+                });
+                return;
         }
         
         if (result && result.embed) {
@@ -143,12 +98,53 @@ async function handleGenerate(interaction, wellnessSystem) {
     }
 }
 
-async function handleHistory(interaction, wellnessSystem) {
-    const type = interaction.options.getString('type');
-    const count = interaction.options.getInteger('count') || 5;
-    
+// Helper functions
+function getColorForType(type) {
+    switch (type) {
+        case 'meal':
+            return '#ff6b6b';
+        case 'snack':
+            return '#feca57';
+        case 'workout':
+            return '#45b7d1';
+        default:
+            return '#ffa500';
+    }
+}
+
+function getEmojiForType(type) {
+    switch (type) {
+        case 'meal':
+            return '🍽️';
+        case 'snack':
+            return '🥨';
+        case 'workout':
+            return '💪';
+        default:
+            return '🌿';
+    }
+}
+
+async function handleHistory(interaction, wellnessSystem, type) {
     try {
-        const history = aiMealPlan.getHistory(type, count);
+        let history;
+        switch (type) {
+            case 'meals':
+                history = wellnessSystem.getHistory('meals');
+                break;
+            case 'snacks':
+                history = wellnessSystem.getHistory('snacks');
+                break;
+            case 'workouts':
+                history = wellnessSystem.getHistory('workouts');
+                break;
+            default:
+                await interaction.reply({
+                    content: '❌ Invalid history type specified.',
+                    ephemeral: true
+                });
+                return;
+        }
         
         if (!history || history.length === 0) {
             await interaction.reply({

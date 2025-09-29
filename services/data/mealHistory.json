@@ -98,7 +98,69 @@
       "id": "1759161782112",
       "isAIGenerated": true,
       "responseTimeMs": 181284
+    },
+    {
+      "name": "Spicy Tofu and Veggie Stir-Fry",
+      "type": "lunch",
+      "ingredients": [
+        "1 block of firm tofu, pressed and cubed",
+        "1 tablespoon vegetable oil",
+        "2 tablespoons soy sauce or tamari",
+        "1 tablespoon sesame oil",
+        "2 cloves garlic, minced",
+        "1 tablespoon ginger, minced",
+        "1 red bell pepper, sliced",
+        "1 cup broccoli florets",
+        "1 medium carrot, julienned",
+        "1 tablespoon sriracha or chili sauce",
+        "1 tablespoon sesame seeds",
+        "2 cups cooked brown rice or quinoa",
+        "Seasonal green onions for garnish"
+      ],
+      "prepTime": "20 minutes",
+      "calories": "400-500",
+      "description": "A vibrant and spicy tofu stir-fry packed with fresh veggies, perfect for a quick and nutritious lunch.",
+      "instructions": [
+        "Heat vegetable oil in a large pan or wok over medium-high heat. Add cubed tofu and cook until golden brown on all sides, about 5-7 minutes. Remove tofu and set aside.",
+        "In the same pan, add sesame oil, minced garlic, and ginger. Sauté for 30 seconds until fragrant. Add red bell pepper, broccoli, and carrot. Stir-fry for 5 minutes until vegetables are tender-crisp.",
+        "Return tofu to the pan. Add soy sauce, sriracha, and a splash of water. Stir well to combine, cooking for another 2-3 minutes. Serve stir-fry over cooked brown rice or quinoa, garnished with sesame seeds and green onions."
+      ],
+      "nutritionNotes": "This meal provides a balanced mix of protein from tofu, fiber and vitamins from vegetables, and complex carbohydrates from brown rice or quinoa. The use of seasonal vegetables ensures freshness and cost-effectiveness.",
+      "generatedAt": "2025-09-29T19:06:26.747Z",
+      "id": "1759172786747",
+      "isAIGenerated": true,
+      "responseTimeMs": 174939
+    },
+    {
+      "name": "Cauliflower Rice Veggie Stir-Fry with Edamame",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup cauliflower rice",
+        "1 cup frozen edamame",
+        "1 cup mixed seasonal vegetables (e.g., bell peppers, snap peas, carrots)",
+        "2 tablespoons low-sodium soy sauce or tamari",
+        "1 tablespoon sesame oil",
+        "1 tablespoon grated ginger",
+        "2 cloves garlic, minced",
+        "1 tablespoon sesame seeds (optional)",
+        "Salt and pepper to taste"
+      ],
+      "prepTime": "20 minutes",
+      "calories": "350-400",
+      "description": "A vibrant and nutritious veggie stir-fry that's packed with flavor and perfect for a quick, balanced lunch.",
+      "instructions": [
+        "Heat the sesame oil in a large pan over medium heat. Add the garlic and ginger, and sauté for 1-2 minutes until fragrant.",
+        "Add the cauliflower rice and sauté for 3-4 minutes until slightly tender.",
+        "Add the frozen edamame and mixed vegetables. Cook for another 5-7 minutes until everything is heated through and vegetables are crisp-tender.",
+        "Pour in the soy sauce or tamari, and stir to combine. Cook for an additional 2 minutes.",
+        "Season with salt and pepper to taste. Sprinkle with sesame seeds before serving, if desired."
+      ],
+      "nutritionNotes": "This meal is rich in protein from the edamame, providing essential amino acids for muscle repair and growth. Cauliflower rice adds fiber and keeps the dish low-carb, while the mixed vegetables boost the vitamin and mineral content, supporting overall health and energy levels. The ginger and garlic offer anti-inflammatory benefits.",
+      "generatedAt": "2025-09-29T19:11:28.532Z",
+      "id": "1759173088532",
+      "isAIGenerated": true,
+      "responseTimeMs": 165758
     }
   ],
-  "lastGenerated": "2025-09-29T16:03:02.113Z"
+  "lastGenerated": "2025-09-29T19:11:28.533Z"
 }
