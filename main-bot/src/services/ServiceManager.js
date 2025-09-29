@@ -158,6 +158,29 @@ class ServiceManager {
         });
     }
 
+    /**
+     * Get best single day performers (top 5 by default, all if requested)
+     */
+    async getBestSingleDay(getAllUsers = false) {
+        const queryParam = getAllUsers ? '?all=true' : '';
+        return this.makeServiceRequest('weather', `/shitty/best-single-day${queryParam}`);
+    }
+
+    /**
+     * Get top 5 weekly averages for last 7 days (or all if requested)
+     */
+    async getTopWeeklyAverages(getAllUsers = false) {
+        const queryParam = getAllUsers ? '?all=true' : '';
+        return this.makeServiceRequest('weather', `/shitty/weekly-averages${queryParam}`);
+    }
+
+    /**
+     * Get detailed weather history for a user
+     */
+    async getUserWeatherHistory(userId, days = 30) {
+        return this.makeServiceRequest('weather', `/user/${userId}/history?days=${days}`);
+    }
+
     // Admin methods
     async weatherAdminCommand(subcommand, params = {}) {
         return this.makeServiceRequest('weather', '/admin', {
@@ -256,6 +279,160 @@ class ServiceManager {
         }
 
         return null;
+    }
+
+    // Server Tracking Methods
+    /**
+     * Add a server to weather monitoring
+     */
+    async addTrackedServer(serverName, postalCode, thresholds = {}) {
+        const { addTrackedServer } = require('../database/weather');
+        return addTrackedServer(serverName, postalCode, thresholds);
+    }
+
+    /**
+     * Remove a server from weather monitoring
+     */
+    async removeTrackedServer(serverId) {
+        const { removeTrackedServer } = require('../database/weather');
+        return removeTrackedServer(serverId);
+    }
+
+    /**
+     * Get all tracked servers
+     */
+    async getAllTrackedServers() {
+        const { getAllTrackedServers } = require('../database/weather');
+        return getAllTrackedServers();
+    }
+
+    /**
+     * Update server alert thresholds
+     */
+    async updateServerThresholds(serverId, thresholds) {
+        const { updateServerThresholds } = require('../database/weather');
+        return updateServerThresholds(serverId, thresholds);
+    }
+
+    /**
+     * Get server alert history
+     */
+    async getServerAlertHistory(serverId, days = 7) {
+        const { getServerAlertHistory } = require('../database/weather');
+        return getServerAlertHistory(serverId, days);
+    }
+
+    /**
+     * Check weather for a specific server
+     */
+    async getServerWeatherStatus(serverId) {
+        const { getAllTrackedServers } = require('../database/weather');
+        
+        try {
+            // Get server details
+            const servers = await getAllTrackedServers();
+            const server = servers.find(s => s.id === serverId);
+            
+            if (!server) {
+                throw new Error('Server not found');
+            }
+
+            // Get weather for server location
+            const weatherData = await this.makeServiceRequest('weather', '/weather/postal', {
+                method: 'POST',
+                data: { postalCode: server.postal_code }
+            });
+
+            // Check for threshold violations
+            const alerts = [];
+            if (weatherData.temperature > server.temp_high_threshold) {
+                alerts.push({
+                    type: 'HIGH_TEMP',
+                    message: `Temperature ${weatherData.temperature}°F exceeds threshold ${server.temp_high_threshold}°F`
+                });
+            }
+            if (weatherData.temperature < server.temp_low_threshold) {
+                alerts.push({
+                    type: 'LOW_TEMP', 
+                    message: `Temperature ${weatherData.temperature}°F below threshold ${server.temp_low_threshold}°F`
+                });
+            }
+            if (weatherData.wind_speed > server.wind_threshold) {
+                alerts.push({
+                    type: 'HIGH_WIND',
+                    message: `Wind speed ${weatherData.wind_speed} mph exceeds threshold ${server.wind_threshold} mph`
+                });
+            }
+            if (weatherData.humidity > server.humidity_threshold) {
+                alerts.push({
+                    type: 'HIGH_HUMIDITY',
+                    message: `Humidity ${weatherData.humidity}% exceeds threshold ${server.humidity_threshold}%`
+                });
+            }
+
+            return {
+                server,
+                weather: weatherData,
+                alerts,
+                hasAlerts: alerts.length > 0
+            };
+        } catch (error) {
+            console.error('[SERVICE MANAGER] Error getting server weather status:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check weather for all tracked servers and create alerts if needed
+     */
+    async checkAllServerWeather() {
+        const { getAllTrackedServers, addServerWeatherAlert } = require('../database/weather');
+        
+        try {
+            const servers = await getAllTrackedServers();
+            const results = [];
+
+            for (const server of servers) {
+                try {
+                    const status = await this.getServerWeatherStatus(server.id);
+                    
+                    // Create alerts for threshold violations
+                    for (const alert of status.alerts) {
+                        await addServerWeatherAlert(
+                            server.id,
+                            server.server_name,
+                            alert.type,
+                            alert.message,
+                            status.weather
+                        );
+                    }
+
+                    results.push({
+                        serverId: server.id,
+                        serverName: server.server_name,
+                        status: 'checked',
+                        alertsCreated: status.alerts.length
+                    });
+                } catch (error) {
+                    console.error(`[SERVICE MANAGER] Error checking weather for server ${server.server_name}:`, error);
+                    results.push({
+                        serverId: server.id,
+                        serverName: server.server_name,
+                        status: 'error',
+                        error: error.message
+                    });
+                }
+            }
+
+            return {
+                success: true,
+                serversChecked: servers.length,
+                results
+            };
+        } catch (error) {
+            console.error('[SERVICE MANAGER] Error checking all server weather:', error);
+            throw error;
+        }
     }
 
     /**

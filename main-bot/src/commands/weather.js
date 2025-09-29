@@ -44,7 +44,19 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('shitty')
-                .setDescription('View the Shitty Weather Championship leaderboard')),
+                .setDescription('View the Shitty Weather Championship leaderboard')
+                .addUserOption(option =>
+                    option.setName('user')
+                        .setDescription('Check a specific user\'s ranking (optional)')
+                        .setRequired(false))
+                .addStringOption(option =>
+                    option.setName('view')
+                        .setDescription('Type of view for user ranking')
+                        .setRequired(false)
+                        .addChoices(
+                            { name: 'Summary (default)', value: 'summary' },
+                            { name: 'Detailed breakdown', value: 'detailed' }
+                        ))),
 
     async execute(interaction, bot) {
         const subcommand = interaction.options.getSubcommand();
@@ -73,7 +85,9 @@ module.exports = {
                     break;
 
                 case 'shitty':
-                    await this.handleShittyLeaderboard(interaction, bot.serviceManager);
+                    const userToCheck = interaction.options.getUser('user');
+                    const viewType = interaction.options.getString('view') || 'summary';
+                    await this.handleShittyLeaderboard(interaction, bot.serviceManager, userToCheck, viewType);
                     break;
                 default:
                     await interaction.reply({
@@ -236,8 +250,8 @@ module.exports = {
             
             const embed = new EmbedBuilder()
                 .setColor(this.getWeatherColor(temp || 70))
-                .setTitle(`${weatherEmoji} Current Weather`)
-                .setDescription(`Weather for **${user.displayName}** in ${user.location}`)
+                .setTitle(`${weatherEmoji} Current Weather (Live)`)
+                .setDescription(`Real-time weather for **${user.displayName}** in ${user.location}`)
                 .addFields(
                     { name: '🌡️ Temperature', value: temp ? formatTemperature(temp) : 'N/A', inline: true },
                     { name: '🤚 Feels Like', value: feelsLike ? formatTemperature(feelsLike) : 'N/A', inline: true },
@@ -246,7 +260,7 @@ module.exports = {
                     { name: '💧 Humidity', value: `${weather.humidity || 0}%`, inline: true },
                     { name: '🔍 Visibility', value: `${Math.round((weather.main?.visibility || 10000) / 1609.34)} mi`, inline: true }
                 )
-                .setFooter({ text: 'Weather updates every 4 hours' })
+                .setFooter({ text: 'Live weather data • Competition tracking updates every 4 hours' })
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [embed] });
@@ -368,9 +382,56 @@ module.exports = {
         };
     },
 
-    async handleShittyLeaderboard(interaction, serviceManager) {
+    async handleShittyLeaderboard(interaction, serviceManager, userToCheck = null, viewType = 'summary') {
         await interaction.deferReply();
 
+        // If a specific user is requested, show their ranking (summary or detailed)
+        if (userToCheck) {
+            try {
+                if (viewType === 'detailed') {
+                    // Show detailed breakdown
+                    return await this.showDetailedUserBreakdown(interaction, serviceManager, userToCheck);
+                } else {
+                    // Show summary ranking (existing functionality)
+                    const [bestSingleDay, topWeeklyAverages] = await Promise.all([
+                        serviceManager.getBestSingleDay(),
+                        serviceManager.getTopWeeklyAverages()
+                    ]);
+                    
+                    const bestDayData = bestSingleDay?.top5 || [];
+                    const weeklyData = topWeeklyAverages || [];
+                    
+                    const personalRanking = await this.getUserPersonalRanking(serviceManager, userToCheck.id, bestDayData, weeklyData);
+                    
+                    if (!personalRanking) {
+                        return await interaction.editReply({
+                            content: `❌ **${userToCheck.displayName}** is not in the weather tracking system.\\n\\nThey can join with \`/weather join <postal_code>\` to start competing!`
+                        });
+                    }
+
+                    const embed = new EmbedBuilder()
+                        .setColor(0x8B4513)
+                        .setTitle(`🏆 ${userToCheck.displayName}'s Weather Championship Standing`)
+                        .setDescription(personalRanking)
+                        .addFields({
+                            name: '🎮 Want More Details?',
+                            value: `Use \`/weather shitty @${userToCheck.displayName} detailed\` to see hourly point breakdown!\\n\\nOr use \`/weather shitty\` to see the full leaderboard!`,
+                            inline: false
+                        })
+                        .setTimestamp();
+
+                    return await interaction.editReply({ embeds: [embed] });
+                }
+                
+            } catch (error) {
+                console.error('Error getting user ranking:', error);
+                return await interaction.editReply({
+                    content: `❌ Failed to get ranking for **${userToCheck.displayName}**: ${error.message}`
+                });
+            }
+        }
+
+        // Show normal leaderboard if no specific user requested
         try {
             const [bestSingleDay, topWeeklyAverages] = await Promise.all([
                 serviceManager.getBestSingleDay(),
@@ -378,7 +439,7 @@ module.exports = {
             ]);
             
             // Handle null/undefined results
-            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const bestDayData = bestSingleDay?.top5 || [];
             const weeklyData = topWeeklyAverages || [];
             
             if (bestDayData.length === 0 && weeklyData.length === 0) {
@@ -438,7 +499,7 @@ module.exports = {
                     },
                     {
                         name: '🎮 Join the Competition!',
-                        value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*',
+                        value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*\n\n*💡 Tip: Use `/weather shitty @username` to check someone\'s ranking!*',
                         inline: false
                     }
                 );
@@ -569,7 +630,7 @@ module.exports = {
 
             embed.addFields({
                 name: '🎮 Join the Competition!',
-                value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*',
+                value: '**Ready to compete for shitty weather points?**\nUse `/weather join <your_postal_code>` to start tracking!\n\n*The worse your weather, the more points you earn!*\n*Your postal code stays private - only your region is shown.*\n\n*💡 Tip: Use `/weather shitty @username` to check someone\'s ranking!*',
                 inline: false
             });
 
@@ -681,7 +742,7 @@ module.exports = {
                 bot.serviceManager.getTopWeeklyAverages()
             ]);
             
-            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const bestDayData = bestSingleDay?.top5 || [];
             const weeklyData = topWeeklyAverages || [];
             
             if (bestDayData.length === 0 && weeklyData.length === 0) {
@@ -906,6 +967,311 @@ module.exports = {
             await interaction.editReply({
                 content: `❌ Failed to trigger weather alerts: ${error.message}`
             });
+        }
+    },
+
+    // Show detailed point breakdown for a user
+    async showDetailedUserBreakdown(interaction, serviceManager, userToCheck) {
+        try {
+            // Get user's detailed history
+            const userHistory = await serviceManager.getUserWeatherHistory(userToCheck.id);
+            
+            if (!userHistory || !userHistory.success) {
+                return await interaction.editReply({
+                    content: `❌ **${userToCheck.displayName}** is not in the weather tracking system or has no recent activity.\\n\\nThey can join with \`/weather join <postal_code>\` to start competing!`
+                });
+            }
+
+            const history = userHistory.data || [];
+            
+            if (history.length === 0) {
+                return await interaction.editReply({
+                    content: `📊 **${userToCheck.displayName}** has no recent weather point activity.\\n\\nPoints are awarded hourly when weather conditions are particularly bad!`
+                });
+            }
+
+            // Group data by time periods
+            const now = new Date();
+            const last24Hours = [];
+            const lastWeek = [];
+            const lastMonth = [];
+
+            history.forEach(entry => {
+                const entryTime = new Date(entry.timestamp || entry.created_at);
+                const hoursAgo = (now - entryTime) / (1000 * 60 * 60);
+                const daysAgo = hoursAgo / 24;
+
+                if (hoursAgo <= 24) last24Hours.push(entry);
+                if (daysAgo <= 7) lastWeek.push(entry);
+                if (daysAgo <= 30) lastMonth.push(entry);
+            });
+
+            // Create detailed breakdown
+            const embed = new EmbedBuilder()
+                .setColor(0x8B4513)
+                .setTitle(`📊 ${userToCheck.displayName}'s Detailed Weather Points`)
+                .setDescription(`**Hourly breakdown of weather point awards**\\nShowing recent activity with point explanations`)
+                .setTimestamp();
+
+            // Last 24 hours breakdown - improved readability
+            if (last24Hours.length > 0) {
+                const sortedLast24 = last24Hours.sort((a, b) => new Date(b.timestamp || b.created_at) - new Date(a.timestamp || a.created_at));
+                const total24 = last24Hours.reduce((sum, entry) => sum + (entry.points_awarded || entry.points || 0), 0);
+                
+                // Only show entries that earned points for cleaner display
+                const pointEntries = sortedLast24.filter(entry => (entry.points_awarded || entry.points || 0) > 0);
+                
+                let last24Text = '';
+                if (pointEntries.length > 0) {
+                    last24Text = '**🎯 Point-earning weather events:**\n';
+                    pointEntries.slice(0, 8).forEach(entry => { // Show max 8 point entries
+                        const time = new Date(entry.timestamp || entry.created_at);
+                        
+                        // Fix timing display - round :59 to next hour for cleaner display
+                        const minutes = time.getMinutes();
+                        let displayTime = new Date(time);
+                        if (minutes >= 55) {
+                            displayTime.setHours(time.getHours() + 1, 0, 0, 0);
+                        } else if (minutes <= 5) {
+                            displayTime.setMinutes(0, 0, 0);
+                        }
+                        
+                        const timeStr = displayTime.toLocaleTimeString([], {
+                            hour: 'numeric', 
+                            minute: displayTime.getMinutes() === 0 ? undefined : '2-digit',
+                            hour12: true
+                        });
+                        
+                        const points = entry.points_awarded || entry.points || 0;
+                        
+                        let reason = 'bad weather';
+                        if (entry.breakdown) {
+                            try {
+                                const breakdown = typeof entry.breakdown === 'string' ? JSON.parse(entry.breakdown) : entry.breakdown;
+                                const reasons = [];
+                                if (breakdown.extreme_heat) reasons.push('extreme heat');
+                                if (breakdown.extreme_cold) reasons.push('extreme cold');
+                                if (breakdown.freezing) reasons.push('freezing temps');
+                                if (breakdown.hot) reasons.push('hot weather');
+                                if (breakdown.cold) reasons.push('cold weather');
+                                if (breakdown.thunderstorm) reasons.push('thunderstorm');
+                                if (breakdown.snow) reasons.push('snow');
+                                if (breakdown.rain) reasons.push('rain');
+                                if (breakdown.drizzle) reasons.push('drizzle');
+                                if (breakdown.high_winds) reasons.push('high winds');
+                                if (breakdown.moderate_winds) reasons.push('windy');
+                                if (breakdown.high_humidity) reasons.push('very humid');
+                                if (breakdown.low_humidity) reasons.push('very dry');
+                                if (breakdown.poor_visibility) reasons.push('fog/mist');
+                                if (breakdown.tornado) reasons.push('🌪️ TORNADO');
+                                if (breakdown.hurricane) reasons.push('🌀 HURRICANE');
+                                if (breakdown.blizzard) reasons.push('❄️ blizzard');
+                                reason = reasons.length > 0 ? reasons.join(', ') : 'bad weather';
+                            } catch (e) {
+                                reason = entry.weather_summary || 'bad weather conditions';
+                            }
+                        }
+                        
+                        last24Text += `💩 **${timeStr}** - ${points} pt${points !== 1 ? 's' : ''} *(${reason})*\n`;
+                    });
+                    
+                    if (pointEntries.length > 8) {
+                        last24Text += `\n*...and ${pointEntries.length - 8} more point-earning events*`;
+                    }
+                    
+                    // Add summary of non-point entries
+                    const nonPointEntries = sortedLast24.length - pointEntries.length;
+                    if (nonPointEntries > 0) {
+                        last24Text += `\n\n☀️ **${nonPointEntries} checks with good weather** (0 pts each)`;
+                    }
+                } else {
+                    last24Text = '☀️ **Great weather!** No shitty conditions in the last 24 hours.\n*Points are awarded when weather gets particularly bad.*';
+                }
+                
+                embed.addFields({
+                    name: `🕐 Last 24 Hours (${total24} total points)`,
+                    value: last24Text,
+                    inline: false
+                });
+            } else {
+                embed.addFields({
+                    name: '🕐 Last 24 Hours',
+                    value: '☀️ No point awards in the last 24 hours\\n*Points are awarded hourly when weather is particularly bad*',
+                    inline: false
+                });
+            }
+
+            // Weekly summary
+            if (lastWeek.length > 0) {
+                const totalWeek = lastWeek.reduce((sum, entry) => sum + (entry.points_awarded || entry.points || 0), 0);
+                const avgPerDay = (totalWeek / 7).toFixed(1);
+                const daysWithPoints = new Set(lastWeek.filter(e => (e.points_awarded || e.points || 0) > 0).map(e => {
+                    const date = new Date(e.timestamp || e.created_at);
+                    return date.toDateString();
+                })).size;
+                
+                embed.addFields({
+                    name: `📅 Last 7 Days Summary`,
+                    value: `📊 **${totalWeek} total points** (${avgPerDay} avg/day)
+💩 **${daysWithPoints} days** with shitty weather points
+🎯 **${lastWeek.length} total** weather checks`,
+                    inline: false
+                });
+            }
+
+            // Monthly summary
+            if (lastMonth.length > 0) {
+                const totalMonth = lastMonth.reduce((sum, entry) => sum + (entry.points_awarded || entry.points || 0), 0);
+                const avgPerDay = (totalMonth / 30).toFixed(1);
+                const daysWithPoints = new Set(lastMonth.filter(e => (e.points_awarded || e.points || 0) > 0).map(e => {
+                    const date = new Date(e.timestamp || e.created_at);
+                    return date.toDateString();
+                })).size;
+                
+                embed.addFields({
+                    name: `🗓️ Last 30 Days Summary`,
+                    value: `📊 **${totalMonth} total points** (${avgPerDay} avg/day)
+💩 **${daysWithPoints} days** with shitty weather points
+🎯 **${lastMonth.length} total** weather checks`,
+                    inline: false
+                });
+            }
+
+            embed.addFields({
+                name: '💡 Understanding Points',
+                value: `**Points are awarded for:**
+🌡️ Extreme temperatures (hot/cold)
+🌧️ Rain, snow, or precipitation
+💨 High wind speeds
+💧 High humidity levels
+⚡ Severe weather conditions
+
+*The worse your weather, the more points you earn!*`,
+                inline: false
+            });
+
+            await interaction.editReply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('Error getting detailed breakdown:', error);
+            await interaction.editReply({
+                content: `❌ Failed to get detailed breakdown for **${userToCheck.displayName}**: ${error.message}`
+            });
+        }
+    },
+
+    // Helper function to get user's personal ranking
+    async getUserPersonalRanking(serviceManager, userId, bestDayData, weeklyData) {
+        try {
+            // Get full leaderboard to find user's position
+            const fullLeaderboard = await serviceManager.getShittyWeatherLeaderboard();
+            
+            if (!fullLeaderboard || fullLeaderboard.length === 0) {
+                return null;
+            }
+
+            // Find user in the leaderboard
+            const userInLeaderboard = fullLeaderboard.find(user => 
+                (user.userId === userId || user.user_id === userId)
+            );
+
+            if (!userInLeaderboard) {
+                return `❌ **Not tracking yet!**\nUse \`/weather join <postal_code>\` to start competing for shitty weather points!`;
+            }
+
+            const userPosition = fullLeaderboard.findIndex(user => 
+                (user.userId === userId || user.user_id === userId)
+            ) + 1;
+
+            const totalUsers = fullLeaderboard.length;
+            const userPoints = userInLeaderboard.totalPoints || userInLeaderboard.total_points || 0;
+            const userRegion = userInLeaderboard.region || 'Unknown Region';
+
+            let rankingMessage = `🏅 **Rank ${userPosition} of ${totalUsers}** - **${userPoints} total points**\n`;
+            rankingMessage += `📍 Competing from: **${userRegion}**\n\n`;
+
+            // Check user's position in daily competition (get full ranking, not just top 5)
+            if (bestDayData && bestDayData.length > 0) {
+                const userInDaily = bestDayData.find(user => 
+                    (user.user_id === userId)
+                );
+                
+                if (userInDaily) {
+                    const dailyPosition = bestDayData.findIndex(user => user.user_id === userId) + 1;
+                    const dailyEmoji = dailyPosition === 1 ? '👑' : dailyPosition === 2 ? '🥈' : dailyPosition === 3 ? '🥉' : '⭐';
+                    rankingMessage += `🏆 **Daily Ranking**: ${dailyEmoji} #${dailyPosition} (${userInDaily.total_points} pts)\n`;
+                } else {
+                    // User not in top 5, get their actual position from full daily data
+                    try {
+                        const fullDailyRanking = await serviceManager.getBestSingleDay(30, true); // Get all users
+                        if (fullDailyRanking?.allUsers && fullDailyRanking.allUsers.length > 0) {
+                            const userInFullDaily = fullDailyRanking.allUsers.find(user => user.user_id === userId);
+                            if (userInFullDaily) {
+                                const fullDailyPosition = fullDailyRanking.allUsers.findIndex(user => user.user_id === userId) + 1;
+                                const totalDailyUsers = fullDailyRanking.allUsers.length;
+                                rankingMessage += `🏆 **Daily Ranking**: #${fullDailyPosition} of ${totalDailyUsers} (${userInFullDaily.total_points} pts)\n`;
+                            } else {
+                                rankingMessage += `🏆 **Daily Ranking**: No recent daily points (last 30 days)\n`;
+                            }
+                        } else {
+                            rankingMessage += `🏆 **Daily Ranking**: Not in recent competition (last 30 days)\n`;
+                        }
+                    } catch (dailyError) {
+                        rankingMessage += `🏆 **Daily Ranking**: Not in top 5 (last 30 days)\n`;
+                    }
+                }
+            }
+
+            // Check user's position in weekly averages (get full ranking, not just top 5)
+            if (weeklyData && weeklyData.length > 0) {
+                const userInWeekly = weeklyData.find(user => 
+                    (user.user_id === userId)
+                );
+                
+                if (userInWeekly) {
+                    const weeklyPosition = weeklyData.findIndex(user => user.user_id === userId) + 1;
+                    const weeklyEmoji = weeklyPosition === 1 ? '🥇' : weeklyPosition === 2 ? '🥈' : weeklyPosition === 3 ? '🥉' : '🏅';
+                    const avgPoints = parseFloat(userInWeekly.avg_points).toFixed(1);
+                    rankingMessage += `📈 **Weekly Average**: ${weeklyEmoji} #${weeklyPosition} (${avgPoints} pts/day)`;
+                } else {
+                    // User not in top 5, get their actual position from full weekly data
+                    try {
+                        const fullWeeklyRanking = await serviceManager.getTopWeeklyAverages(true); // Get all users
+                        if (fullWeeklyRanking && fullWeeklyRanking.length > 0) {
+                            const userInFullWeekly = fullWeeklyRanking.find(user => user.user_id === userId);
+                            if (userInFullWeekly) {
+                                const fullWeeklyPosition = fullWeeklyRanking.findIndex(user => user.user_id === userId) + 1;
+                                const totalWeeklyUsers = fullWeeklyRanking.length;
+                                const avgPoints = parseFloat(userInFullWeekly.avg_points).toFixed(1);
+                                rankingMessage += `📈 **Weekly Average**: #${fullWeeklyPosition} of ${totalWeeklyUsers} (${avgPoints} pts/day)`;
+                            } else {
+                                rankingMessage += `📈 **Weekly Average**: No recent activity (last 7 days)`;
+                            }
+                        } else {
+                            rankingMessage += `📈 **Weekly Average**: Not in recent competition (last 7 days)`;
+                        }
+                    } catch (weeklyError) {
+                        rankingMessage += `📈 **Weekly Average**: Not in top 5 (last 7 days)`;
+                    }
+                }
+            }
+
+            // Add encouragement based on position
+            if (userPosition === 1) {
+                rankingMessage += `\n\n👑 **You're the Shitty Weather Champion!** Keep it up!`;
+            } else if (userPosition <= 3) {
+                rankingMessage += `\n\n🏆 **You're in the top 3!** Almost at the top!`;
+            } else if (userPosition <= Math.ceil(totalUsers * 0.5)) {
+                rankingMessage += `\n\n📈 **You're in the top half!** Climb higher!`;
+            } else {
+                rankingMessage += `\n\n💪 **Keep competing!** Hope for worse weather to rise in ranks!`;
+            }
+
+            return rankingMessage;
+
+        } catch (error) {
+            console.error('Error getting personal ranking:', error);
+            return null;
         }
     }
 };

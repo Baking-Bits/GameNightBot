@@ -100,11 +100,19 @@ class WeatherSystemAdapter {
         
         return new Promise((resolve, reject) => {
             let url;
+            
+            // Properly encode postal code for URL
+            const encodedPostalCode = encodeURIComponent(postalCode);
+            
             if (countryCode) {
-                url = `https://api.openweathermap.org/data/2.5/weather?zip=${postalCode},${countryCode}&appid=${apiKey}&units=imperial`;
+                // For UK and other countries with postal codes that may have issues with the zip endpoint,
+                // we still try the zip endpoint first but with proper encoding
+                url = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode},${countryCode}&appid=${apiKey}&units=imperial`;
             } else {
-                url = `https://api.openweathermap.org/data/2.5/weather?zip=${postalCode}&appid=${apiKey}&units=imperial`;
+                url = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode}&appid=${apiKey}&units=imperial`;
             }
+
+            console.log(`[WEATHER API] Fetching weather for postal code: ${postalCode} (${countryCode}) - URL: ${url}`);
 
             https.get(url, (response) => {
                 let data = '';
@@ -117,15 +125,19 @@ class WeatherSystemAdapter {
                     try {
                         const weatherData = JSON.parse(data);
                         if (response.statusCode === 200) {
+                            console.log(`[WEATHER API] Success for ${postalCode}: ${weatherData.name}, ${weatherData.main?.temp}°F`);
                             resolve(weatherData);
                         } else {
+                            console.error(`[WEATHER API] Error for ${postalCode}: ${response.statusCode} - ${weatherData.message || 'Unknown error'}`);
                             reject(new Error(`Weather API error: ${response.statusCode} - ${weatherData.message || 'Unknown error'}`));
                         }
                     } catch (error) {
+                        console.error(`[WEATHER API] Parse error for ${postalCode}:`, error);
                         reject(new Error(`Failed to parse weather data: ${error.message}`));
                     }
                 });
             }).on('error', (error) => {
+                console.error(`[WEATHER API] Request error for ${postalCode}:`, error);
                 reject(new Error(`Weather API request failed: ${error.message}`));
             });
         });

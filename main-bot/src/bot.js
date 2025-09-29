@@ -208,7 +208,7 @@ class VoiceTimeTracker {
                 this.serviceManager.getTopWeeklyAverages()
             ]);
             
-            const bestDayData = bestSingleDay ? [bestSingleDay] : [];
+            const bestDayData = bestSingleDay?.top5 || [];
             const weeklyData = topWeeklyAverages || [];
             
             if (bestDayData.length === 0 && weeklyData.length === 0) {
@@ -217,16 +217,20 @@ class VoiceTimeTracker {
 
             let message = `💩 **DAILY SHITTY WEATHER UPDATE** 💩\n\n`;
             
-            // Show best single day winner
+            // Show top 5 best single day performers
             if (bestDayData.length > 0) {
-                const winner = bestDayData[0];
-                const displayName = winner.display_name || `User-${winner.user_id.slice(-4)}`;
-                const region = winner.region || 'Unknown Region';
-                const date = new Date(winner.date).toLocaleDateString();
+                message += `🏆 **Top Single Day Performers (Last 30 Days)**\n`;
                 
-                message += `🏆 **Best Single Day Winner (Last 30 Days)**\n`;
-                message += `👑 **${displayName}** from **${region}** - **${winner.total_points} points**\n`;
-                message += `📅 ${date}\n\n`;
+                bestDayData.forEach((performer, index) => {
+                    const displayName = performer.display_name || `User-${performer.user_id.slice(-4)}`;
+                    const region = performer.region || 'Unknown Region';
+                    const date = new Date(performer.date).toLocaleDateString();
+                    const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '⭐';
+                    
+                    message += `${emoji} **${displayName}** from **${region}** - **${performer.total_points} points** (${date})\n`;
+                });
+                
+                message += `\n`;
             }
             
             // Show top weekly average

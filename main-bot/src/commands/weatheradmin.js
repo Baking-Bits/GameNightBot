@@ -249,11 +249,23 @@ async function showWeatherAdminPanel(interaction, bot) {
             leaderboard = []; // Fallback to empty array
         }
         
+        // Get server tracking stats
+        let trackedServersCount = 0;
+        let serverStatsError = false;
+        
+        try {
+            const serverStats = await bot.serviceManager.getTrackedServersStats();
+            trackedServersCount = serverStats.count || 0;
+        } catch (error) {
+            console.error('[WEATHERADMIN] Failed to get server stats:', error);
+            serverStatsError = true;
+        }
+
         const embed = new EmbedBuilder()
             .setTitle('🌤️ Weather System Admin Panel')
             .setDescription(statsError ? 
                 '**⚠️ Service Temporarily Unavailable**\n🔄 Weather service is restarting...\n🔧 Admin functions available below\n\n*Some features may be limited until service is restored*' :
-                `**Current System Status**\n👥 **Active Users:** ${leaderboard.length}\n🕐 **Points Awarded:** Every hour\n📊 **Fair Competition:** Active\n\n*Select an action below to manage the weather system*`)
+                `**Current System Status**\n👥 **Active Users:** ${leaderboard.length}\n🖥️ **Tracked Servers:** ${trackedServersCount}\n🕐 **Points Awarded:** Every hour\n📊 **Fair Competition:** Active\n\n*Select an action below to manage the weather system*`)
             .setColor(statsError ? '#FF9800' : '#2196F3')
             .setTimestamp();
 
@@ -269,10 +281,22 @@ async function showWeatherAdminPanel(interaction, bot) {
                     emoji: '👥'
                 },
                 {
-                    label: '📊 System Statistics',
+                    label: '�️ List Tracked Servers',
+                    description: 'View all tracked GameNight servers',
+                    value: 'listservers',
+                    emoji: '🖥️'
+                },
+                {
+                    label: '�📊 System Statistics',
                     description: 'View detailed weather system stats',
                     value: 'stats', 
                     emoji: '📊'
+                },
+                {
+                    label: '🌡️ Server Weather Status',
+                    description: 'Check current weather at all server locations',
+                    value: 'serverstatus',
+                    emoji: '🌡️'
                 },
                 {
                     label: '💩 Award Points Manually',
@@ -325,11 +349,36 @@ async function showWeatherAdminPanel(interaction, bot) {
                     .setEmoji('🎯')
             );
 
+        // Create buttons for server management
+        const serverManagementRow = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('weatheradmin_addserver')
+                    .setLabel('Add Server')
+                    .setStyle(ButtonStyle.Success)
+                    .setEmoji('🖥️'),
+                new ButtonBuilder()
+                    .setCustomId('weatheradmin_removeserver')
+                    .setLabel('Remove Server')
+                    .setStyle(ButtonStyle.Danger)
+                    .setEmoji('🗑️'),
+                new ButtonBuilder()
+                    .setCustomId('weatheradmin_configserver')
+                    .setLabel('Configure Alerts')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('⚙️'),
+                new ButtonBuilder()
+                    .setCustomId('weatheradmin_alerthistory')
+                    .setLabel('Alert History')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('📜')
+            );
+
         const selectRow = new ActionRowBuilder().addComponents(selectMenu);
 
         await interaction.reply({
             embeds: [embed],
-            components: [selectRow, userManagementRow],
+            components: [selectRow, userManagementRow, serverManagementRow],
             ephemeral: true
         });
 
@@ -347,7 +396,16 @@ async function showWeatherAdminPanel(interaction, bot) {
                     await handleGuiAction(i, bot, action);
                 } else if (i.isButton()) {
                     const action = i.customId.replace('weatheradmin_', '');
-                    await handleUserManagementAction(i, bot, action);
+                    
+                    // Determine if it's user or server management
+                    const userActions = ['adduser', 'removeuser', 'setactive', 'setscore'];
+                    const serverActions = ['addserver', 'removeserver', 'configserver', 'alerthistory'];
+                    
+                    if (userActions.includes(action)) {
+                        await handleUserManagementAction(i, bot, action);
+                    } else if (serverActions.includes(action)) {
+                        await handleServerManagementAction(i, bot, action);
+                    }
                 }
             } catch (error) {
                 console.error('Error handling weatheradmin GUI interaction:', error);
@@ -363,15 +421,19 @@ async function showWeatherAdminPanel(interaction, bot) {
         collector.on('end', () => {
             // Disable components when collector expires
             const disabledSelectMenu = StringSelectMenuBuilder.from(selectMenu).setDisabled(true);
-            const disabledButtons = userManagementRow.components.map(button => 
+            const disabledUserButtons = userManagementRow.components.map(button => 
                 ButtonBuilder.from(button).setDisabled(true)
             );
-            const disabledUserRow = new ActionRowBuilder().addComponents(disabledButtons);
+            const disabledServerButtons = serverManagementRow.components.map(button => 
+                ButtonBuilder.from(button).setDisabled(true)
+            );
+            const disabledUserRow = new ActionRowBuilder().addComponents(disabledUserButtons);
+            const disabledServerRow = new ActionRowBuilder().addComponents(disabledServerButtons);
             const disabledSelectRow = new ActionRowBuilder().addComponents(disabledSelectMenu);
 
             interaction.editReply({
                 embeds: [embed.setFooter({ text: '⏰ Admin panel expired - run /weatheradmin again' })],
-                components: [disabledSelectRow, disabledUserRow]
+                components: [disabledSelectRow, disabledUserRow, disabledServerRow]
             }).catch(() => {}); // Ignore errors if already deleted
         });
 
@@ -392,8 +454,14 @@ async function handleGuiAction(interaction, bot, action) {
         case 'listusers':
             await handleListUsers(interaction, bot.serviceManager);
             break;
+        case 'listservers':
+            await handleListServers(interaction, bot.serviceManager);
+            break;
         case 'stats':
             await handleStats(interaction, bot.serviceManager);
+            break;
+        case 'serverstatus':
+            await handleServerStatus(interaction, bot.serviceManager);
             break;
         case 'award':
             await handleManualAward(interaction, bot.serviceManager);
@@ -775,7 +843,7 @@ async function handleStats(interaction, serviceManager) {
             .setColor('#2196F3')
             .addFields(
                 { name: '👥 Total Users', value: leaderboard.length.toString(), inline: true },
-                { name: '🏆 Competition Active', value: bestSingleDay ? 'Yes' : 'Starting up', inline: true },
+                { name: '🏆 Competition Active', value: bestSingleDay?.best ? 'Yes' : 'Starting up', inline: true },
                 { name: '📈 Weekly Trackers', value: topWeeklyAverages ? topWeeklyAverages.length.toString() : '0', inline: true }
             )
             .setTimestamp();
@@ -1024,21 +1092,435 @@ function validatePostalCode(code) {
         return { valid: true, country: 'FR', format: 'postcode' };
     }
     
-    // Danish postal codes (4 digits, but we can't distinguish from AU without more context)
-    // Note: Both Denmark and Australia use 4-digit codes
+    // Danish postal codes (4 digits, 1000-9999)
+    // Common Danish codes: 1000-2999 (Copenhagen area), 3000-4999 (Zealand), 5000-5999 (Funen), 6000-9999 (Jutland)
     if (/^\d{4}$/.test(cleanCode)) {
-        // For 4-digit codes, we'll let the API handle country detection
-        // or require users to be more specific in ambiguous cases
-        return { valid: true, country: 'AMBIGUOUS', format: 'postcode' };
+        const postalNum = parseInt(cleanCode);
+        // Danish postal codes (including 2300 Køge, 7470 Karup)
+        if (postalNum >= 1000 && postalNum <= 9999) {
+            return { valid: true, country: 'DK', format: 'danish_postcode' };
+        }
+        // Australian postal codes (different range, avoid conflict with Danish)
+        if (postalNum >= 200 && postalNum <= 999) {
+            return { valid: true, country: 'AU', format: 'australian_postcode' };
+        }
     }
     
-    // For other formats, be more lenient - accept if it's 3-10 characters with letters/numbers
-    if (/^[A-Z0-9\s-]{3,10}$/i.test(code)) {
+    // For other formats, be more lenient but reject obvious text strings
+    if (/^[A-Z0-9\s-]{3,10}$/i.test(code) && !/sailing|server|test|north|sea/i.test(code)) {
         return { valid: true, country: 'UNKNOWN', format: 'generic' };
     }
     
     return { 
         valid: false, 
-        message: 'Please provide a valid postal/zip code.\n\nExamples:\n• US: 12345 or 12345-6789\n• UK: SW1A 1AA or M1 1AA\n• Canada: A1A 1A1\n• Denmark/Australia: 2000\n• Germany: 10115' 
+        message: 'Please provide a valid postal/zip code.\n\n**Examples:**\n• **US:** 12345 or 12345-6789\n• **UK:** SW1A 1AA or M1 1AA\n• **Canada:** A1A 1A1\n• **Denmark:** 1000-9999 (e.g., 2100 for Copenhagen)\n• **Australia:** 2000-9999\n• **Germany:** 10115' 
     };
+}
+
+// ===== SERVER TRACKING FUNCTIONS =====
+
+// Handle server management button actions
+async function handleServerManagementAction(interaction, bot, action) {
+    const serverActions = ['addserver', 'removeserver', 'configserver', 'alerthistory'];
+    
+    if (!serverActions.includes(action)) {
+        await interaction.reply({
+            content: '❌ Unknown server management action.',
+            ephemeral: true
+        });
+        return;
+    }
+
+    // Show appropriate modal for the server action
+    let modal;
+    
+    switch (action) {
+        case 'addserver':
+            modal = new ModalBuilder()
+                .setCustomId('weatheradmin_modal_addserver')
+                .setTitle('Add GameNight Server Tracking')
+                .addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('server_name')
+                            .setLabel('Server Name')
+                            .setPlaceholder('e.g., Main Game Server, EU Server, Development Box')
+                            .setStyle(TextInputStyle.Short)
+                            .setRequired(true)
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('postal_code')
+                            .setLabel('Server Location (Postal Code)')
+                            .setPlaceholder('Postal code where server is physically located')
+                            .setStyle(TextInputStyle.Short)
+                            .setRequired(true)
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('alert_thresholds')
+                            .setLabel('Alert Thresholds (Optional)')
+                            .setPlaceholder('temp_high:85,temp_low:10,wind:50 (leave blank for defaults)')
+                            .setStyle(TextInputStyle.Paragraph)
+                            .setRequired(false)
+                    )
+                );
+            break;
+            
+        case 'removeserver':
+            modal = new ModalBuilder()
+                .setCustomId('weatheradmin_modal_removeserver')
+                .setTitle('Remove Server Tracking')
+                .addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('server_name')
+                            .setLabel('Server Name')
+                            .setPlaceholder('Enter exact server name to remove')
+                            .setStyle(TextInputStyle.Short)
+                            .setRequired(true)
+                    )
+                );
+            break;
+            
+        case 'configserver':
+            modal = new ModalBuilder()
+                .setCustomId('weatheradmin_modal_configserver')
+                .setTitle('Configure Server Alert Thresholds')
+                .addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('server_name')
+                            .setLabel('Server Name')
+                            .setPlaceholder('Enter server name to configure')
+                            .setStyle(TextInputStyle.Short)
+                            .setRequired(true)
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('alert_thresholds')
+                            .setLabel('Alert Thresholds')
+                            .setPlaceholder('temp_high:85,temp_low:10,wind:50,humidity:90')
+                            .setStyle(TextInputStyle.Paragraph)
+                            .setRequired(true)
+                    )
+                );
+            break;
+            
+        case 'alerthistory':
+            // This doesn't need a modal - just show the history directly
+            await interaction.deferReply({ ephemeral: true });
+            await handleShowAlertHistory(interaction, bot.serviceManager);
+            return;
+    }
+    
+    if (modal) {
+        await interaction.showModal(modal);
+        
+        // Set up modal submit handler for server modals
+        const filter = (i) => i.customId.startsWith('weatheradmin_modal_') && i.user.id === interaction.user.id;
+        
+        try {
+            const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 300000 }); // 5 minutes
+            await handleServerModalSubmission(modalSubmission, bot);
+        } catch (error) {
+            console.log('Server modal submission timed out or failed:', error.message);
+        }
+    }
+}
+
+// Handle server modal submissions
+async function handleServerModalSubmission(interaction, bot) {
+    const modalId = interaction.customId;
+    
+    try {
+        if (modalId === 'weatheradmin_modal_addserver') {
+            const serverName = interaction.fields.getTextInputValue('server_name').trim();
+            const postalCode = interaction.fields.getTextInputValue('postal_code').trim();
+            const alertThresholdsInput = interaction.fields.getTextInputValue('alert_thresholds').trim();
+            
+            await interaction.deferReply({ ephemeral: true });
+            
+            // Validate postal code
+            const validation = validatePostalCode(postalCode);
+            if (!validation.valid) {
+                return await interaction.editReply({
+                    content: `❌ Invalid postal code. ${validation.message}`
+                });
+            }
+            
+            // Parse alert thresholds with proper defaults
+            let alertThresholds = {
+                temp_high: 95,    // °F - High temperature alert
+                temp_low: 32,     // °F - Low temperature alert (freezing)
+                wind: 40,         // mph - High wind alert
+                humidity: 90      // % - High humidity alert
+            };
+            
+            if (alertThresholdsInput) {
+                try {
+                    const pairs = alertThresholdsInput.split(',');
+                    for (const pair of pairs) {
+                        const [key, value] = pair.trim().split(':');
+                        if (key && value && !isNaN(parseFloat(value))) {
+                            alertThresholds[key.trim()] = parseFloat(value);
+                        }
+                    }
+                } catch (error) {
+                    // Keep defaults if parsing fails
+                    console.log('Using default thresholds due to parsing error:', error);
+                }
+            }
+            
+            // Add server via service manager
+            const response = await bot.serviceManager.addTrackedServer(serverName, postalCode, alertThresholds);
+            
+            if (!response.success) {
+                return await interaction.editReply({
+                    content: `❌ ${response.message || 'Failed to add server tracking.'}`
+                });
+            }
+            
+            const embed = new EmbedBuilder()
+                .setTitle('✅ Server Tracking Added')
+                .setColor('#4CAF50')
+                .addFields(
+                    { name: 'Server Name', value: serverName, inline: true },
+                    { name: 'Location', value: postalCode, inline: true },
+                    { name: 'Alert Thresholds', value: Object.keys(alertThresholds).length > 0 ? 
+                        Object.entries(alertThresholds).map(([k, v]) => `${k}: ${v}`).join('\n') : 
+                        'Default', inline: true }
+                )
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [embed] });
+            
+        } else if (modalId === 'weatheradmin_modal_removeserver') {
+            const serverName = interaction.fields.getTextInputValue('server_name').trim();
+            
+            await interaction.deferReply({ ephemeral: true });
+            
+            const response = await bot.serviceManager.removeTrackedServer(serverName);
+            
+            if (!response.success) {
+                return await interaction.editReply({
+                    content: `❌ ${response.message || 'Failed to remove server tracking.'}`
+                });
+            }
+            
+            const embed = new EmbedBuilder()
+                .setTitle('✅ Server Tracking Removed')
+                .setColor('#F44336')
+                .addFields(
+                    { name: 'Server Name', value: serverName, inline: true },
+                    { name: 'Action', value: 'Removed from tracking system', inline: true }
+                )
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [embed] });
+            
+        } else if (modalId === 'weatheradmin_modal_configserver') {
+            const serverName = interaction.fields.getTextInputValue('server_name').trim();
+            const alertThresholdsInput = interaction.fields.getTextInputValue('alert_thresholds').trim();
+            
+            await interaction.deferReply({ ephemeral: true });
+            
+            // Parse alert thresholds
+            let alertThresholds = {};
+            try {
+                const pairs = alertThresholdsInput.split(',');
+                for (const pair of pairs) {
+                    const [key, value] = pair.trim().split(':');
+                    if (key && value && !isNaN(parseFloat(value))) {
+                        alertThresholds[key.trim()] = parseFloat(value);
+                    }
+                }
+                
+                if (Object.keys(alertThresholds).length === 0) {
+                    throw new Error('No valid thresholds provided');
+                }
+            } catch (error) {
+                return await interaction.editReply({
+                    content: '❌ Invalid alert thresholds format. Use: temp_high:85,temp_low:10,wind:50,humidity:90'
+                });
+            }
+            
+            const response = await bot.serviceManager.configureServerAlerts(serverName, alertThresholds);
+            
+            if (!response.success) {
+                return await interaction.editReply({
+                    content: `❌ ${response.message || 'Failed to configure server alerts.'}`
+                });
+            }
+            
+            const embed = new EmbedBuilder()
+                .setTitle('✅ Server Alerts Configured')
+                .setColor('#4CAF50')
+                .addFields(
+                    { name: 'Server Name', value: serverName, inline: true },
+                    { name: 'New Thresholds', value: Object.entries(alertThresholds)
+                        .map(([k, v]) => `${k}: ${v}`).join('\n'), inline: true }
+                )
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [embed] });
+        }
+        
+    } catch (error) {
+        console.error('Error handling server modal submission:', error);
+        
+        if (!interaction.replied && !interaction.deferred) {
+            await interaction.reply({
+                content: '❌ An error occurred while processing your server request.',
+                ephemeral: true
+            });
+        } else if (interaction.deferred) {
+            await interaction.editReply({
+                content: '❌ An error occurred while processing your server request.'
+            });
+        }
+    }
+}
+
+// Server tracking select menu handlers
+async function handleListServers(interaction, serviceManager) {
+    try {
+        const response = await serviceManager.listTrackedServers();
+        
+        if (!response.success) {
+            await interaction.editReply(`❌ ${response.message || 'Failed to list tracked servers.'}`);
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle('🖥️ Tracked GameNight Servers')
+            .setColor('#2196F3')
+            .setTimestamp();
+
+        if (response.servers && response.servers.length > 0) {
+            let description = `**${response.servers.length} server(s) being monitored:**\n\n`;
+            
+            response.servers.forEach((server, index) => {
+                description += `**${index + 1}. ${server.name}**\n`;
+                description += `📍 Location: ${server.postal_code}\n`;
+                description += `🌡️ Alert Thresholds: `;
+                
+                const thresholds = [];
+                if (server.temp_high_threshold) thresholds.push(`High: ${server.temp_high_threshold}°F`);
+                if (server.temp_low_threshold) thresholds.push(`Low: ${server.temp_low_threshold}°F`);
+                if (server.wind_threshold) thresholds.push(`Wind: ${server.wind_threshold} mph`);
+                if (server.humidity_threshold) thresholds.push(`Humidity: ${server.humidity_threshold}%`);
+                
+                description += thresholds.length > 0 ? thresholds.join(', ') : 'Default';
+                description += `\n⏰ Added: ${new Date(server.created_at).toLocaleDateString()}\n\n`;
+            });
+            
+            embed.setDescription(description);
+        } else {
+            embed.setDescription('No servers are currently being tracked.\n\n*Use the "Add Server" button to start monitoring GameNight server weather.*');
+        }
+
+        await interaction.editReply({ embeds: [embed] });
+
+    } catch (error) {
+        console.error('Error listing servers:', error);
+        await interaction.editReply('❌ Failed to list tracked servers. Please try again.');
+    }
+}
+
+async function handleServerStatus(interaction, serviceManager) {
+    try {
+        const response = await serviceManager.getServerWeatherStatus();
+        
+        if (!response.success) {
+            await interaction.editReply(`❌ ${response.message || 'Failed to get server weather status.'}`);
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle('🌡️ Server Weather Status')
+            .setColor('#2196F3')
+            .setTimestamp();
+
+        if (response.servers && response.servers.length > 0) {
+            let description = `**Current weather at all tracked server locations:**\n\n`;
+            
+            response.servers.forEach((server, index) => {
+                const weather = server.weather;
+                const alerts = server.alerts || [];
+                
+                description += `**${server.name}**\n`;
+                description += `📍 ${server.location || server.postal_code}\n`;
+                
+                if (weather) {
+                    const tempF = Math.round(weather.temp);
+                    const tempC = Math.round((weather.temp - 32) * 5/9);
+                    
+                    description += `🌡️ ${tempF}°F (${tempC}°C) - ${weather.description}\n`;
+                    description += `💨 Wind: ${weather.wind} mph | 💧 Humidity: ${weather.humidity}%\n`;
+                    
+                    if (alerts.length > 0) {
+                        description += `⚠️ **ALERTS:** ${alerts.join(', ')}\n`;
+                    } else {
+                        description += `✅ All conditions normal\n`;
+                    }
+                } else {
+                    description += `⚠️ Weather data unavailable\n`;
+                }
+                
+                description += `\n`;
+            });
+            
+            embed.setDescription(description);
+        } else {
+            embed.setDescription('No tracked servers found.\n\n*Add servers using the "Add Server" button to monitor their weather.*');
+        }
+
+        await interaction.editReply({ embeds: [embed] });
+
+    } catch (error) {
+        console.error('Error getting server status:', error);
+        await interaction.editReply('❌ Failed to get server weather status. Please try again.');
+    }
+}
+
+async function handleShowAlertHistory(interaction, serviceManager) {
+    try {
+        const response = await serviceManager.getServerAlertHistory();
+        
+        if (!response.success) {
+            await interaction.editReply(`❌ ${response.message || 'Failed to get alert history.'}`);
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle('📜 Server Weather Alert History')
+            .setColor('#FF9800')
+            .setTimestamp();
+
+        if (response.alerts && response.alerts.length > 0) {
+            let description = `**Recent weather alerts for tracked servers:**\n\n`;
+            
+            response.alerts.slice(0, 10).forEach((alert, index) => {
+                const alertTime = new Date(alert.created_at);
+                description += `**${alert.server_name}** - ${alert.alert_type}\n`;
+                description += `📊 ${alert.alert_message}\n`;
+                description += `⏰ ${alertTime.toLocaleString()}\n\n`;
+            });
+            
+            if (response.alerts.length > 10) {
+                description += `*Showing 10 most recent alerts (${response.alerts.length} total)*`;
+            }
+            
+            embed.setDescription(description);
+        } else {
+            embed.setDescription('No weather alerts found.\n\n*This is good - it means your servers haven\'t experienced extreme weather conditions recently!*');
+        }
+
+        await interaction.editReply({ embeds: [embed] });
+
+    } catch (error) {
+        console.error('Error getting alert history:', error);
+        await interaction.editReply('❌ Failed to get server alert history. Please try again.');
+    }
 }

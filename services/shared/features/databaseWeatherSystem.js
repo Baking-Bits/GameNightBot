@@ -98,6 +98,13 @@ class DatabaseWeatherSystem {
         await this.initialize();
         
         try {
+            // Import the point calculator
+            const { calculateWeatherPoints } = require('../utils/weatherPointCalculator');
+            
+            // Calculate points for this weather check
+            const pointData = calculateWeatherPoints(weatherData);
+            
+            // Prepare weather history data
             const historyData = {
                 temperature: weatherData.main?.temp,
                 feels_like: weatherData.main?.feels_like,
@@ -109,7 +116,24 @@ class DatabaseWeatherSystem {
                 country: weatherData.sys?.country
             };
             
-            await addWeatherHistory(userId, historyData);
+            // Use the enhanced function to store both weather data and points
+            const { addWeatherHistoryWithPoints } = require('../../../main-bot/src/database/weather');
+            await addWeatherHistoryWithPoints(userId, historyData, pointData);
+            
+            // If points were earned, also update the total score
+            if (pointData.points > 0) {
+                console.log(`[WEATHER DB] User ${userId} earned ${pointData.points} points: ${pointData.summary}`);
+                await this.updateShittyWeatherScore(userId, pointData.points, {
+                    weather: pointData.summary,
+                    temperature: weatherData.main?.temp,
+                    windSpeed: weatherData.wind?.speed,
+                    humidity: weatherData.main?.humidity,
+                    breakdown: pointData.breakdown,
+                    timestamp: new Date()
+                });
+            }
+            
+            return { success: true, pointsEarned: pointData.points, breakdown: pointData.breakdown };
         } catch (error) {
             console.error('[WEATHER DB] Error adding weather history:', error);
             throw error;

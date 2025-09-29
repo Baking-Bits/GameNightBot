@@ -24,7 +24,29 @@
       "id": "1758999711991",
       "isAIGenerated": true,
       "responseTimeMs": 111901
+    },
+    {
+      "name": "Apple Slices with Almond Butter",
+      "type": "snack",
+      "ingredients": [
+        "1 medium apple",
+        "2 tablespoons almond butter"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "220",
+      "description": "A simple and delicious snack featuring apple slices paired with almond butter for a satisfying and nutritious treat.",
+      "instructions": [
+        "Wash and core the apple.",
+        "Slice the apple into even pieces.",
+        "Place the almond butter in a small container or wrap it in parchment paper.",
+        "Serve apple slices with almond butter for dipping."
+      ],
+      "benefits": "This snack provides a balanced mix of carbohydrates, protein, and healthy fats, making it ideal for sustained energy. The fiber from the apple helps keep you full, while the almond butter offers protein and healthy fats for a steady energy release. It's quick to prepare, portable, and perfect for busy schedules.",
+      "generatedAt": "2025-09-28T19:01:34.587Z",
+      "id": "1759086094587",
+      "isAIGenerated": true,
+      "responseTimeMs": 94238
     }
   ],
-  "lastGenerated": "2025-09-27T19:01:51.991Z"
+  "lastGenerated": "2025-09-28T19:01:34.587Z"
 }

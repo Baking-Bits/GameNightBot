@@ -154,6 +154,37 @@ async function initializeWeatherDatabase() {
             )
         `);
 
+        // Server tracking tables for infrastructure monitoring
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS tracked_servers (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                server_name VARCHAR(255) NOT NULL UNIQUE,
+                postal_code VARCHAR(20) NOT NULL,
+                temp_high_threshold DECIMAL(5,2) DEFAULT 85.0,
+                temp_low_threshold DECIMAL(5,2) DEFAULT 32.0,
+                wind_threshold DECIMAL(5,2) DEFAULT 50.0,
+                humidity_threshold INT DEFAULT 90,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_server_name (server_name)
+            )
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS server_weather_alerts (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                server_id INT NOT NULL,
+                server_name VARCHAR(255) NOT NULL,
+                alert_type VARCHAR(100) NOT NULL,
+                alert_message TEXT,
+                weather_data JSON,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_server_alerts (server_id, created_at),
+                INDEX idx_alert_time (created_at),
+                FOREIGN KEY (server_id) REFERENCES tracked_servers(id) ON DELETE CASCADE
+            )
+        `);
+
         console.log('[WEATHER DB] Weather database tables initialized successfully');
     } catch (error) {
         console.error('[WEATHER DB] Error initializing weather database:', error);
@@ -263,6 +294,48 @@ async function addWeatherHistory(userId, weatherData) {
         return result;
     } catch (error) {
         console.error('[WEATHER DB] Error adding weather history:', error);
+        throw error;
+    }
+}
+
+// Enhanced Weather History with Point Calculation
+async function addWeatherHistoryWithPoints(userId, weatherData, pointCalculationData = null) {
+    try {
+        let points = 0;
+        let pointsBreakdown = null;
+        let calculatedAt = null;
+        
+        // If point calculation data is provided, use it
+        if (pointCalculationData) {
+            points = pointCalculationData.points || 0;
+            pointsBreakdown = pointCalculationData.breakdown ? JSON.stringify(pointCalculationData.breakdown) : null;
+            calculatedAt = new Date();
+        }
+        
+        const result = await pool.query(`
+            INSERT INTO weather_history (
+                user_id, temperature, feels_like, humidity, wind_speed,
+                weather_main, weather_description, city, country,
+                points, points_breakdown, calculated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            userId,
+            weatherData.temperature,
+            weatherData.feels_like,
+            weatherData.humidity,
+            weatherData.wind_speed,
+            weatherData.weather_main,
+            weatherData.weather_description,
+            weatherData.city,
+            weatherData.country,
+            points,
+            pointsBreakdown,
+            calculatedAt
+        ]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error adding weather history with points:', error);
         throw error;
     }
 }
@@ -393,8 +466,9 @@ async function addDailyPoints(userId, points, pointsBreakdown, weatherSummary, d
     }
 }
 
-async function getBestSingleDay(days = 30) {
+async function getBestSingleDay(days = 30, getAllUsers = false) {
     try {
+        const limitClause = getAllUsers ? '' : 'LIMIT 5';
         const result = await pool.query(`
             SELECT 
                 dp.user_id,
@@ -409,18 +483,23 @@ async function getBestSingleDay(days = 30) {
             WHERE dp.date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                 AND wu.is_active = TRUE
             ORDER BY dp.total_points DESC
-            LIMIT 1
+            ${limitClause}
         `, [days]);
         
-        return result[0] || null;
+        if (getAllUsers) {
+            return result.length > 0 ? { best: result[0], top5: result.slice(0, 5), allUsers: result } : null;
+        } else {
+            return result.length > 0 ? { best: result[0], top5: result } : null;
+        }
     } catch (error) {
         console.error('[WEATHER DB] Error getting best single day:', error);
         throw error;
     }
 }
 
-async function getTopWeeklyAverages(days = 7, limit = 5) {
+async function getTopWeeklyAverages(days = 7, getAllUsers = false) {
     try {
+        const limit = getAllUsers ? 1000 : 5; // Use large limit instead of no limit for safety
         const result = await pool.query(`
             SELECT 
                 dp.user_id,
@@ -489,6 +568,219 @@ async function getWeeklyResults(startDate, endDate) {
     }
 }
 
+// Server Tracking Functions
+async function addTrackedServer(serverName, postalCode, thresholds = {}) {
+    try {
+        const result = await pool.query(`
+            INSERT INTO tracked_servers (
+                server_name, postal_code, temp_high_threshold, 
+                temp_low_threshold, wind_threshold, humidity_threshold
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        `, [
+            serverName,
+            postalCode,
+            thresholds.temp_high || 85.0,
+            thresholds.temp_low || 32.0,
+            thresholds.wind || 50.0,
+            thresholds.humidity || 90
+        ]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error adding tracked server:', error);
+        throw error;
+    }
+}
+
+async function removeTrackedServer(serverId) {
+    try {
+        const result = await pool.query(
+            'DELETE FROM tracked_servers WHERE id = ?',
+            [serverId]
+        );
+        
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('[WEATHER DB] Error removing tracked server:', error);
+        throw error;
+    }
+}
+
+async function getAllTrackedServers() {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM tracked_servers ORDER BY server_name'
+        );
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting tracked servers:', error);
+        throw error;
+    }
+}
+
+async function updateServerThresholds(serverId, thresholds) {
+    try {
+        const result = await pool.query(`
+            UPDATE tracked_servers SET
+                temp_high_threshold = ?,
+                temp_low_threshold = ?,
+                wind_threshold = ?,
+                humidity_threshold = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `, [
+            thresholds.temp_high,
+            thresholds.temp_low,
+            thresholds.wind,
+            thresholds.humidity,
+            serverId
+        ]);
+        
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('[WEATHER DB] Error updating server thresholds:', error);
+        throw error;
+    }
+}
+
+async function addServerWeatherAlert(serverId, serverName, alertType, alertMessage, weatherData) {
+    try {
+        const result = await pool.query(`
+            INSERT INTO server_weather_alerts (
+                server_id, server_name, alert_type, alert_message, weather_data
+            ) VALUES (?, ?, ?, ?, ?)
+        `, [
+            serverId,
+            serverName,
+            alertType,
+            alertMessage,
+            JSON.stringify(weatherData)
+        ]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error adding server weather alert:', error);
+        throw error;
+    }
+}
+
+async function getServerAlertHistory(serverId, days = 7) {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM server_weather_alerts 
+            WHERE server_id = ? 
+            AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            ORDER BY created_at DESC
+        `, [serverId, days]);
+        
+        return result;
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting server alert history:', error);
+        throw error;
+    }
+}
+
+// Get detailed weather history for a user
+async function getUserWeatherHistory(userId, days = 30) {
+    try {
+        // Get weather history with points for the specified time period
+        const historyResult = await pool.query(`
+            SELECT 
+                wh.*,
+                wu.display_name,
+                wu.region
+            FROM weather_history wh
+            JOIN weather_users wu ON wh.user_id = wu.user_id
+            WHERE wh.user_id = ?
+                AND wh.timestamp >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                AND wu.is_active = TRUE
+            ORDER BY wh.timestamp DESC
+            LIMIT 500
+        `, [userId, days]);
+
+        // Also get daily points entries for context and legacy support
+        const dailyPointsResult = await pool.query(`
+            SELECT 
+                dp.*,
+                wu.display_name,
+                wu.region
+            FROM daily_weather_points dp
+            JOIN weather_users wu ON dp.user_id = wu.user_id
+            WHERE dp.user_id = ?
+                AND dp.date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                AND wu.is_active = TRUE
+            ORDER BY dp.date DESC
+        `, [userId, days]);
+
+        // Combine the data - prioritize weather_history entries with calculated points
+        const combinedData = [];
+        
+        // First, add all weather history entries (these now have hourly point data)
+        historyResult.forEach(entry => {
+            let pointsBreakdown = null;
+            try {
+                if (entry.points_breakdown) {
+                    pointsBreakdown = typeof entry.points_breakdown === 'string' 
+                        ? JSON.parse(entry.points_breakdown) 
+                        : entry.points_breakdown;
+                }
+            } catch (e) {
+                console.warn('Failed to parse points breakdown:', e);
+            }
+
+            combinedData.push({
+                timestamp: entry.timestamp,
+                user_id: entry.user_id,
+                display_name: entry.display_name,
+                region: entry.region,
+                points: entry.points || 0,
+                points_awarded: entry.points || 0,
+                breakdown: pointsBreakdown,
+                weather_summary: `${entry.weather_description} (${Math.round(entry.temperature || 0)}°F, ${entry.humidity || 0}% humidity, ${Math.round(entry.wind_speed || 0)}mph wind)`,
+                temperature: entry.temperature,
+                humidity: entry.humidity,
+                wind_speed: entry.wind_speed,
+                weather_description: entry.weather_description,
+                calculated_at: entry.calculated_at,
+                source: 'weather_history'
+            });
+        });
+
+        // Add daily points entries for reference (if they don't overlap with hourly data)
+        dailyPointsResult.forEach(entry => {
+            const entryDate = new Date(entry.date).toDateString();
+            const hasHourlyData = combinedData.some(hourly => {
+                const hourlyDate = new Date(hourly.timestamp).toDateString();
+                return hourlyDate === entryDate;
+            });
+            
+            // Only add daily summary if we don't have hourly data for that day
+            if (!hasHourlyData) {
+                combinedData.push({
+                    timestamp: entry.created_at || entry.date,
+                    user_id: entry.user_id,
+                    display_name: entry.display_name,
+                    region: entry.region,
+                    points: entry.total_points,
+                    points_awarded: entry.total_points,
+                    breakdown: entry.points_breakdown,
+                    weather_summary: entry.weather_summary || 'Daily summary',
+                    source: 'daily_points'
+                });
+            }
+        });
+
+        // Sort by timestamp descending (most recent first)
+        combinedData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        return combinedData;
+
+    } catch (error) {
+        console.error('[WEATHER DB] Error getting user weather history:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     initializeWeatherDatabase,
     addWeatherUser,
@@ -496,6 +788,7 @@ module.exports = {
     getAllActiveWeatherUsers,
     removeWeatherUser,
     addWeatherHistory,
+    addWeatherHistoryWithPoints,  // NEW: Enhanced function with point calculation
     getShittyWeatherLeaderboard,
     updateShittyWeatherScore,
     addShittyWeatherAward,
@@ -504,5 +797,13 @@ module.exports = {
     addDailyPoints,
     getBestSingleDay,
     getTopWeeklyAverages,
-    getWeeklyResults
+    getWeeklyResults,
+    getUserWeatherHistory,
+    // Server Tracking Functions
+    addTrackedServer,
+    removeTrackedServer,
+    getAllTrackedServers,
+    updateServerThresholds,
+    addServerWeatherAlert,
+    getServerAlertHistory
 };

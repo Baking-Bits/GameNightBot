@@ -217,6 +217,46 @@ app.delete('/leave/:userId', authenticateService, async (req, res) => {
     }
 });
 
+// Get weather by postal code (for server monitoring)
+app.post('/weather/postal', authenticateService, async (req, res) => {
+    try {
+        const { postalCode, countryCode } = req.body;
+        console.log(`[WEATHER SERVICE] Getting weather for postal code: ${postalCode}`);
+        
+        const weatherData = await weatherSystemAdapter.fetchWeatherByPostalCode(postalCode, countryCode);
+        
+        if (!weatherData) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid postal code or location not found' 
+            });
+        }
+
+        // Format the response to match expected format
+        const response = {
+            temperature: weatherData.main.temp,
+            feels_like: weatherData.main.feels_like,
+            humidity: weatherData.main.humidity,
+            wind_speed: weatherData.wind?.speed || 0,
+            weather_main: weatherData.weather[0].main,
+            weather_description: weatherData.weather[0].description,
+            city: weatherData.name,
+            region: weatherData.sys?.country || 'Unknown',
+            country: weatherData.sys?.country || countryCode,
+            postal_code: postalCode
+        };
+
+        res.json(response);
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting weather by postal code:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to get weather data',
+            error: error.message 
+        });
+    }
+});
+
 // Shitty weather leaderboard endpoint
 app.get('/shitty-leaderboard', authenticateService, async (req, res) => {
     try {
@@ -306,7 +346,8 @@ app.get('/shitty/last-award', authenticateService, async (req, res) => {
 // Get best single day performance in last 30 days
 app.get('/shitty/best-single-day', authenticateService, async (req, res) => {
     try {
-        const result = await weatherSystem.getBestSingleDay();
+        const getAllUsers = req.query.all === 'true';
+        const result = await weatherSystem.getBestSingleDay(30, getAllUsers);
         res.json(result);
     } catch (error) {
         console.error('[WEATHER SERVICE] Error getting best single day:', error);
@@ -317,11 +358,44 @@ app.get('/shitty/best-single-day', authenticateService, async (req, res) => {
 // Get top 5 weekly averages for last 7 days
 app.get('/shitty/weekly-averages', authenticateService, async (req, res) => {
     try {
-        const result = await weatherSystem.getTopWeeklyAverages();
+        const getAllUsers = req.query.all === 'true';
+        const result = await weatherSystem.getTopWeeklyAverages(7, getAllUsers);
         res.json(result);
     } catch (error) {
         console.error('[WEATHER SERVICE] Error getting weekly averages:', error);
         res.status(500).json({ error: 'Failed to get weekly averages' });
+    }
+});
+
+// Get detailed weather history for a user
+app.get('/user/:userId/history', authenticateService, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const days = parseInt(req.query.days) || 30;
+        
+        console.log(`[WEATHER SERVICE] Getting weather history for user: ${userId} (last ${days} days)`);
+        
+        const history = await weatherSystem.getUserWeatherHistory(userId, days);
+        
+        if (!history) {
+            return res.status(404).json({ 
+                success: false,
+                error: 'User not found or no history available' 
+            });
+        }
+
+        res.json({
+            success: true,
+            data: history,
+            user_id: userId,
+            days_requested: days
+        });
+    } catch (error) {
+        console.error('[WEATHER SERVICE] Error getting user weather history:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Failed to get user weather history' 
+        });
     }
 });
 
