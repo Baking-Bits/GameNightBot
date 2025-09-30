@@ -160,7 +160,37 @@
       "id": "1759173088532",
       "isAIGenerated": true,
       "responseTimeMs": 165758
+    },
+    {
+      "name": "Avocado and Turkey Lettuce Wraps",
+      "type": "lunch",
+      "ingredients": [
+        "2 large lettuce leaves (like butter lettuce or romaine)",
+        "4 oz turkey breast slices",
+        "1 avocado",
+        "1 medium tomato",
+        "1/4 red onion",
+        "1 tablespoon fresh lime juice",
+        "1 teaspoon olive oil",
+        "Salt and pepper to taste",
+        "1/4 cup cilantro (optional)"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "350-400",
+      "description": "Refreshing and satisfying avocado and turkey lettuce wraps with a zesty lime kick.",
+      "instructions": [
+        "Prepare the vegetables: Dice the tomato and red onion, and slice the avocado.",
+        "In a small bowl, mix the diced tomato, red onion, avocado, lime juice, olive oil, salt, and pepper.",
+        "Place a lettuce leaf on a plate and add a slice of turkey breast on top.",
+        "Spoon a generous amount of the avocado mixture onto each turkey slice.",
+        "Garnish with cilantro if desired and wrap the lettuce leaves around the filling to secure."
+      ],
+      "nutritionNotes": "This meal is rich in healthy fats from avocado, lean protein from turkey, and provides a good source of fiber and vitamins from the vegetables. The use of lettuce as a wrap keeps it light and low-carb, ideal for maintaining energy levels throughout the day.",
+      "generatedAt": "2025-09-30T16:02:20.193Z",
+      "id": "1759248140193",
+      "isAIGenerated": true,
+      "responseTimeMs": 139217
     }
   ],
-  "lastGenerated": "2025-09-29T19:11:28.533Z"
+  "lastGenerated": "2025-09-30T16:02:20.193Z"
 }

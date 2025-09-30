@@ -35,14 +35,6 @@
    - `serviceManager.getShittyWeatherLeaderboard()`
    - ➜ `GET /shitty/leaderboard` → Database: `getShittyWeatherLeaderboard()`
 
-6. **`/weather stats`** ✅ **ADMIN ONLY**
-   - `serviceManager.getSystemStats()`
-   - ➜ `GET /stats` → Database: `getUserCount()` + leaderboard data
-
-7. **`/weather manualaward`** ✅ **ADMIN ONLY**
-   - `serviceManager.awardShittyWeatherPoints()`
-   - ➜ `POST /award-points` → Database: `updateShittyWeatherScore()`
-
 ### `/weatheradmin` Command ✅ **FULLY INTEGRATED**
 **All subcommands using ServiceManager → Weather Service → Database:**
 
