@@ -1,73 +1,158 @@
 # GameNight Bot
 
-A comprehensive Discord bot that tracks voice activity, provides AI-powered assistance, and promotes healthy gaming habits with automated meal plans and workout suggestions.
+A comprehensive Discord bot designed to enhance gaming communities with voice activity tracking, weather-based competitions, and AI-powered wellness features.
 
-## Features
+## 🌟 Features
 
-- 🕒 Real-time voice activity tracking
-- 📈 Multiple time period views (daily, weekly, monthly, yearly, all-time)
-- 🤝 User comparison functionality
-- 🤖 AI-powered chat with configurable personalities
-- 🥗 **AI Meal Plan & Workout System** - Automated healthy lifestyle suggestions
-- 💾 Persistent data storage using MariaDB
-- ⚡ Slash command support
+### 🎮 **Voice Activity Tracking**
+- Real-time voice channel monitoring
+- Daily, weekly, monthly, and all-time statistics
+- Interactive leaderboards and user comparisons
+- Detailed analytics and activity patterns
 
-## Commands
+### 🌦️ **Weather Competition System**
+- Join with your postal code to compete in "shitty weather" challenges
+- Automatic point awards for bad weather conditions (rain, snow, extreme temperatures)
+- Global leaderboard with multi-region support (US, UK, Mexico, Denmark, and more)
+- Real-time weather monitoring with fallback API support
 
-### Time Tracking
-* `/timespent [period] [user]` - Shows time spent in voice channels
-  * `period` - daily/weekly/monthly/yearly/all (default: all)
-  * `user` - @user mention (default: yourself)
- 
-* `/compare <user1> <user2>` - Compare voice time between two users
-  * `user1` - first @user mention
-  * `user2` - second @user mention
+### 🖥️ **CraftyControl Server Management**
+- Comprehensive Minecraft server management via CraftyControl integration
+- Real-time server status monitoring and dashboard
+- Admin-controlled server operations (start, stop, restart, console commands)
+- Multi-server support with organized status display
 
-* `/leaderboard [period] [page]` - Shows server leaderboard
-  * `period` - daily/weekly/monthly/yearly/all (default: all)
-  * `page` - Page number (default: 1)
+### 🥗 **AI Wellness System**
+- AI-generated meal plans, snacks, and workout routines
+- Automated daily scheduling with customizable requirements
+- Healthy lifestyle recommendations for gamers
+- Smart content generation that avoids repetition
 
-### Activity Analysis
-* `/average [user]` - Shows average daily voice time
-  * `user` - @user mention (default: yourself)
-  * Displays average time spent in voice per day
+### ⚙️ **Advanced Administration**
+- Comprehensive admin panels for all systems
+- Service health monitoring and statistics
+- User management and system configuration
+- Microservices architecture for reliability
 
-* `/stats [user]` - Shows detailed voice activity patterns
-  * `user` - @user mention (default: yourself)
-  * Displays hourly and daily activity graphs
-  * Shows peak activity times and patterns
+## 🚀 Quick Start
 
-* `/serverstats` - Shows server-wide voice activity statistics
-  * Displays server-wide activity patterns
-  * Shows total users and average daily users
-  * Includes hourly and daily activity graphs with user counts
-
-### AI Meal Plan & Workouts
-* `/aimealplan generate <type>` - Generate meal, snack, or workout on demand
-  * `type` - meal/snack/workout
-  
-* `/aimealplan history <type> [count]` - View recent generation history
-  * `type` - meals/snacks/workouts
-  * `count` - Number of items to show (1-20, default: 5)
-
-* `/aimealplan toggle` - Enable/disable automatic scheduling
-
-* `/aimealplan schedule` - View current posting schedule
-
-## Setup
-
-### Basic Setup
-1. Install dependencies: `npm install`
-2. Configure `config.json` with your bot token and database credentials
-3. Run: `npm start`
-
-### AI Meal Plan System Setup
-See [MEAL_PLAN_SETUP.md](MEAL_PLAN_SETUP.md) for detailed setup instructions for the AI-powered meal plan and workout system.
-
-## Prerequisites
-
+### Prerequisites
 - Node.js 16.9.0 or higher
-- Discord Bot Token  
 - MariaDB database
-- LocalAI instance (for AI features)
-- Configure all credentials in `config.json`
+- Discord Bot Token
+- OpenWeatherMap API key (for weather features)
+- LocalAI instance (for wellness features)
+- CraftyControl instance (for Minecraft server management)
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/GameNightBot.git
+   cd GameNightBot
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure your bot:
+   ```bash
+   cp config.json.template config.json
+   # Edit config.json with your credentials
+   ```
+
+4. Start the bot:
+   ```bash
+   npm run start:all
+   ```
+
+## 📋 Main Commands
+
+### Voice Tracking
+- `/voice stats [user]` - View voice activity statistics
+- `/voice leaderboard [period]` - Server voice time leaderboard
+- `/voice compare <user1> <user2>` - Compare two users' activity
+- `/voiceadmin` - Admin panel for voice system management
+
+### Weather Competition
+- `/weather join <zipcode>` - Join the weather competition
+- `/weather current` - Check your current weather and points
+- `/weather shitty` - View the shitty weather leaderboard
+- `/weather leave` - Leave the weather tracking system
+- `/weatheradmin` - Admin panel for weather system management
+
+### CraftyControl Server Management
+- `/crafty` - Minecraft server management dashboard
+  - Real-time server status monitoring
+  - Start, stop, restart server operations (admin only)
+  - Server console access and command execution
+  - Multi-server environment support
+
+### Wellness System
+- `/wellness generate <type>` - Generate meal, snack, or workout
+- `/wellnessadmin` - Admin panel for wellness system management
+
+### General
+- `/personality <name>` - Switch AI personality for chat interactions
+- `/raffle` - Create and manage server raffles
+- `/eventrole` - Manage event-based roles
+
+## 🏗️ Architecture
+
+The bot uses a microservices architecture:
+
+- **Main Bot** (`main-bot/`) - Core Discord functionality and command handling
+- **Weather Service** (`services/weather-service/`) - Dedicated weather API and point system
+- **Shared Services** (`services/shared/`) - Common utilities and systems
+- **ServiceManager** - Handles communication between services
+
+## 🌍 Supported Regions
+
+The weather system supports postal codes from:
+- 🇺🇸 United States (ZIP codes)
+- 🇬🇧 United Kingdom (Postcodes)
+- 🇲🇽 Mexico (Códigos Postales)
+- 🇩🇰 Denmark (Postnummer)
+- And more regions via fallback geocoding
+
+## 📊 Database
+
+Uses MariaDB for persistent storage:
+- Voice activity data
+- Weather user tracking and points
+- Wellness content history
+- System configuration and logs
+
+## 🔧 Configuration
+
+Key configuration options in `config.json`:
+- Discord bot token and guild settings
+- Database connection details
+- Weather API keys and channels
+- Wellness system AI endpoint
+- CraftyControl API credentials and server URLs
+- Service authentication tokens
+
+## 📚 Additional Documentation
+
+- [Weather System Setup](WEATHER_COMMANDS_DATABASE_INTEGRATION.md)
+- [Wellness System Setup](MEAL_PLAN_SETUP.md)
+- [Privacy Policy](legal/privacy_policy.md)
+- [Terms of Service](legal/ToS.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+*Designed to enhance gaming communities with data-driven insights and healthy lifestyle features.*

@@ -95,26 +95,24 @@ class WeatherSystemAdapter {
 
     // Utility methods needed by admin handlers
     async fetchWeatherByPostalCode(postalCode, countryCode = null) {
-        // Direct OpenWeatherMap API implementation
+        // Direct OpenWeatherMap API implementation with fallback for problematic postal codes
         const apiKey = process.env.OPENWEATHER_API_KEY || 'a1afa3d523672a255ebd39a126e7ac3e';
         
         return new Promise((resolve, reject) => {
-            let url;
-            
             // Properly encode postal code for URL
             const encodedPostalCode = encodeURIComponent(postalCode);
             
+            // Primary attempt: Direct zip code API
+            let primaryUrl;
             if (countryCode) {
-                // For UK and other countries with postal codes that may have issues with the zip endpoint,
-                // we still try the zip endpoint first but with proper encoding
-                url = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode},${countryCode}&appid=${apiKey}&units=imperial`;
+                primaryUrl = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode},${countryCode}&appid=${apiKey}&units=imperial`;
             } else {
-                url = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode}&appid=${apiKey}&units=imperial`;
+                primaryUrl = `https://api.openweathermap.org/data/2.5/weather?zip=${encodedPostalCode}&appid=${apiKey}&units=imperial`;
             }
 
-            console.log(`[WEATHER API] Fetching weather for postal code: ${postalCode} (${countryCode}) - URL: ${url}`);
+            console.log(`[WEATHER API] Primary attempt for postal code: ${postalCode} (${countryCode}) - URL: ${primaryUrl}`);
 
-            https.get(url, (response) => {
+            https.get(primaryUrl, (response) => {
                 let data = '';
 
                 response.on('data', (chunk) => {
@@ -125,11 +123,14 @@ class WeatherSystemAdapter {
                     try {
                         const weatherData = JSON.parse(data);
                         if (response.statusCode === 200) {
-                            console.log(`[WEATHER API] Success for ${postalCode}: ${weatherData.name}, ${weatherData.main?.temp}°F`);
+                            console.log(`[WEATHER API] Primary success for ${postalCode}: ${weatherData.name}, ${weatherData.main?.temp}°F`);
                             resolve(weatherData);
                         } else {
-                            console.error(`[WEATHER API] Error for ${postalCode}: ${response.statusCode} - ${weatherData.message || 'Unknown error'}`);
-                            reject(new Error(`Weather API error: ${response.statusCode} - ${weatherData.message || 'Unknown error'}`));
+                            console.log(`[WEATHER API] Primary failed for ${postalCode}: ${response.statusCode} - ${weatherData.message || 'Unknown error'}`);
+                            // Try fallback approach for specific postal codes
+                            this.tryFallbackGeocoding(postalCode, countryCode, apiKey)
+                                .then(resolve)
+                                .catch(reject);
                         }
                     } catch (error) {
                         console.error(`[WEATHER API] Parse error for ${postalCode}:`, error);
@@ -138,7 +139,76 @@ class WeatherSystemAdapter {
                 });
             }).on('error', (error) => {
                 console.error(`[WEATHER API] Request error for ${postalCode}:`, error);
-                reject(new Error(`Weather API request failed: ${error.message}`));
+                // Try fallback approach
+                this.tryFallbackGeocoding(postalCode, countryCode, apiKey)
+                    .then(resolve)
+                    .catch(reject);
+            });
+        });
+    }
+
+    // Fallback method using geocoding API for problematic postal codes
+    async tryFallbackGeocoding(postalCode, countryCode, apiKey) {
+        return new Promise((resolve, reject) => {
+            const encodedPostalCode = encodeURIComponent(postalCode);
+            const geocodingUrl = `https://api.openweathermap.org/geo/1.0/zip?zip=${encodedPostalCode},${countryCode || 'US'}&appid=${apiKey}`;
+            
+            console.log(`[WEATHER API] Fallback geocoding attempt for ${postalCode}: ${geocodingUrl}`);
+            
+            https.get(geocodingUrl, (geoResponse) => {
+                let geoData = '';
+
+                geoResponse.on('data', (chunk) => {
+                    geoData += chunk;
+                });
+
+                geoResponse.on('end', () => {
+                    try {
+                        const geoResult = JSON.parse(geoData);
+                        if (geoResponse.statusCode === 200) {
+                            console.log(`[WEATHER API] Geocoding success for ${postalCode}: ${geoResult.name}, ${geoResult.country}`);
+                            
+                            // Now get weather using coordinates
+                            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${geoResult.lat}&lon=${geoResult.lon}&appid=${apiKey}&units=imperial`;
+                            
+                            https.get(weatherUrl, (weatherResponse) => {
+                                let weatherData = '';
+
+                                weatherResponse.on('data', (chunk) => {
+                                    weatherData += chunk;
+                                });
+
+                                weatherResponse.on('end', () => {
+                                    try {
+                                        const weatherResult = JSON.parse(weatherData);
+                                        if (weatherResponse.statusCode === 200) {
+                                            console.log(`[WEATHER API] Fallback success for ${postalCode}: ${weatherResult.name}, ${weatherResult.main?.temp}°F`);
+                                            resolve(weatherResult);
+                                        } else {
+                                            console.error(`[WEATHER API] Fallback weather error for ${postalCode}: ${weatherResponse.statusCode}`);
+                                            reject(new Error(`Weather API fallback failed: ${weatherResponse.statusCode} - ${weatherResult.message || 'Unknown error'}`));
+                                        }
+                                    } catch (error) {
+                                        console.error(`[WEATHER API] Fallback parse error for ${postalCode}:`, error);
+                                        reject(new Error(`Failed to parse fallback weather data: ${error.message}`));
+                                    }
+                                });
+                            }).on('error', (error) => {
+                                console.error(`[WEATHER API] Fallback weather request error for ${postalCode}:`, error);
+                                reject(new Error(`Fallback weather request failed: ${error.message}`));
+                            });
+                        } else {
+                            console.error(`[WEATHER API] Geocoding failed for ${postalCode}: ${geoResponse.statusCode} - ${geoResult.message || 'Unknown error'}`);
+                            reject(new Error(`Geocoding API error: ${geoResponse.statusCode} - ${geoResult.message || 'Unknown error'}`));
+                        }
+                    } catch (error) {
+                        console.error(`[WEATHER API] Geocoding parse error for ${postalCode}:`, error);
+                        reject(new Error(`Failed to parse geocoding data: ${error.message}`));
+                    }
+                });
+            }).on('error', (error) => {
+                console.error(`[WEATHER API] Geocoding request error for ${postalCode}:`, error);
+                reject(new Error(`Geocoding request failed: ${error.message}`));
             });
         });
     }

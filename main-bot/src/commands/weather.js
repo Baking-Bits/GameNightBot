@@ -30,7 +30,8 @@ module.exports = {
                             { name: 'Australia', value: 'AU' },
                             { name: 'Denmark', value: 'DK' },
                             { name: 'Germany', value: 'DE' },
-                            { name: 'France', value: 'FR' }
+                            { name: 'France', value: 'FR' },
+                            { name: 'Mexico', value: 'MX' }
                         )))
         .addSubcommand(subcommand =>
             subcommand
@@ -115,7 +116,7 @@ module.exports = {
         const displayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
 
         // Validate postal code format (supports US zip codes and international formats)
-        const isValidPostalCode = this.validatePostalCode(zipCode);
+        const isValidPostalCode = this.validatePostalCode(zipCode, countryCode);
         if (!isValidPostalCode.valid) {
             return await interaction.reply({
                 content: `❌ ${isValidPostalCode.message}`,
@@ -335,40 +336,110 @@ module.exports = {
         return 0xE74C3C; // Red for very hot
     },
 
-    validatePostalCode(code) {
+    validatePostalCode(code, countryCode = null) {
         // Remove spaces and convert to uppercase for validation
         const cleanCode = code.replace(/\s+/g, '').toUpperCase();
         
-        // US ZIP codes (5 digits or 5+4 format)
-        if (/^\d{5}(-?\d{4})?$/.test(cleanCode)) {
-            return { valid: true, country: 'US', format: 'zip' };
+        // If country code is provided, validate against specific country format
+        if (countryCode) {
+            switch (countryCode) {
+                case 'US':
+                    if (/^\d{5}(-?\d{4})?$/.test(cleanCode)) {
+                        return { valid: true, country: 'US', format: 'zip' };
+                    }
+                    break;
+                case 'MX':
+                    if (/^\d{5}$/.test(cleanCode)) {
+                        return { valid: true, country: 'MX', format: 'mexican_postcode' };
+                    }
+                    break;
+                case 'GB':
+                    const ukPostcodeRegex = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}$/i;
+                    if (ukPostcodeRegex.test(code)) {
+                        return { valid: true, country: 'GB', format: 'postcode' };
+                    }
+                    break;
+                case 'CA':
+                    if (/^[A-Z]\d[A-Z]\s*\d[A-Z]\d$/.test(cleanCode)) {
+                        return { valid: true, country: 'CA', format: 'postal' };
+                    }
+                    break;
+                case 'AU':
+                    if (/^\d{4}$/.test(cleanCode)) {
+                        return { valid: true, country: 'AU', format: 'postcode' };
+                    }
+                    break;
+                case 'DK':
+                    if (/^\d{4}$/.test(cleanCode)) {
+                        return { valid: true, country: 'DK', format: 'postcode' };
+                    }
+                    break;
+                case 'DE':
+                    if (/^\d{5}$/.test(cleanCode)) {
+                        return { valid: true, country: 'DE', format: 'postcode' };
+                    }
+                    break;
+                case 'FR':
+                    if (/^\d{5}$/.test(cleanCode)) {
+                        return { valid: true, country: 'FR', format: 'postcode' };
+                    }
+                    break;
+            }
+            // If country is specified but format doesn't match, return invalid
+            return { 
+                valid: false, 
+                message: `Invalid postal code format for ${countryCode}. Please check the format for your country.` 
+            };
         }
         
-        // UK postcodes - comprehensive pattern for all valid formats
-        // Formats: M1 1AA, M60 1NW, CR0 2YR, DN55 1PT, W1A 0AX, EC1A 1BB, SW1A 1AA
+        // No country code provided - try to auto-detect based on format
+        // Order matters for ambiguous formats!
+        
+        // UK postcodes - unique format, check first
         const ukPostcodeRegex = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}$/i;
         if (ukPostcodeRegex.test(code)) {
             return { valid: true, country: 'GB', format: 'postcode' };
         }
         
-        // Canadian postal codes (A1A1A1 or A1A 1A1)
+        // Canadian postal codes - unique format
         if (/^[A-Z]\d[A-Z]\s*\d[A-Z]\d$/.test(cleanCode)) {
             return { valid: true, country: 'CA', format: 'postal' };
         }
         
-        // Australian postcodes (4 digits)
+        // US ZIP codes with 9 digits (unique format)
+        if (/^\d{5}-\d{4}$/.test(cleanCode)) {
+            return { valid: true, country: 'US', format: 'zip' };
+        }
+        
+        // 5-digit codes - ambiguous between US, Mexico, Germany, France
+        // Prioritize by likelihood/usage patterns
+        if (/^\d{5}$/.test(cleanCode)) {
+            const postalNum = parseInt(cleanCode);
+            
+            // Mexican postal codes: 01000-99999 (covers 01580)
+            if (postalNum >= 1000 && postalNum <= 99999) {
+                // Return as ambiguous so user can specify country if needed
+                return { valid: true, country: 'AMBIGUOUS_5DIGIT', format: 'postcode', 
+                        message: 'This could be US, Mexican, German, or French postal code. Consider specifying country.' };
+            }
+            
+            // US ZIP codes: 00000-99999 (all ranges)
+            return { valid: true, country: 'US', format: 'zip' };
+        }
+        
+        // 4-digit codes - ambiguous between Australia and Denmark
         if (/^\d{4}$/.test(cleanCode)) {
-            return { valid: true, country: 'AU', format: 'postcode' };
-        }
-        
-        // German postal codes (5 digits)
-        if (/^\d{5}$/.test(cleanCode)) {
-            return { valid: true, country: 'DE', format: 'postcode' };
-        }
-        
-        // French postal codes (5 digits)
-        if (/^\d{5}$/.test(cleanCode)) {
-            return { valid: true, country: 'FR', format: 'postcode' };
+            const postalNum = parseInt(cleanCode);
+            // Danish postal codes (1000-9999)
+            if (postalNum >= 1000 && postalNum <= 9999) {
+                return { valid: true, country: 'DK', format: 'danish_postcode' };
+            }
+            // Australian postal codes (different range)
+            if (postalNum >= 200 && postalNum <= 999) {
+                return { valid: true, country: 'AU', format: 'australian_postcode' };
+            }
+            // General 4-digit
+            return { valid: true, country: 'AMBIGUOUS', format: 'postcode' };
         }
         
         // For other formats, be more lenient - accept if it's 3-10 characters with letters/numbers
@@ -378,7 +449,7 @@ module.exports = {
         
         return { 
             valid: false, 
-            message: 'Please provide a valid postal/zip code.\n\nExamples:\n• US: 12345 or 12345-6789\n• UK: SW1A 1AA or M1 1AA\n• Canada: A1A 1A1\n• Australia: 2000\n• Germany: 10115' 
+            message: 'Please provide a valid postal/zip code.\n\nExamples:\n• US: 12345 or 12345-6789\n• UK: SW1A 1AA or M1 1AA\n• Canada: A1A 1A1\n• Australia: 2000\n• Germany: 10115\n• Mexico: 01580' 
         };
     },
 
@@ -655,49 +726,102 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const result = await serviceManager.awardShittyWeatherPoints();
+            // Force award points to all users based on current weather
+            const awardResult = await serviceManager.awardShittyWeatherPoints();
             
-            if (!result || !result.award) {
+            if (!awardResult || !awardResult.success) {
                 return await interaction.editReply({
-                    content: '❌ No users with shitty weather found, or no one has bad enough weather to award points.'
+                    content: '❌ Failed to award weather points or no users are active in the weather system.'
                 });
             }
 
-            const award = result.award;
-            const scoreEmojis = ['💩', '🌧️', '❄️', '🌪️', '⛈️'];
-            const emoji = scoreEmojis[Math.min(Math.floor(award.score / 2), scoreEmojis.length - 1)] || '💩';
+            // Create response showing what happened
+            let responseContent = `✅ **Manual Weather Points Award Complete**\n\n📊 **Results:**\n• Users checked: ${awardResult.totalUsers || 0}\n• Points awarded: ${awardResult.totalPoints || 0}\n• Users with qualifying weather: ${awardResult.usersProcessed || 0}\n\n`;
+
+            // If no points were awarded this time, but show recent activity
+            if (awardResult.totalPoints === 0) {
+                responseContent += `*No users currently have weather bad enough to earn points right now.*\n\nCheck \`/weather shitty\` to see the current leaderboard with all awarded points!`;
+                return await interaction.editReply({
+                    content: responseContent
+                });
+            }
+
+            // Get the current best performers to show who got points
+            const bestSingleDay = await serviceManager.getBestSingleDay();
+            const leaderboard = await serviceManager.getShittyWeatherLeaderboard();
             
-            let description = `🏆 **${award.displayName}** from **${award.region}** wins!\n\n**Weather Score:** ${award.score} points\n**Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
+            if (!bestSingleDay || !bestSingleDay.best || !leaderboard || leaderboard.length === 0) {
+                return await interaction.editReply({
+                    content: `✅ **Weather Points Awarded!**\n\n📊 **Results:**\n• Users checked: ${awardResult.totalUsers}\n• Points awarded: ${awardResult.totalPoints}\n• Users with points: ${awardResult.usersProcessed}\n\n*Check \`/weather shitty\` to see the updated leaderboard!*`
+                });
+            }
+
+            // Get the top performer from today and create award display
+            const winner = bestSingleDay.best;
+            const topUser = leaderboard[0];
+            
+            const displayName = winner.display_name || topUser.display_name || 'Unknown User';
+            const region = winner.region || topUser.region || 'Unknown Region';
+            const todayPoints = winner.total_points || 0;
+            const totalPoints = topUser.total_points || 0;
+            
+            // Determine emoji based on today's points
+            const scoreEmojis = ['💩', '🌧️', '❄️', '🌪️', '⛈️'];
+            const emoji = scoreEmojis[Math.min(Math.floor(todayPoints / 2), scoreEmojis.length - 1)] || '💩';
+            
+            let description = `🏆 **${displayName}** from **${region}** performed best today!\n\n**Today's Score:** ${todayPoints} points\n**Total Points:** ${totalPoints} points\n`;
             
             // Add point breakdown if available
-            if (award.breakdown && award.breakdown.length > 0) {
-                description += `\n📊 **How they earned ${award.score} points:**\n${award.breakdown.join('\n')}\n`;
+            if (winner.points_breakdown) {
+                try {
+                    const breakdown = typeof winner.points_breakdown === 'string' ? JSON.parse(winner.points_breakdown) : winner.points_breakdown;
+                    const breakdownItems = [];
+                    if (breakdown.extreme_heat) breakdownItems.push(`🌡️ Extreme heat (+${breakdown.extreme_heat}pts)`);
+                    if (breakdown.extreme_cold) breakdownItems.push(`❄️ Extreme cold (+${breakdown.extreme_cold}pts)`);
+                    if (breakdown.hot) breakdownItems.push(`🌡️ Hot weather (+${breakdown.hot}pts)`);
+                    if (breakdown.cold) breakdownItems.push(`❄️ Cold weather (+${breakdown.cold}pts)`);
+                    if (breakdown.freezing) breakdownItems.push(`🧊 Freezing temps (+${breakdown.freezing}pts)`);
+                    if (breakdown.thunderstorm) breakdownItems.push(`⛈️ Thunderstorm (+${breakdown.thunderstorm}pts)`);
+                    if (breakdown.snow) breakdownItems.push(`🌨️ Snow (+${breakdown.snow}pts)`);
+                    if (breakdown.rain) breakdownItems.push(`🌧️ Rain (+${breakdown.rain}pts)`);
+                    if (breakdown.drizzle) breakdownItems.push(`💧 Drizzle (+${breakdown.drizzle}pts)`);
+                    if (breakdown.high_winds) breakdownItems.push(`💨 High winds (+${breakdown.high_winds}pts)`);
+                    if (breakdown.moderate_winds) breakdownItems.push(`💨 Moderate winds (+${breakdown.moderate_winds}pts)`);
+                    if (breakdown.high_humidity) breakdownItems.push(`💧 High humidity (+${breakdown.high_humidity}pts)`);
+                    if (breakdown.low_humidity) breakdownItems.push(`🏜️ Low humidity (+${breakdown.low_humidity}pts)`);
+                    if (breakdown.poor_visibility) breakdownItems.push(`🌫️ Poor visibility (+${breakdown.poor_visibility}pts)`);
+                    if (breakdown.tornado) breakdownItems.push(`🌪️ TORNADO (+${breakdown.tornado}pts)`);
+                    if (breakdown.hurricane) breakdownItems.push(`🌀 HURRICANE (+${breakdown.hurricane}pts)`);
+                    if (breakdown.blizzard) breakdownItems.push(`❄️ Blizzard (+${breakdown.blizzard}pts)`);
+                    
+                    if (breakdownItems.length > 0) {
+                        description += `\n📊 **How they earned ${todayPoints} points:**\n${breakdownItems.join('\n')}\n`;
+                    }
+                } catch (e) {
+                    // Fallback if breakdown parsing fails
+                    description += `\n📊 **Earned ${todayPoints} points from various weather conditions**\n`;
+                }
             }
             
             description += `\n*Join the competition with \`/weather join <zipcode>\`!*`;
 
             const embed = new EmbedBuilder()
                 .setColor(0x8B4513)
-                .setTitle(`${emoji} Manual Shitty Weather Award ${emoji}`)
+                .setTitle(`${emoji} Manual Weather Points Award ${emoji}`)
                 .setDescription(description)
                 .addFields(
-                    { name: '💨 Wind', value: `${award.weather.wind} mph`, inline: true },
-                    { name: '💧 Humidity', value: `${award.weather.humidity}%`, inline: true },
-                    { name: '🎖️ Total Points', value: award.totalPoints.toString(), inline: true }
+                    { name: '� Award Summary', value: `**${awardResult.totalPoints}** points awarded to **${awardResult.usersProcessed}** users`, inline: false },
+                    { name: '� Best Performer', value: `${displayName} from ${region}`, inline: true },
+                    { name: '� Today\'s Points', value: todayPoints.toString(), inline: true },
+                    { name: '🎖️ Total Points', value: totalPoints.toString(), inline: true }
                 )
                 .setTimestamp();
 
-            // Show top 3 worst weather for context
-            if (result.allScores.length > 1) {
-                let allScoresText = '';
-                result.allScores.slice(0, 3).forEach((user, index) => {
-                    const position = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
-                    allScoresText += `${position} ${user.userData.displayName}: ${user.score} pts (${user.weather.weather[0].description})\n`;
-                });
-                
+            // Show weather summary if available
+            if (winner.weather_summary) {
                 embed.addFields({
-                    name: '📊 This Round\'s Scores',
-                    value: allScoresText,
+                    name: '🌤️ Weather Conditions',
+                    value: winner.weather_summary,
                     inline: false
                 });
             }

@@ -887,36 +887,105 @@ async function handleManualAward(interaction, serviceManager) {
     try {
         const result = await serviceManager.awardShittyWeatherPoints();
         
-        if (!result || !result.award) {
+        if (!result || !result.success) {
             return await interaction.editReply({
-                content: '❌ No users with shitty weather found, or no one has bad enough weather to award points.'
+                content: '❌ Failed to award weather points or no users are active in the weather system.'
             });
         }
 
-        const award = result.award;
-        const formatTemperature = (fahrenheit) => {
-            const celsius = ((fahrenheit - 32) * 5/9);
-            return `${Math.round(fahrenheit)}°F (${Math.round(celsius)}°C)`;
-        };
-        
-        let description = `🏆 **${award.displayName}** from **${award.region}** wins!\n\n**Weather Score:** ${award.score} points\n**Conditions:** ${formatTemperature(award.weather.temp)}, ${award.weather.description}\n`;
-        
-        if (award.breakdown && award.breakdown.length > 0) {
-            description += `\n📊 **How they earned ${award.score} points:**\n${award.breakdown.join('\n')}\n`;
+        // If no points were awarded this time
+        if (result.totalPoints === 0) {
+            return await interaction.editReply({
+                content: `✅ **Manual Weather Points Check Complete**\n\n📊 **Results:**\n• Users checked: ${result.totalUsers || 0}\n• Points awarded: ${result.totalPoints || 0}\n• Users with qualifying weather: ${result.usersProcessed || 0}\n\n*No users currently have weather bad enough to earn points right now.*\n\nThe automatic system may have already awarded points recently. Check \`/weather shitty\` to see the current leaderboard!`
+            });
         }
-        
-        description += `\n*Manually awarded by admin*`;
 
+        // Points were awarded, get details and show comprehensive summary
+        const bestSingleDay = await serviceManager.getBestSingleDay();
+        const leaderboard = await serviceManager.getShittyWeatherLeaderboard();
+        
+        // Create detailed embed showing the awards
         const embed = new EmbedBuilder()
             .setColor(0x8B4513)
-            .setTitle(`💩 Manual Shitty Weather Award`)
-            .setDescription(description)
+            .setTitle(`💩 Manual Weather Points Award Complete`)
+            .setDescription(`**${result.totalPoints}** points awarded to **${result.usersProcessed}** users with qualifying weather conditions!`)
             .addFields(
-                { name: '💨 Wind', value: `${award.weather.wind} mph`, inline: true },
-                { name: '💧 Humidity', value: `${award.weather.humidity}%`, inline: true },
-                { name: '🎖️ Total Points', value: award.totalPoints.toString(), inline: true }
+                { name: '📊 Award Summary', value: `**${result.totalPoints}** points awarded to **${result.usersProcessed}** users out of **${result.totalUsers}** total users`, inline: false }
             )
             .setTimestamp();
+
+        // Try to show current best performer details if available
+        if (bestSingleDay && bestSingleDay.best && leaderboard && leaderboard.length > 0) {
+            const winner = bestSingleDay.best;
+            const topUser = leaderboard[0];
+            
+            const displayName = winner.display_name || topUser.display_name || 'Unknown User';
+            const region = winner.region || topUser.region || 'Unknown Region';
+            const todayPoints = winner.total_points || 0;
+            const totalPoints = topUser.total_points || 0;
+            
+            embed.addFields(
+                { name: '🏆 Current Leader', value: `${displayName} from ${region}`, inline: true },
+                { name: '📈 Leader Total Points', value: totalPoints.toString(), inline: true },
+                { name: '🎯 Today\'s Best Score', value: `${todayPoints} points`, inline: true }
+            );
+
+            // Add point breakdown if available
+            if (winner.points_breakdown) {
+                try {
+                    const breakdown = typeof winner.points_breakdown === 'string' ? JSON.parse(winner.points_breakdown) : winner.points_breakdown;
+                    const breakdownItems = [];
+                    if (breakdown.extreme_heat) breakdownItems.push(`🌡️ Extreme heat (+${breakdown.extreme_heat}pts)`);
+                    if (breakdown.extreme_cold) breakdownItems.push(`❄️ Extreme cold (+${breakdown.extreme_cold}pts)`);
+                    if (breakdown.hot) breakdownItems.push(`🌡️ Hot weather (+${breakdown.hot}pts)`);
+                    if (breakdown.cold) breakdownItems.push(`❄️ Cold weather (+${breakdown.cold}pts)`);
+                    if (breakdown.freezing) breakdownItems.push(`🧊 Freezing temps (+${breakdown.freezing}pts)`);
+                    if (breakdown.thunderstorm) breakdownItems.push(`⛈️ Thunderstorm (+${breakdown.thunderstorm}pts)`);
+                    if (breakdown.snow) breakdownItems.push(`🌨️ Snow (+${breakdown.snow}pts)`);
+                    if (breakdown.rain) breakdownItems.push(`🌧️ Rain (+${breakdown.rain}pts)`);
+                    if (breakdown.drizzle) breakdownItems.push(`💧 Drizzle (+${breakdown.drizzle}pts)`);
+                    if (breakdown.high_winds) breakdownItems.push(`💨 High winds (+${breakdown.high_winds}pts)`);
+                    if (breakdown.moderate_winds) breakdownItems.push(`💨 Moderate winds (+${breakdown.moderate_winds}pts)`);
+                    if (breakdown.high_humidity) breakdownItems.push(`💧 High humidity (+${breakdown.high_humidity}pts)`);
+                    if (breakdown.low_humidity) breakdownItems.push(`🏜️ Low humidity (+${breakdown.low_humidity}pts)`);
+                    if (breakdown.poor_visibility) breakdownItems.push(`🌫️ Poor visibility (+${breakdown.poor_visibility}pts)`);
+                    if (breakdown.tornado) breakdownItems.push(`🌪️ TORNADO (+${breakdown.tornado}pts)`);
+                    if (breakdown.hurricane) breakdownItems.push(`🌀 HURRICANE (+${breakdown.hurricane}pts)`);
+                    if (breakdown.blizzard) breakdownItems.push(`❄️ Blizzard (+${breakdown.blizzard}pts)`);
+                    
+                    if (breakdownItems.length > 0) {
+                        embed.addFields({
+                            name: '� Today\'s Point Breakdown',
+                            value: breakdownItems.join('\n'),
+                            inline: false
+                        });
+                    }
+                } catch (e) {
+                    // Fallback if breakdown parsing fails
+                    embed.addFields({
+                        name: '� Point Details',
+                        value: `Best performer earned ${todayPoints} points from various weather conditions`,
+                        inline: false
+                    });
+                }
+            }
+
+            // Show weather summary if available
+            if (winner.weather_summary) {
+                embed.addFields({
+                    name: '�️ Current Conditions',
+                    value: winner.weather_summary,
+                    inline: false
+                });
+            }
+        } else {
+            // Fallback if we can't get best performer details
+            embed.addFields({
+                name: '💡 Next Steps',
+                value: 'Use `/weather shitty` to see the updated leaderboard!',
+                inline: false
+            });
+        }
 
         await interaction.editReply({ embeds: [embed] });
     } catch (error) {
@@ -1093,6 +1162,15 @@ function validatePostalCode(code) {
     }
     
     // Danish postal codes (4 digits, 1000-9999)
+    // Mexican postal codes (5 digits, 01000-99999)
+    if (/^\d{5}$/.test(cleanCode)) {
+        const postalNum = parseInt(cleanCode);
+        // Mexican postal codes: 01000-99999 (01580 is in Mexico City area)
+        if (postalNum >= 1000 && postalNum <= 99999) {
+            return { valid: true, country: 'MX', format: 'mexican_postcode' };
+        }
+    }
+    
     // Common Danish codes: 1000-2999 (Copenhagen area), 3000-4999 (Zealand), 5000-5999 (Funen), 6000-9999 (Jutland)
     if (/^\d{4}$/.test(cleanCode)) {
         const postalNum = parseInt(cleanCode);
@@ -1113,7 +1191,7 @@ function validatePostalCode(code) {
     
     return { 
         valid: false, 
-        message: 'Please provide a valid postal/zip code.\n\n**Examples:**\n• **US:** 12345 or 12345-6789\n• **UK:** SW1A 1AA or M1 1AA\n• **Canada:** A1A 1A1\n• **Denmark:** 1000-9999 (e.g., 2100 for Copenhagen)\n• **Australia:** 2000-9999\n• **Germany:** 10115' 
+        message: 'Please provide a valid postal/zip code.\n\n**Examples:**\n• **US:** 12345 or 12345-6789\n• **UK:** SW1A 1AA or M1 1AA\n• **Canada:** A1A 1A1\n• **Denmark:** 1000-9999 (e.g., 2100 for Copenhagen)\n• **Australia:** 2000-9999\n• **Germany:** 10115\n• **Mexico:** 01580' 
     };
 }
 

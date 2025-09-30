@@ -234,6 +234,15 @@ function validatePostalCode(code) {
         return { valid: true, country: 'CA', format: 'postal' };
     }
     
+    // Mexican postal codes (5 digits, 01000-99999)
+    if (/^\d{5}$/.test(cleanCode)) {
+        const postalNum = parseInt(cleanCode);
+        // Mexican postal codes: 01000-99999 (01580 is in Mexico City area)
+        if (postalNum >= 1000 && postalNum <= 99999) {
+            return { valid: true, country: 'MX', format: 'mexican_postcode' };
+        }
+    }
+    
     if (/^\d{5}$/.test(cleanCode)) {
         return { valid: true, country: 'DE', format: 'postcode' };
     }
@@ -248,7 +257,7 @@ function validatePostalCode(code) {
     
     return { 
         valid: false, 
-        message: 'Please provide a valid postal/zip code.\n\nExamples:\n• US: 12345 or 12345-6789\n• UK: SW1A 1AA or M1 1AA\n• Canada: A1A 1A1\n• Denmark/Australia: 2000\n• Germany: 10115' 
+        message: 'Please provide a valid postal/zip code.\n\nExamples:\n• US: 12345 or 12345-6789\n• UK: SW1A 1AA or M1 1AA\n• Canada: A1A 1A1\n• Denmark/Australia: 2000\n• Germany: 10115\n• Mexico: 01580' 
     };
 }
 
