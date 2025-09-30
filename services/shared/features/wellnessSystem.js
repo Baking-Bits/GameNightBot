@@ -33,7 +33,7 @@ class WellnessSystem {
         };
     }
 
-    async callLocalAI(messages, personality, channel = null, maxTokens = 500, timeoutMs = 30000) {
+    async callLocalAI(messages, personality, channel = null, maxTokens = 1500, timeoutMs = 30000) {
         const startTime = Date.now();
         try {
             console.log(`[ADMIN] Making LocalAI call for personality: ${personality}`);
@@ -305,13 +305,29 @@ Response format (valid JSON only):
                     timeoutMs = 30 * 1000; // 30 seconds default
             }
             
+            // Adjust token limits based on content type
+            let maxTokens;
+            switch (type) {
+                case 'workout':
+                    maxTokens = 2500; // Higher limit for detailed workout plans
+                    break;
+                case 'meal':
+                    maxTokens = 2000; // Higher limit for detailed meal plans
+                    break;
+                default:
+                    maxTokens = 1500; // Default for snacks and other content
+            }
+            
             const response = await this.callLocalAI([
                 { role: 'user', content: prompt }
-            ], 'nutritionist', null, 500, timeoutMs);
+            ], 'nutritionist', null, maxTokens, timeoutMs);
 
             if (!response || !response.content) {
                 throw new Error('No response from AI');
             }
+
+            console.log('[ADMIN] Response received - length:', response.content.length);
+            console.log('[ADMIN] Response preview:', response.content.substring(0, 200) + '...');
 
             // Try to parse JSON response
             let contentData;
@@ -352,7 +368,16 @@ Response format (valid JSON only):
                 }
             } catch (parseError) {
                 console.error('[ADMIN] Failed to parse response as JSON:', parseError);
-                console.log('[ADMIN] Response was:', response.content.substring(0, 500) + '...');
+                console.log('[ADMIN] Response content length:', response.content.length);
+                console.log('[ADMIN] Response was:', response.content.substring(0, 500) + (response.content.length > 500 ? '...' : ''));
+                
+                // Try to extract partial content for fallback
+                const partialMatch = response.content.match(/"name":\s*"([^"]+)"/);
+                if (partialMatch) {
+                    console.log('[ADMIN] Found partial content, creating basic fallback');
+                    throw new Error(`Incomplete response - found: ${partialMatch[1]} (${response.content.length} chars)`);
+                }
+                
                 throw new Error('Invalid JSON response from service');
             }
 

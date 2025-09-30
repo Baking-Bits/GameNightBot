@@ -258,22 +258,29 @@ async function handleDirectGenerate(interaction, wellnessSystem, type) {
                 return;
         }
 
-        if (result && result.success) {
+        if (result && result.data) {
+            const data = result.data;
             const embed = new EmbedBuilder()
                 .setTitle(`${emoji} ${title}`)
-                .setDescription(`**${result.name || result.title}**\n\n${result.description || result.instructions}`)
+                .setDescription(`**${data.name || data.title}**\n\n${data.description || data.instructions}`)
                 .setColor('#4CAF50')
                 .setTimestamp()
                 .setFooter({ text: 'Generated via Admin Panel' });
 
-            if (result.ingredients) {
-                embed.addFields({ name: '🥘 Ingredients', value: result.ingredients, inline: true });
+            if (data.ingredients) {
+                embed.addFields({ name: '🥘 Ingredients', value: Array.isArray(data.ingredients) ? data.ingredients.join(', ') : data.ingredients, inline: true });
             }
-            if (result.nutrition) {
-                embed.addFields({ name: '📊 Nutrition', value: result.nutrition, inline: true });
+            if (data.nutrition || data.nutritionNotes) {
+                embed.addFields({ name: '📊 Nutrition', value: data.nutrition || data.nutritionNotes, inline: true });
             }
-            if (result.duration) {
-                embed.addFields({ name: '⏱️ Duration', value: result.duration, inline: true });
+            if (data.duration) {
+                embed.addFields({ name: '⏱️ Duration', value: data.duration, inline: true });
+            }
+            if (data.intensity) {
+                embed.addFields({ name: '💪 Intensity', value: data.intensity, inline: true });
+            }
+            if (data.equipment) {
+                embed.addFields({ name: '🏋️ Equipment', value: Array.isArray(data.equipment) ? data.equipment.join(', ') : data.equipment, inline: true });
             }
 
             await interaction.editReply({ embeds: [embed] });
