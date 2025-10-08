@@ -46,7 +46,154 @@
       "id": "1759086094587",
       "isAIGenerated": true,
       "responseTimeMs": 94238
+    },
+    {
+      "name": "Roasted Chickpea Trail Mix",
+      "type": "snack",
+      "ingredients": [
+        "1 cup canned chickpeas, drained and rinsed",
+        "1 tablespoon olive oil",
+        "1/2 teaspoon paprika",
+        "1/2 teaspoon garlic powder",
+        "1/4 teaspoon salt",
+        "2 tablespoons mixed nuts (e.g., almonds, walnuts)",
+        "2 tablespoons dried cranberries",
+        "1 tablespoon pumpkin seeds"
+      ],
+      "prepTime": "8 minutes",
+      "calories": "350",
+      "description": "A savory and sweet snack mix that combines roasted chickpeas with nuts, seeds, and dried fruit for a balanced energy boost.",
+      "instructions": [
+        "Preheat oven to 400°F (200°C).",
+        "Spread chickpeas on a baking sheet, drizzle with olive oil, and toss with paprika, garlic powder, and salt.",
+        "Roast for 20-25 minutes, stirring halfway through, until crispy.",
+        "Let chickpeas cool, then mix with nuts, cranberries, and pumpkin seeds."
+      ],
+      "benefits": "This snack is rich in protein, fiber, and healthy fats, providing sustained energy. Chickpeas offer plant-based protein and fiber, while nuts and seeds contribute essential fats and micronutrients. Dried fruit adds a touch of sweetness and quick energy, making it ideal for busy schedules.",
+      "generatedAt": "2025-10-01T19:02:15.955Z",
+      "id": "1759345335955",
+      "isAIGenerated": true,
+      "responseTimeMs": 135615
+    },
+    {
+      "name": "Avocado Toast with Egg",
+      "type": "snack",
+      "ingredients": [
+        "1 slice whole grain bread",
+        "1/2 ripe avocado",
+        "1 egg",
+        "Salt and pepper to taste"
+      ],
+      "prepTime": "8 minutes",
+      "calories": "250",
+      "description": "A quick and portable snack that combines healthy fats, protein, and whole grains for sustained energy.",
+      "instructions": [
+        "Toast the slice of whole grain bread.",
+        "While the bread is toasting, cook the egg to your liking (either scrambled or poached).",
+        "Mash the avocado and spread it on the toasted bread.",
+        "Top the avocado with the cooked egg and season with salt and pepper."
+      ],
+      "benefits": "Avocado provides healthy fats for sustained energy, while the egg offers high-quality protein to keep you full. Whole grain bread adds fiber for digestion and steady energy release, making it ideal for busy schedules.",
+      "generatedAt": "2025-10-02T19:01:38.638Z",
+      "id": "1759431698638",
+      "isAIGenerated": true,
+      "responseTimeMs": 98415
+    },
+    {
+      "name": "Greek Yogurt and Berries with Honey",
+      "type": "snack",
+      "ingredients": [
+        "plain Greek yogurt",
+        "mixed berries (such as blueberries, strawberries, raspberries)",
+        "honey"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A delicious and creamy snack that combines protein-rich Greek yogurt with antioxidant-packed berries and a touch of natural sweetness from honey.",
+      "instructions": [
+        "Scoop a serving of plain Greek yogurt into a small bowl or container.",
+        "Top with a generous handful of mixed berries.",
+        "Drizzle a teaspoon of honey over the top and gently mix to combine."
+      ],
+      "benefits": "This snack is excellent for sustained energy due to its high protein content from Greek yogurt, which keeps you full longer. The berries provide fiber and antioxidants, supporting overall health and energy levels, while honey offers a quick natural energy boost. It's portable and can be prepared in advance for a convenient on-the-go option.",
+      "generatedAt": "2025-10-03T19:01:41.295Z",
+      "id": "1759518101295",
+      "isAIGenerated": true,
+      "responseTimeMs": 100328
+    },
+    {
+      "name": "Hummus and Veggie Sticks",
+      "type": "snack",
+      "ingredients": [
+        "hummus",
+        "carrot sticks",
+        "celery sticks",
+        "cucumber slices"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A refreshing and satisfying snack combining creamy hummus with crunchy vegetable sticks.",
+      "instructions": [
+        "Wash and peel the carrot, celery, and cucumber.",
+        "Cut them into sticks or slices.",
+        "Serve with a small portion of hummus."
+      ],
+      "benefits": "This snack provides a balanced mix of protein, fiber, and healthy fats from the hummus, while the vegetables offer vitamins and hydration. The combination helps sustain energy levels and keeps you feeling full longer, making it ideal for busy schedules.",
+      "generatedAt": "2025-10-04T19:01:44.525Z",
+      "id": "1759604504525",
+      "isAIGenerated": true,
+      "responseTimeMs": 104255
+    },
+    {
+      "name": "Banana Nut Oatmeal Bites",
+      "type": "snack",
+      "ingredients": [
+        "1 ripe banana",
+        "1/2 cup rolled oats",
+        "2 tablespoons chopped walnuts",
+        "1 tablespoon honey",
+        "1 teaspoon cinnamon"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per bite",
+      "description": "These no-bake banana nut oatmeal bites are a delicious, portable snack that provides sustained energy with the perfect balance of sweetness and crunch.",
+      "instructions": [
+        "Mash the banana in a bowl until smooth.",
+        "Add rolled oats, chopped walnuts, honey, and cinnamon to the mashed banana. Mix until well combined.",
+        "Scoop a tablespoon of the mixture and roll it into a ball with your hands.",
+        "Place the bites on a parchment-lined tray and refrigerate for at least 30 minutes to set."
+      ],
+      "benefits": "Banana provides natural sugars and potassium for quick energy and muscle function. Rolled oats offer complex carbohydrates and fiber for sustained energy release. Walnuts add healthy fats and protein, supporting brain health and satiety. This snack is easy to prepare, portable, and ideal for busy schedules.",
+      "generatedAt": "2025-10-06T19:02:07.796Z",
+      "id": "1759777327796",
+      "isAIGenerated": true,
+      "responseTimeMs": 127533
+    },
+    {
+      "name": "Nutty Quinoa Energy Balls",
+      "type": "snack",
+      "ingredients": [
+        "quinoa (cooked and cooled)",
+        "honey",
+        "rolled oats",
+        "peanut butter",
+        "dark chocolate chips",
+        "chia seeds"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per ball",
+      "description": "These Nutty Quinoa Energy Balls are a portable and nutritious snack, perfect for busy schedules. They combine the protein-rich quinoa with the satisfying crunch of oats and the sweetness of honey and dark chocolate.",
+      "instructions": [
+        "In a large bowl, mix together 1 cup cooked and cooled quinoa, 2 tablespoons honey, 1/2 cup rolled oats, 1/4 cup peanut butter, 1/4 cup dark chocolate chips, and 1 tablespoon chia seeds.",
+        "Using your hands or a spoon, form the mixture into small, bite-sized balls.",
+        "Place the balls on a plate and refrigerate for at least 30 minutes to set."
+      ],
+      "benefits": "These energy balls are packed with protein, fiber, and healthy fats, providing sustained energy throughout the day. The quinoa offers essential amino acids, while the oats and chia seeds contribute to satiety. The honey and dark chocolate add a touch of sweetness, making this snack both delicious and energizing.",
+      "generatedAt": "2025-10-07T19:02:11.063Z",
+      "id": "1759863731063",
+      "isAIGenerated": true,
+      "responseTimeMs": 130837
     }
   ],
-  "lastGenerated": "2025-09-28T19:01:34.587Z"
+  "lastGenerated": "2025-10-07T19:02:11.063Z"
 }

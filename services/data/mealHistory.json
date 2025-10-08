@@ -190,7 +190,195 @@
       "id": "1759248140193",
       "isAIGenerated": true,
       "responseTimeMs": 139217
+    },
+    {
+      "name": "Mango and Chicken Salad",
+      "type": "lunch",
+      "ingredients": [
+        "1 chicken breast",
+        "1 ripe mango",
+        "1 cup mixed greens (e.g., spinach, arugula)",
+        "1 small avocado",
+        "1/4 cup cherry tomatoes",
+        "1/4 cup red onion, thinly sliced",
+        "1 tablespoon olive oil",
+        "1 tablespoon lime juice",
+        "1 teaspoon honey",
+        "Salt and pepper to taste"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "350-450",
+      "description": "A refreshing and vibrant salad featuring succulent chicken, sweet mango, creamy avocado, and crisp vegetables, all tossed in a zesty lime-honey dressing.",
+      "instructions": [
+        "Season the chicken breast with salt and pepper, then grill or bake until fully cooked. Let it cool and slice into strips.",
+        "Dice the ripe mango and avocado, halve the cherry tomatoes, and thinly slice the red onion.",
+        "In a large bowl, combine the mixed greens, mango, avocado, cherry tomatoes, red onion, and cooked chicken strips.",
+        "Whisk together the olive oil, lime juice, honey, salt, and pepper to make the dressing.",
+        "Pour the dressing over the salad and toss gently to combine. Serve immediately."
+      ],
+      "nutritionNotes": "This meal provides a balanced mix of protein from the chicken, healthy fats from the avocado and olive oil, and essential vitamins and minerals from the fresh fruits and vegetables. The mango adds natural sweetness and vitamin C, supporting an active lifestyle.",
+      "generatedAt": "2025-10-01T16:02:49.729Z",
+      "id": "1759334569729",
+      "isAIGenerated": true,
+      "responseTimeMs": 169660
+    },
+    {
+      "name": "Roasted Vegetable and Hummus Pita Pocket",
+      "type": "lunch",
+      "ingredients": [
+        "whole wheat pita pockets",
+        "hummus",
+        "zucchini",
+        "red bell pepper",
+        "yellow squash",
+        "red onion",
+        "olive oil",
+        "lemon juice",
+        "fresh parsley",
+        "salt and pepper",
+        "feta cheese (optional)"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "350-450",
+      "description": "A vibrant and flavorful pita pocket filled with roasted seasonal vegetables, creamy hummus, and a hint of fresh parsley, perfect for a nutritious and satisfying lunch.",
+      "instructions": [
+        "Preheat oven to 425°F (220°C). Slice zucchini, red bell pepper, yellow squash, and red onion into bite-sized pieces.",
+        "Toss vegetables in a bowl with olive oil, lemon juice, salt, and pepper. Spread on a baking sheet and roast for 20-25 minutes, until tender and slightly caramelized.",
+        "While vegetables roast, slice open the whole wheat pita pockets and spread a generous layer of hummus on each.",
+        "Once vegetables are roasted, let them cool slightly, then fill each pita pocket with the roasted vegetables. Top with crumbled feta cheese and fresh parsley if desired.",
+        "Serve immediately for a delicious, easy-to-eat meal."
+      ],
+      "nutritionNotes": "This meal is packed with fiber from the vegetables and whole grains from the pita, providing sustained energy. Hummus adds protein and healthy fats, making it a balanced and satisfying option for an active lifestyle.",
+      "generatedAt": "2025-10-02T16:02:54.926Z",
+      "id": "1759420974926",
+      "isAIGenerated": true,
+      "responseTimeMs": 174186
+    },
+    {
+      "name": "Cucumber, Feta, and Chickpea Greek Salad Pita Pocket",
+      "type": "lunch",
+      "ingredients": [
+        "whole wheat pita bread",
+        "cucumber",
+        "cherry tomatoes",
+        "chickpeas",
+        "feta cheese",
+        "red onion",
+        "olive oil",
+        "lemon juice",
+        "dried oregano",
+        "salt",
+        "pepper"
+      ],
+      "prepTime": "15 minutes",
+      "calories": "350-450",
+      "description": "A refreshing and tangy Greek-inspired pita pocket packed with crunchy vegetables, creamy feta, and protein-rich chickpeas.",
+      "instructions": [
+        "Slice the cucumber and cherry tomatoes into halves and chop the red onion into thin slices.",
+        "In a bowl, combine chickpeas, cucumber, cherry tomatoes, and red onion.",
+        "Crumble feta cheese over the vegetable mixture.",
+        "In a small bowl, whisk together olive oil, lemon juice, dried oregano, salt, and pepper to make the dressing.",
+        "Pour the dressing over the salad and mix well.",
+        "Cut the whole wheat pita bread in half and stuff each half with the Greek salad mixture."
+      ],
+      "nutritionNotes": "This meal offers a great balance of carbohydrates from the pita, protein from chickpeas and feta, and healthy fats from olive oil. It's also rich in vitamins and minerals, making it a perfect energizing lunch for an active lifestyle. Seasonal ingredients like cucumbers and tomatoes add freshness and flavor.",
+      "generatedAt": "2025-10-03T16:02:37.631Z",
+      "id": "1759507357631",
+      "isAIGenerated": true,
+      "responseTimeMs": 157517
+    },
+    {
+      "name": "Spinach and Feta Stuffed Sweet Potato",
+      "type": "lunch",
+      "ingredients": [
+        "1 medium sweet potato",
+        "1 cup fresh spinach",
+        "1/4 cup crumbled feta cheese",
+        "1/4 cup cherry tomatoes, halved",
+        "1 tbsp olive oil",
+        "1 clove garlic, minced",
+        "Salt and pepper to taste",
+        "1 tbsp pumpkin seeds for garnish"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "350-400",
+      "description": "A wholesome, comforting lunch featuring a baked sweet potato filled with sautéed spinach, tangy feta, and juicy cherry tomatoes, topped with a sprinkle of pumpkin seeds.",
+      "instructions": [
+        "Preheat oven to 400°F (200°C). Poke holes in the sweet potato with a fork and place on a baking sheet. Bake for 35-40 minutes or until tender.",
+        "While the sweet potato bakes, heat olive oil in a skillet over medium heat. Add garlic and sauté for 1 minute. Add spinach and cook until wilted, about 2-3 minutes.",
+        "In a bowl, mix the sautéed spinach, cherry tomatoes, and feta cheese. Season with salt and pepper.",
+        "Once the sweet potato is done, slice it open and stuff with the spinach and feta mixture. Garnish with pumpkin seeds before serving."
+      ],
+      "nutritionNotes": "This meal is packed with fiber from the sweet potato and spinach, providing sustained energy for the afternoon. Feta adds a boost of protein and calcium, while pumpkin seeds offer healthy fats and a crunchy texture. The use of seasonal vegetables keeps it fresh and budget-friendly.",
+      "generatedAt": "2025-10-04T16:03:19.891Z",
+      "id": "1759593799891",
+      "isAIGenerated": true,
+      "responseTimeMs": 199171
+    },
+    {
+      "name": "Grilled Chicken and Veggie Quinoa Bowl",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup quinoa",
+        "2 boneless, skinless chicken breasts",
+        "1 zucchini",
+        "1 bell pepper",
+        "1 cup cherry tomatoes",
+        "2 tablespoons olive oil",
+        "1 lemon",
+        "1 tablespoon balsamic vinegar",
+        "Salt and pepper to taste",
+        "Fresh herbs (such as parsley or cilantro)",
+        "Optional: crumbled feta cheese or toasted almonds for garnish"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "400-500",
+      "description": "A vibrant and nourishing quinoa bowl featuring grilled chicken and seasonal vegetables, dressed in a zesty lemon-balsamic vinaigrette.",
+      "instructions": [
+        "Rinse quinoa under cold water and cook according to package instructions. Fluff with a fork and set aside.",
+        "Preheat grill or grill pan over medium-high heat. Season chicken breasts with salt, pepper, and a drizzle of olive oil. Grill for 6-7 minutes per side, or until fully cooked. Let rest, then slice.",
+        "Slice zucchini and bell pepper into thin strips. Toss with olive oil, salt, and pepper. Grill until tender and slightly charred, about 3-4 minutes per side.",
+        "In a small bowl, whisk together the juice of one lemon, balsamic vinegar, olive oil, salt, and pepper for the dressing.",
+        "Combine cooked quinoa, grilled chicken, grilled vegetables, and halved cherry tomatoes in a bowl. Drizzle with dressing and toss gently to combine.",
+        "Garnish with fresh herbs and optional feta cheese or toasted almonds."
+      ],
+      "nutritionNotes": "This meal is rich in protein from the chicken, providing sustained energy and muscle support. Quinoa offers a complete protein source with fiber, while the vegetables add vitamins, minerals, and antioxidants. The lemon-balsamic dressing adds flavor without excessive calories.",
+      "generatedAt": "2025-10-07T16:03:41.256Z",
+      "id": "1759853021256",
+      "isAIGenerated": true,
+      "responseTimeMs": 220626
+    },
+    {
+      "name": "Turkey and Veggie Farro Salad",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup farro",
+        "4 oz sliced turkey breast",
+        "1 cup mixed greens (e.g., spinach, arugula)",
+        "1/2 cup cherry tomatoes, halved",
+        "1/4 cup sliced cucumber",
+        "1/4 cup shredded carrots",
+        "1/4 cup feta cheese",
+        "1/4 cup chopped walnuts",
+        "1 tablespoon olive oil",
+        "1 tablespoon balsamic vinegar",
+        "Salt and pepper to taste"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "450-500",
+      "description": "A refreshing and protein-packed salad with the nutty flavor of farro, crisp vegetables, and a zesty balsamic dressing.",
+      "instructions": [
+        "Cook farro according to package instructions, then drain and let cool.",
+        "In a large bowl, combine the mixed greens, cherry tomatoes, cucumber, carrots, and cooled farro.",
+        "Top the salad with sliced turkey breast, feta cheese, and walnuts.",
+        "In a small bowl, whisk together olive oil, balsamic vinegar, salt, and pepper. Drizzle over the salad and toss to combine."
+      ],
+      "nutritionNotes": "This meal offers a balance of protein from turkey and farro, healthy fats from olive oil and walnuts, and a variety of vitamins and minerals from fresh vegetables. It is suitable for active lifestyles and provides sustained energy.",
+      "generatedAt": "2025-10-08T16:03:01.226Z",
+      "id": "1759939381226",
+      "isAIGenerated": true,
+      "responseTimeMs": 180347
     }
   ],
-  "lastGenerated": "2025-09-30T16:02:20.193Z"
+  "lastGenerated": "2025-10-08T16:03:01.226Z"
 }

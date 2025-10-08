@@ -1,4 +1,6 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 
 class StatusMonitor {
     constructor(bot, config) {
@@ -9,6 +11,8 @@ class StatusMonitor {
         this.lastUpdateTime = null;
         this.serviceStatuses = new Map();
         this.updateInterval = null;
+        this.recruitmentInvite = null;
+        this.inviteDataFile = path.join(__dirname, '../../data/recruitmentInvite.json');
         
         // Initialize service statuses
         if (config.statusMonitoring?.services) {
@@ -38,6 +42,9 @@ class StatusMonitor {
                 return;
             }
 
+            // Load existing recruitment invite or generate new one
+            await this.loadOrGenerateRecruitmentInvite(channel);
+
             // Try to find existing status message
             const messages = await channel.messages.fetch({ limit: 50 });
             const existingMessage = messages.find(msg => 
@@ -52,9 +59,13 @@ class StatusMonitor {
             } else {
                 // Create new status message
                 const embed = this.createStatusEmbed();
-                this.statusMessage = await channel.send({ embeds: [embed] });
+                const components = this.createStatusComponents();
+                this.statusMessage = await channel.send({ embeds: [embed], components });
                 console.log('[STATUS MONITOR] Created new status message');
             }
+
+            // Set up button interaction handler
+            this.setupButtonHandler();
 
             // Start monitoring
             this.startMonitoring();
@@ -244,6 +255,15 @@ class StatusMonitor {
         embed.setDescription(description);
         embed.setColor(allUp ? '#57F287' : '#ED4245'); // Green if all up, red if any down
 
+        // Add recruitment invite section
+        if (this.recruitmentInvite) {
+            embed.addFields({
+                name: '👥 Recruitment Invite',
+                value: `Share this link to invite new members:\n${this.recruitmentInvite.url}`,
+                inline: false
+            });
+        }
+
         // Add last update timestamp
         const now = new Date();
         embed.addFields({
@@ -270,7 +290,8 @@ class StatusMonitor {
 
         try {
             const embed = this.createStatusEmbed();
-            await this.statusMessage.edit({ embeds: [embed] });
+            const components = this.createStatusComponents();
+            await this.statusMessage.edit({ embeds: [embed], components });
         } catch (error) {
             console.error('[STATUS MONITOR] Failed to update status message:', error);
         }
@@ -296,6 +317,202 @@ class StatusMonitor {
     // Method to manually update a service status from external code
     setServiceStatus(serviceKey, status, details = null) {
         this.updateServiceStatus(serviceKey, status, details);
+    }
+
+    async generateRecruitmentInvite(channel) {
+        try {
+            // Delete old invite if it exists
+            if (this.recruitmentInvite) {
+                try {
+                    await this.recruitmentInvite.delete();
+                    console.log(`[STATUS MONITOR] Deleted old recruitment invite: ${this.recruitmentInvite.code}`);
+                } catch (error) {
+                    console.log(`[STATUS MONITOR] Could not delete old invite (may already be deleted): ${error.message}`);
+                }
+            }
+
+            // Create a never-expiring invite for recruitment
+            this.recruitmentInvite = await channel.createInvite({
+                maxAge: 0,          // Never expires
+                maxUses: 0,         // Unlimited uses
+                unique: true,       // Always create new invite
+                temporary: false,   // Members stay after disconnecting
+                reason: 'Recruitment invite for bot status'
+            });
+            
+            console.log(`[STATUS MONITOR] Created recruitment invite: ${this.recruitmentInvite.url}`);
+            
+            // Save invite data persistently
+            await this.saveInviteData();
+            
+            // Set up tracking for this invite
+            this.trackInviteUsage();
+            
+        } catch (error) {
+            console.error('[STATUS MONITOR] Failed to create recruitment invite:', error);
+        }
+    }
+
+    async loadOrGenerateRecruitmentInvite(channel) {
+        try {
+            // Try to load existing invite data
+            if (fs.existsSync(this.inviteDataFile)) {
+                const savedData = JSON.parse(fs.readFileSync(this.inviteDataFile, 'utf8'));
+                
+                // Try to fetch the saved invite to see if it still exists
+                try {
+                    const guild = channel.guild;
+                    const invites = await guild.invites.fetch();
+                    this.recruitmentInvite = invites.find(invite => invite.code === savedData.code);
+                    
+                    if (this.recruitmentInvite) {
+                        console.log(`[STATUS MONITOR] Loaded existing recruitment invite: ${this.recruitmentInvite.url}`);
+                        this.trackInviteUsage();
+                        return;
+                    }
+                } catch (error) {
+                    console.log(`[STATUS MONITOR] Saved invite no longer exists, generating new one`);
+                }
+            }
+            
+            // Generate new invite if none exists or old one is invalid
+            await this.generateRecruitmentInvite(channel);
+            
+        } catch (error) {
+            console.error('[STATUS MONITOR] Failed to load/generate recruitment invite:', error);
+        }
+    }
+
+    async saveInviteData() {
+        try {
+            const inviteData = {
+                code: this.recruitmentInvite.code,
+                url: this.recruitmentInvite.url,
+                uses: this.recruitmentInvite.uses,
+                createdAt: this.recruitmentInvite.createdAt
+            };
+            
+            // Ensure data directory exists
+            const dataDir = path.dirname(this.inviteDataFile);
+            if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir, { recursive: true });
+            }
+            
+            fs.writeFileSync(this.inviteDataFile, JSON.stringify(inviteData, null, 2));
+            console.log('[STATUS MONITOR] Saved recruitment invite data');
+        } catch (error) {
+            console.error('[STATUS MONITOR] Failed to save invite data:', error);
+        }
+    }
+
+    createStatusComponents() {
+        const row = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('reset_recruitment_invite')
+                    .setLabel('🔄 Reset Invite')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('🔄')
+            );
+        return [row];
+    }
+
+    setupButtonHandler() {
+        this.client.on('interactionCreate', async (interaction) => {
+            if (!interaction.isButton()) return;
+            if (interaction.customId !== 'reset_recruitment_invite') return;
+
+            // Check if user has admin permissions
+            const isAdmin = this.config.adminRoles?.some(roleId => 
+                interaction.member?.roles.cache.has(roleId)
+            );
+
+            if (!isAdmin) {
+                await interaction.reply({
+                    content: '❌ You do not have permission to reset the recruitment invite.',
+                    ephemeral: true
+                });
+                return;
+            }
+
+            await interaction.deferReply({ ephemeral: true });
+
+            try {
+                const channel = await this.client.channels.fetch(this.config.botLogsChannelId);
+                await this.generateRecruitmentInvite(channel);
+                await this.updateStatusMessage();
+
+                await interaction.editReply({
+                    content: `✅ Recruitment invite has been reset!\nNew invite: ${this.recruitmentInvite.url}`
+                });
+
+                console.log(`[STATUS MONITOR] Recruitment invite reset by ${interaction.user.tag}`);
+            } catch (error) {
+                await interaction.editReply({
+                    content: '❌ Failed to reset recruitment invite. Please try again.'
+                });
+                console.error('[STATUS MONITOR] Failed to reset recruitment invite:', error);
+            }
+        });
+    }
+
+    trackInviteUsage() {
+        // Listen for new members and check if they used our recruitment invite
+        this.client.on('guildMemberAdd', async (member) => {
+            try {
+                // Wait a moment for Discord to process the join
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const guild = member.guild;
+                const invites = await guild.invites.fetch();
+                const usedInvite = invites.find(invite => invite.code === this.recruitmentInvite?.code);
+                
+                if (usedInvite && usedInvite.uses > (this.recruitmentInvite.uses || 0)) {
+                    // Update our stored invite data
+                    this.recruitmentInvite = usedInvite;
+                    
+                    // Assign recruitment role if configured
+                    const recruitmentRoleId = this.config.recruitmentRoleId;
+                    if (recruitmentRoleId) {
+                        const role = guild.roles.cache.get(recruitmentRoleId);
+                        if (role) {
+                            await member.roles.add(role);
+                            console.log(`[RECRUITMENT] Assigned role ${role.name} to ${member.user.tag}`);
+                        }
+                    }
+                    
+                    // Log to bot logs channel
+                    await this.logRecruitment(member);
+                }
+            } catch (error) {
+                console.error('[RECRUITMENT] Error tracking invite usage:', error);
+            }
+        });
+    }
+
+    async logRecruitment(member) {
+        try {
+            const channel = await this.client.channels.fetch(this.config.botLogsChannelId);
+            if (!channel) return;
+
+            const embed = new EmbedBuilder()
+                .setTitle('👥 New Recruitment')
+                .setDescription(`**${member.user.tag}** joined using the recruitment invite!`)
+                .setColor('#57F287')
+                .setThumbnail(member.user.displayAvatarURL())
+                .addFields(
+                    { name: '👤 User', value: `<@${member.id}>`, inline: true },
+                    { name: '📅 Joined', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
+                    { name: '🔗 Invite Uses', value: `${this.recruitmentInvite.uses || 0}`, inline: true }
+                )
+                .setTimestamp();
+
+            await channel.send({ embeds: [embed] });
+            console.log(`[RECRUITMENT] Logged new member: ${member.user.tag}`);
+            
+        } catch (error) {
+            console.error('[RECRUITMENT] Failed to log recruitment:', error);
+        }
     }
 }
 
