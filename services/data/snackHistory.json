@@ -193,7 +193,31 @@
       "id": "1759863731063",
       "isAIGenerated": true,
       "responseTimeMs": 130837
+    },
+    {
+      "name": "Cucumber and Cottage Cheese Bites",
+      "type": "snack",
+      "ingredients": [
+        "cucumber",
+        "cottage cheese",
+        "sunflower seeds",
+        "fresh dill"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "60 per bite",
+      "description": "Crunchy cucumber rounds topped with creamy cottage cheese and a sprinkle of sunflower seeds and dill.",
+      "instructions": [
+        "Wash and slice the cucumber into 1/4 inch thick rounds.",
+        "Top each cucumber slice with a small spoonful of cottage cheese.",
+        "Sprinkle sunflower seeds and a little dill on top for added flavor and crunch.",
+        "Serve immediately or pack for on-the-go snacking."
+      ],
+      "benefits": "This snack is rich in protein and healthy fats from the cottage cheese and sunflower seeds, providing sustained energy. Cucumbers add hydration and fiber, while dill offers a refreshing flavor. It's quick to prepare, portable, and perfect for busy schedules.",
+      "generatedAt": "2025-10-08T19:03:21.265Z",
+      "id": "1759950201265",
+      "isAIGenerated": true,
+      "responseTimeMs": 201121
     }
   ],
-  "lastGenerated": "2025-10-07T19:02:11.063Z"
+  "lastGenerated": "2025-10-08T19:03:21.265Z"
 }
