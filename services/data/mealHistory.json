@@ -378,7 +378,36 @@
       "id": "1759939381226",
       "isAIGenerated": true,
       "responseTimeMs": 180347
+    },
+    {
+      "name": "Broccoli and Cheddar Quinoa Bites",
+      "type": "lunch",
+      "ingredients": [
+        "1 cup cooked quinoa",
+        "2 cups broccoli florets",
+        "1/2 cup shredded sharp cheddar cheese",
+        "1 large egg",
+        "1 tablespoon olive oil",
+        "Salt and pepper to taste",
+        "Optional: red pepper flakes for spice"
+      ],
+      "prepTime": "30 minutes",
+      "calories": "200-250 per serving",
+      "description": "These Broccoli and Cheddar Quinoa Bites are a delicious and nutritious lunch option. They're easy to make, portable, and packed with protein and fiber to keep you energized throughout the day.",
+      "instructions": [
+        "Preheat your oven to 375°F (190°C) and line a baking sheet with parchment paper.",
+        "Steam the broccoli florets until tender, about 5-7 minutes, then let them cool slightly.",
+        "In a large bowl, combine the cooked quinoa, steamed broccoli, shredded cheddar cheese, egg, olive oil, salt, pepper, and red pepper flakes (if using). Mix until well combined.",
+        "Using your hands or a spoon, form the mixture into bite-sized patties and place them on the prepared baking sheet.",
+        "Bake in the preheated oven for 20-25 minutes, or until golden brown and firm to the touch.",
+        "Serve warm or allow to cool and store in the fridge for a quick grab-and-go option."
+      ],
+      "nutritionNotes": "This meal offers a balanced mix of protein from the quinoa and egg, healthy fats from the olive oil and cheese, and fiber from the broccoli. Quinoa is a complete protein, making it an excellent choice for active lifestyles. The broccoli adds vitamins C and K, along with antioxidants.",
+      "generatedAt": "2025-10-09T16:02:58.883Z",
+      "id": "1760025778883",
+      "isAIGenerated": true,
+      "responseTimeMs": 178087
     }
   ],
-  "lastGenerated": "2025-10-08T16:03:01.226Z"
+  "lastGenerated": "2025-10-09T16:02:58.883Z"
 }

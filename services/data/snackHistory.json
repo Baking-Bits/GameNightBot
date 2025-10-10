@@ -217,7 +217,36 @@
       "id": "1759950201265",
       "isAIGenerated": true,
       "responseTimeMs": 201121
+    },
+    {
+      "name": "Sweet Potato and Black Bean Bites",
+      "type": "snack",
+      "ingredients": [
+        "sweet potato",
+        "canned black beans",
+        "olive oil",
+        "cumin",
+        "chili powder",
+        "salt"
+      ],
+      "prepTime": "10 minutes",
+      "calories": "150 per serving",
+      "description": "A flavorful and filling snack that combines sweet potatoes with black beans, seasoned with spices and baked until crispy.",
+      "instructions": [
+        "Preheat your oven to 400°F (200°C).",
+        "Peel and dice one small sweet potato into small cubes.",
+        "Rinse and drain one can of black beans.",
+        "In a bowl, mix the sweet potato cubes, black beans, 1 tablespoon of olive oil, 1/2 teaspoon of cumin, 1/2 teaspoon of chili powder, and a pinch of salt.",
+        "Spread the mixture on a baking sheet lined with parchment paper.",
+        "Bake for about 20 minutes, or until the sweet potatoes are tender and the edges are crispy.",
+        "Let cool slightly before serving."
+      ],
+      "benefits": "Sweet potatoes are a great source of complex carbohydrates and fiber, providing sustained energy release. Black beans add protein and fiber, keeping you full longer. The spices add flavor without extra calories, making this a nutritious and satisfying snack for busy schedules.",
+      "generatedAt": "2025-10-09T19:02:17.701Z",
+      "id": "1760036537701",
+      "isAIGenerated": true,
+      "responseTimeMs": 137287
     }
   ],
-  "lastGenerated": "2025-10-08T19:03:21.265Z"
+  "lastGenerated": "2025-10-09T19:02:17.701Z"
 }
