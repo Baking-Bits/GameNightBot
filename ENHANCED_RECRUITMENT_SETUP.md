@@ -18,7 +18,7 @@
 ```json
 {
   "recruitmentSettings": {
-    "authorizedInviterRoles": ["ROLE_ID_1", "ROLE_ID_2"],
+    "authorizedInviterRoles": ["Authorized_Role_ID"],
     "hiddenChannelRoleId": "HIDDEN_CHANNEL_ROLE_ID", 
     "approvalTimeoutMinutes": 60
   }
