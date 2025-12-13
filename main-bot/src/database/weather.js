@@ -12,6 +12,10 @@ async function initializeWeatherDatabase() {
                 city VARCHAR(255),
                 country VARCHAR(10),
                 region VARCHAR(255),
+                state VARCHAR(100) NULL,
+                latitude DECIMAL(9,6) NULL,
+                longitude DECIMAL(9,6) NULL,
+                last_location_change_at TIMESTAMP NULL,
                 joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_weather_check TIMESTAMP NULL,
                 is_active BOOLEAN DEFAULT TRUE,
@@ -22,11 +26,19 @@ async function initializeWeatherDatabase() {
                 reactivated_by VARCHAR(255) NULL,
                 removed_at TIMESTAMP NULL,
                 country_code VARCHAR(10) NULL,
+                location_change_reason VARCHAR(255) NULL,
                 INDEX idx_active (is_active),
                 INDEX idx_last_check (last_weather_check),
                 INDEX idx_region (region)
             )
         `);
+
+        // Ensure new location metadata columns exist for existing deployments
+        await pool.query(`ALTER TABLE weather_users ADD COLUMN IF NOT EXISTS state VARCHAR(100) NULL`);
+        await pool.query(`ALTER TABLE weather_users ADD COLUMN IF NOT EXISTS latitude DECIMAL(9,6) NULL`);
+        await pool.query(`ALTER TABLE weather_users ADD COLUMN IF NOT EXISTS longitude DECIMAL(9,6) NULL`);
+        await pool.query(`ALTER TABLE weather_users ADD COLUMN IF NOT EXISTS last_location_change_at TIMESTAMP NULL`);
+        await pool.query(`ALTER TABLE weather_users ADD COLUMN IF NOT EXISTS location_change_reason VARCHAR(255) NULL`);
 
         // Weather history table
         await pool.query(`
@@ -198,14 +210,20 @@ async function addWeatherUser(userData) {
         const result = await pool.query(`
             INSERT INTO weather_users (
                 user_id, discord_user_id, display_name, postal_code, 
-                city, country, region, admin_added, added_by, country_code
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                city, country, region, state, latitude, longitude,
+                admin_added, added_by, country_code, last_location_change_at, location_change_reason
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
                 display_name = VALUES(display_name),
                 postal_code = VALUES(postal_code),
                 city = VALUES(city),
                 country = VALUES(country),
                 region = VALUES(region),
+                state = VALUES(state),
+                latitude = VALUES(latitude),
+                longitude = VALUES(longitude),
+                last_location_change_at = VALUES(last_location_change_at),
+                location_change_reason = VALUES(location_change_reason),
                 is_active = TRUE,
                 updated_at = CURRENT_TIMESTAMP,
                 reactivated_at = IF(is_active = FALSE, CURRENT_TIMESTAMP, reactivated_at),
@@ -219,9 +237,14 @@ async function addWeatherUser(userData) {
             userData.city,
             userData.country,
             userData.region,
+            userData.state || null,
+            userData.latitude || null,
+            userData.longitude || null,
             userData.admin_added || false,
             userData.added_by || null,
-            userData.country_code || null
+            userData.country_code || null,
+            userData.last_location_change_at || null,
+            userData.location_change_reason || null
         ]);
         
         return result;

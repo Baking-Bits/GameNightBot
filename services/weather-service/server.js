@@ -175,6 +175,7 @@ app.post('/join', authenticateService, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid postal code or location not found' });
         }
         
+        const resolvedCountry = locationData.sys?.country || countryCode || null;
         // Create user data for database
         const userData = {
             userId: userId,
@@ -182,11 +183,15 @@ app.post('/join', authenticateService, async (req, res) => {
             displayName: displayName,
             postalCode: zipCode,
             city: locationData.name,
-            country: locationData.sys?.country || countryCode,
-            region: locationData.sys?.country || 'Unknown',
-            countryCode: locationData.sys?.country || countryCode,
+            country: resolvedCountry,
+            region: `${locationData.name || 'Unknown'}, ${resolvedCountry || 'Unknown'}`,
+            countryCode: resolvedCountry,
+            state: locationData.sys?.state || null,
+            latitude: locationData.coord?.lat || null,
+            longitude: locationData.coord?.lon || null,
             adminAdded: false,
-            addedBy: null
+            addedBy: null,
+            adminOverride: false
         };
         
         const result = await weatherSystem.addUser(userData);
@@ -194,7 +199,7 @@ app.post('/join', authenticateService, async (req, res) => {
         // Return the format expected by the weather command
         const responseData = {
             weather: locationData,
-            location: `${locationData.name}, ${locationData.sys?.country || countryCode}`,
+            location: `${locationData.name}, ${resolvedCountry || countryCode || 'Unknown'}`,
             user: userData,
             addResult: result
         };

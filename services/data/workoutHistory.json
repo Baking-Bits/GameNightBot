@@ -1,4 +1,1980 @@
 {
-  "workouts": [],
-  "lastGenerated": null
+  "workouts": [
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight",
+        "light dumbbells (optional)"
+      ],
+      "description": "This full-body workout is perfect for desk workers. It's designed to be broken into multiple parts throughout the day, allowing you to maintain a consistent routine even with a busy schedule. Start with the warm-up and mobility exercises in the morning, followed by upper body strength exercises during your lunch break, lower body and core exercises in the afternoon, and finally, a cardio and cool-down session before bed. This comprehensive routine helps improve posture, flexibility, strength, and cardiovascular health, while also providing specific benefits for gamers, such as improved focus and reduced fatigue.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Marching in place",
+              "duration": "30 seconds",
+              "description": "March in place while lifting your knees high, swinging your arms for a few seconds. Then, lower your knees and arms and repeat."
+            },
+            {
+              "name": "Cat-Cow Stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Start on your hands and knees. Inhale and arch your back, lifting your head and tailbone towards the ceiling. Exhale and round your spine, tucking your chin towards your chest and your tailbone towards the floor. Repeat for 10 reps."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands slightly wider than shoulder-width apart. Lower your body until your chest almost touches the ground, then push back up to the starting position."
+            },
+            {
+              "name": "Dumbbell Bicep Curls",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Stand with your feet hip-width apart and hold a dumbbell in each hand. Keep your elbows close to your body and curl the dumbbells towards your shoulders, then lower them back down."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet hip-width apart and your toes pointing forward. Lower your body as if you're sitting back into a chair, keeping your weight in your heels and your chest lifted. Push back up to the starting position."
+            },
+            {
+              "name": "Plank Hold",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position with your arms straight and your body in a straight line. Hold this position, engaging your core and keeping your hips level with your shoulders."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and your arms at your sides. Jump your feet apart and raise your arms overhead, then jump your feet back together and lower your arms. Repeat for 2-3 minutes."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Sit in a comfortable position with your back straight. Close your eyes and breathe deeply, inhaling through your nose and exhaling through your mouth. Focus on your breath and try to clear your mind of any distractions."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture, flexibility, strength, and cardiovascular health. By breaking the workout into multiple parts, you can maintain a consistent routine even with a busy schedule. The upper body strength exercises target major muscle groups, while the lower body and core exercises help improve stability and balance. The cardio and cool-down session help reduce stress and improve sleep quality.",
+      "gamerBenefits": "The Desk Worker Detox routine provides specific benefits for gamers, such as improved focus and reduced fatigue. The upper body strength exercises can help improve hand-eye coordination and reaction time, while the lower body and core exercises can help improve balance and stability, reducing the risk of injury during gaming sessions. The warm-up and cool-down sections can also help prevent muscle soreness and cramps, allowing you to stay focused and engaged during gaming.",
+      "generatedAt": "2025-11-09T13:00:52.999Z",
+      "id": "1762693252999",
+      "isAIGenerated": true,
+      "responseTimeMs": 51999
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers break a light to moderate sweat, improve posture, increase flexibility, and build strength throughout the day. The workout can be split into four sections that can be done separately, allowing for a full-body workout that can be done at home with minimal equipment.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Ankle Circles",
+              "duration": "30 seconds",
+              "description": "Sit with your legs straight out in front of you. Circle your ankle in a clockwise direction for 30 seconds, then switch to a counterclockwise direction for 30 seconds."
+            },
+            {
+              "name": "Neck Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit up straight with your arms at your sides. Slowly tilt your head to one side, then roll it in a circular motion, bringing your ear towards your shoulder. Repeat on the other side."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands shoulder-width apart. Bend your elbows to lower your body towards the ground, then push back up to the starting position. Keep your core engaged and your back straight throughout the exercise."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart and your toes pointing forward. Bend your knees and lower your body as if you're sitting back into a chair, keeping your weight in your heels and your chest lifted. Push back up to the starting position."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and your arms at your sides. Jump up, spreading your feet apart and raising your arms overhead. Land softly and immediately jump back to the starting position."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health. The warm-up and mobility exercises help to increase blood flow and reduce stiffness, while the upper body and lower body strength exercises help to build muscle and improve overall strength. The cardio exercises help to increase heart rate and improve cardiovascular health.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, better posture, and increased endurance. The exercises in this routine help to improve overall strength and endurance, which can translate to better performance during gaming sessions. The warm-up and mobility exercises also help to reduce the risk of injury during gaming, as well as improve overall posture and reduce fatigue.",
+      "generatedAt": "2025-11-16T13:00:26.385Z",
+      "id": "1763298026385",
+      "isAIGenerated": true,
+      "responseTimeMs": 25554
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split into 4 sections)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This workout is designed to break down the day into manageable sections, allowing for light to moderate intensity exercises that target different parts of the body. Each section can be done separately, and the timing can be adjusted based on your schedule to fit your needs.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck stretches",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the left and right, then to the front and back. Repeat for each side."
+            },
+            {
+              "name": "Shoulder rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders forward and backward in a circular motion. Keep your arms relaxed and use your core to guide the movement."
+            },
+            {
+              "name": "Arm circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Stand with your arms extended to your sides and make small circles. Gradually increase the size of the circles as you get more comfortable. Reverse the direction and repeat."
+            },
+            {
+              "name": "Wrist and ankle circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Hold your arms outstretched and rotate your wrists in a circular motion. For the ankles, sit or stand with one leg extended and rotate the foot in both directions. Repeat for the other leg."
+            },
+            {
+              "name": "Spinal twist",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit on the floor with your legs extended in front of you. Twist your body to the right, placing your right hand behind you on the floor for support. Hold, then twist to the left, placing your left hand behind you on the floor for support. Repeat for each side."
+            },
+            {
+              "name": "Seated neck stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit with your back straight and shoulders relaxed. Gently tilt your head to the left, allowing your ear to approach your shoulder. Hold, then repeat for the right side. You can also gently turn your head to the side to stretch the muscles on the side of your neck."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Bodyweight squats",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Stand with your feet shoulder-width apart, toes pointing forward. Keep your chest up and engage your core. Squat down as if you're sitting back into a chair, then push back up to the starting position. Keep your knees tracking over your toes and avoid letting them collapse inward."
+            },
+            {
+              "name": "Push-ups",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Start in a plank position with your hands shoulder-width apart. Lower your body until your chest almost touches the ground, then push back up. Keep your core engaged and your hips level throughout the movement. If push-ups are too difficult, start with modified push-ups on your knees."
+            },
+            {
+              "name": "Dumbbell rows (using household items as weights, if available)",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Hold a dumbbell or any household item with one hand and hinge at the hips, keeping your back straight. Let the weight hang down, then pull it up toward your ribcage, squeezing your shoulder blade. Lower the weight back down and repeat for the other side."
+            },
+            {
+              "name": "Lateral arm raises",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart and hold a light weight or household item in each hand. Raise your arms out to the sides, keeping them straight and at shoulder height. Lower the weights back down and repeat."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot, lowering your body until both knees are bent at 90 degrees. Keep your front knee tracking over your toes and your back knee pointed straight ahead. Push back up to the starting position and repeat for the other leg."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position with your body in a straight line from head to heels. Engage your core and hold this position, keeping your hips level and your back straight. If a full plank is too challenging, start with a modified plank on your knees."
+            },
+            {
+              "name": "Leg raises",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Lie on your back with your legs extended and arms by your sides. Contract your abs and lift your legs straight up, keeping them together. Lower your legs back down without touching the floor and repeat. If you're unable to lift your legs straight up, bend them at the knees and lift them as high as you can."
+            },
+            {
+              "name": "Bird-dog",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Start on your hands and knees with your spine in a neutral position. Extend one arm and the opposite leg straight out, keeping your core engaged. Hold for a moment, then switch sides. If you're unable to balance, start with a modified bird-dog on your knees."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and your arms at your sides. Jump up, spreading your feet and raising your arms above your head. Land softly on the balls of your feet and repeat. Keep your core engaged and maintain a controlled pace."
+            },
+            {
+              "name": "Leg swings",
+              "duration": "5 minutes",
+              "description": "Stand facing a wall or sturdy object for support. Hold onto it with one hand and swing your leg forward and backward, keeping your knee straight. Repeat for the other leg. You can also swing your leg side to side for a different stretch."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health by targeting different muscle groups and improving circulation. It can also help reduce the risk of injury and promote better overall body function.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, better posture, and increased stamina. By breaking up the day with regular movement and strength training, gamers can maintain a higher level of engagement and productivity during long gaming sessions.",
+      "generatedAt": "2025-11-18T13:00:36.752Z",
+      "id": "1763470836752",
+      "isAIGenerated": true,
+      "responseTimeMs": 35651
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers improve their posture, flexibility, strength, and cardiovascular health. It can be split into multiple sections throughout the day for convenience.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently rotate your head from side to side, keeping your shoulders relaxed. Repeat for 30 seconds on each side."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Stand with your feet shoulder-width apart, keep your chest up, and bend your knees as you lower your body. Push back up to standing position."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position, but instead of lowering your body, hold your arms straight and keep your body in a straight line from head to heels. Keep your core engaged and avoid letting your hips sag or your butt stick up."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and arms at your sides. Jump your feet out to the side while raising your arms overhead. Jump back to the starting position and repeat."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps desk workers improve their posture, flexibility, strength, and cardiovascular health. It also helps reduce the risk of back pain and other injuries associated with sitting for long periods.",
+      "gamerBenefits": "Improved focus, reduced fatigue, better posture, and increased stamina can all benefit gamers who need to stay alert for long periods of time. The routine also helps reduce the risk of eye strain and other discomforts associated with gaming.",
+      "generatedAt": "2025-11-19T13:00:20.503Z",
+      "id": "1763557220503",
+      "isAIGenerated": true,
+      "responseTimeMs": 20080
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive daily workout routine is designed to help desk workers improve posture, flexibility, strength, and cardiovascular health throughout the day. It's split into four distinct sections that can be done separately, making it easy to fit into a busy schedule.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Circles",
+              "duration": "30 seconds",
+              "description": "Gently rotate your head in a circular motion for 30 seconds to relieve tension in the neck muscles."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a high plank position, lower your body until your chest touches the ground, then push back up."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Glute Bridges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Lying on your back with knees bent and feet flat on the floor, lift your hips up towards the ceiling, then lower back down."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your feet out wide while raising your arms overhead, then quickly jump your feet back together while lowering your arms."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture by strengthening the core and improving flexibility. It also helps build upper body and lower body strength and provides cardiovascular benefits. By breaking the workout into multiple parts, it allows for sustained energy and focus throughout the day.",
+      "gamerBenefits": "Improved focus and reduced fatigue, better posture, and increased overall physical fitness are all benefits for gamers who incorporate this routine into their daily schedule.",
+      "generatedAt": "2025-11-20T13:00:20.877Z",
+      "id": "1763643620877",
+      "isAIGenerated": true,
+      "responseTimeMs": 20203
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive workout is designed to break up the day, improve posture, enhance flexibility, and boost strength and cardio health. It can be split into multiple parts throughout the day for maximum convenience.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Slowly tilt your head to one side and hold for 30 seconds. Repeat on the other side."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "3",
+              "reps": "10",
+              "description": "Roll your shoulders forward and backward in a smooth motion, focusing on keeping your neck relaxed and your head facing forward."
+            },
+            {
+              "name": "Seated Twist",
+              "sets": "3",
+              "reps": "10",
+              "description": "Sit with your legs straight and twist your torso to the right, using your left hand to gently pull your right knee towards your left shoulder. Repeat on the other side."
+            },
+            {
+              "name": "Cat-Cow Stretch",
+              "sets": "3",
+              "reps": "10",
+              "description": "On all fours, arch your back like a cat, then round it like a cow, alternating between the two in a smooth motion."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Place your hands shoulder-width apart on the ground, your body in a straight line, and your feet together behind you. Bend your elbows and lower your body towards the ground, then push back up to the starting position."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position, but rest your forearms on the ground instead of your hands. Keep your body in a straight line and hold this position for the specified time."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart, bend your knees, and lower your body as if you're sitting back into a chair. Keep your back straight and return to the starting position."
+            },
+            {
+              "name": "Plank Jacks",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a plank position. Jump your feet out to the side and then back in, keeping your core engaged the entire time."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your feet out to the side, raise your arms overhead, and then jump back to the starting position. Keep your movements controlled and focused on your form."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Sit or lie down comfortably, close your eyes, and take deep breaths, focusing on filling your lungs fully and exhaling completely. This will help reduce stress and increase your focus."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture, flexibility, strength, and cardiovascular health. It also reduces stress and improves overall wellbeing.",
+      "gamerBenefits": "By improving posture, flexibility, strength, and cardiovascular health, this routine can help gamers maintain better focus, reduce fatigue, and improve their overall gaming experience.",
+      "generatedAt": "2025-11-21T13:00:26.782Z",
+      "id": "1763730026782",
+      "isAIGenerated": true,
+      "responseTimeMs": 25716
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers break up the day with exercise. It can be split into parts throughout the day, making it easy to fit into even the busiest schedules.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretches",
+              "duration": "30 seconds",
+              "description": "Slowly tilt your head to the right and left, then bring your ear towards your shoulder. Repeat on the other side."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sitting or standing, roll your shoulders forward and backward, keeping your arms relaxed."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your arms straight. Lower your body until your chest touches the ground, then push back up. Keep your elbows close to your body."
+            },
+            {
+              "name": "Bodyweight Rows",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Find a sturdy chair or table and grab the edges with your hands, fingers pointing towards your feet. Pull your body up towards the chair or table, then lower back down without touching the seat."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot and lower your body until your front thigh is parallel to the floor. Push back up and repeat on the other side."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position, but rest on your forearms instead of your hands. Keep your body in a straight line from head to heels."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and arms by your sides. Jump up and spread your legs wide, raising your arms above your head. Jump back to the starting position."
+            },
+            {
+              "name": "Stretches",
+              "duration": "5 minutes",
+              "description": "Take a deep breath and hold each stretch for 10-15 seconds. Include stretches for your neck, shoulders, upper back, lower back, hips, and legs."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This routine helps improve posture, flexibility, strength, and cardiovascular health. By breaking up the day with exercise, it can also reduce the risk of developing musculoskeletal issues and improve overall well-being.",
+      "gamerBenefits": "Improved focus, reduced fatigue, better posture, and increased energy levels can all contribute to a better gaming experience.",
+      "generatedAt": "2025-11-22T13:00:22.285Z",
+      "id": "1763816422285",
+      "isAIGenerated": true,
+      "responseTimeMs": 21839
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This full-body workout is designed to help desk workers break up the day, improve posture, increase flexibility, build strength, and boost cardiovascular health. It can be split into multiple parts throughout the day, allowing you to take short breaks to move and refresh.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "20 seconds",
+              "description": "Gently tilt your head to the side, hold for 20 seconds, then switch sides. Repeat for the other side."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands shoulder-width apart. Lower your body until your chest touches the ground, then push back up to the starting position."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position, but instead of lowering your body, hold your arms straight out in front of you. Keep your core tight and your back straight."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together, then jump your feet apart while raising your arms over your head. Jump back to the starting position."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health by breaking up the day with movement, improving body awareness, building muscle, and increasing heart rate.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, better posture, increased stamina, and enhanced hand-eye coordination.",
+      "generatedAt": "2025-11-23T13:00:23.024Z",
+      "id": "1763902823024",
+      "isAIGenerated": true,
+      "responseTimeMs": 22669
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive morning routine is designed to break your day into manageable sections, each focusing on different aspects of fitness. Start with a warm-up to loosen up your muscles and improve flexibility. Follow with upper body strength exercises to support your posture and strengthen your arms. Take a break and focus on lower body and core exercises to improve stability and endurance. End with a cardio session and cool-down to finish your day on a high note.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck stretches",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to each side, then to the front and back. Hold each stretch for 30 seconds."
+            },
+            {
+              "name": "Shoulder circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Stand with your arms at your sides. Slowly raise your arms to shoulder height, then circle them forward and backward. Repeat for 10 reps, then switch directions."
+            },
+            {
+              "name": "Cat-cow stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Start on your hands and knees. Arch your back, lifting your head and tailbone towards the ceiling (cat). Then, round your back, tucking your chin to your chest and tailbone towards the floor (cow). Repeat for 10 reps."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands shoulder-width apart. Lower your body until your chest touches the ground, then push back up. Keep your core engaged and your body in a straight line."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a push-up position, then lower your body so that your forearms are resting on the ground. Keep your body in a straight line and hold this position for 30 seconds. Rest for 10 seconds between each set."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet hip-width apart. Bend your knees and lower your body as if you're sitting back in a chair, keeping your weight in your heels. Push back up to standing, squeezing your glutes at the top of the movement."
+            },
+            {
+              "name": "Leg raises",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Lie on your back with your hands under your buttocks. Lift your legs up so that they're perpendicular to the ground. Hold this position for 30 seconds, then lower your legs back down. Rest for 10 seconds between each set."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping jacks",
+              "duration": "2-3 minutes",
+              "description": "Start with your feet together and your hands at your sides. Jump your feet out to the sides while raising your arms above your head. Jump back to your starting position. Repeat for 2-3 minutes."
+            },
+            {
+              "name": "Deep breathing",
+              "duration": "5 minutes",
+              "description": "Sit or stand comfortably with your back straight. Close your eyes and take slow, deep breaths. Inhale through your nose, hold for a few seconds, and exhale through your mouth. Focus on your breath and clear your mind."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve your posture, flexibility, strength, and cardiovascular health. It also aids in stress relief and can help prevent the negative effects of prolonged sitting. By breaking the workout into multiple parts, you can maintain your focus and energy throughout the day, ensuring that you're always feeling your best.",
+      "gamerBenefits": "Improved focus, reduced fatigue, and better posture can all contribute to a more enjoyable gaming experience. With a strong and flexible body, you'll be better equipped to handle the demands of gaming, whether it's playing for hours on end or maintaining a comfortable position during long gaming sessions.",
+      "generatedAt": "2025-11-25T13:00:28.413Z",
+      "id": "1764075628413",
+      "isAIGenerated": true,
+      "responseTimeMs": 27639
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This workout is designed to break up the day, improve posture, enhance flexibility, build strength, and boost cardiovascular health. It can be done in parts, making it perfect for busy desk workers who need to take breaks throughout the day.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretches",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to each side, then to the front and back, and finally do a 360-degree turn with your head. Repeat on the other side."
+            },
+            {
+              "name": "Shoulder Shrugs",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sitting at your desk, raise your shoulders towards your ears, hold for a second, then relax. Repeat on the other side."
+            },
+            {
+              "name": "Seated Cat-Cow Stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit on the edge of your chair, arch your back, then round it towards the floor. Alternate between the two positions."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Keep your body in a straight line, lower your chest to the ground, then push up. Ensure your elbows are close to your body during the push-up."
+            },
+            {
+              "name": "Pull-Ups or Chin-Ups",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "If you can't do a pull-up or chin-up, use a door frame or resistance band for support. Pull your body up until your chin is above the bar, then lower yourself down. Keep your core engaged throughout the exercise."
+            },
+            {
+              "name": "Tricep Dips",
+              "sets": "3",
+              "reps": "10",
+              "description": "Place your hands behind you on a chair or bench, lower your body until your arms are bent at a 90-degree angle, then push back up. Keep your elbows close to your body during the dip."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot, lowering your body until your front knee is bent at a 90-degree angle. Push back up to standing position. Repeat on the other side."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position, but instead of lowering your body, hold your body in a straight line with your arms extended. Keep your core tight throughout the exercise."
+            },
+            {
+              "name": "Glute Bridges",
+              "sets": "3",
+              "reps": "15",
+              "description": "Lie on your back with your knees bent and feet flat on the ground. Lift your hips up towards the ceiling, squeezing your glutes at the top. Lower back down and repeat."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your feet apart while raising your arms above your head, then jump back to the starting position. Keep your core engaged and land softly on your feet."
+            },
+            {
+              "name": "Child's Pose",
+              "duration": "5 minutes",
+              "description": "Kneel on the ground, sit back on your heels, and fold forward, placing your forehead on the ground. Extend your arms in front of you, palms facing down. Hold this position to relax and stretch your spine."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health. By breaking it up into sections that can be done separately, it allows you to maintain consistency and avoid burnout. Regularly practicing these exercises can improve your overall well-being, enhance your ability to focus, and reduce fatigue.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, and better posture. The exercises target the muscles and joints most commonly used during gaming, such as the shoulders, arms, and core. By strengthening these muscles and improving flexibility, you can reduce the risk of injury and improve your performance.",
+      "generatedAt": "2025-11-26T13:00:28.394Z",
+      "id": "1764162028394",
+      "isAIGenerated": true,
+      "responseTimeMs": 27963
+    },
+    {
+      "name": "Desk Worker Detox Routine",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight",
+        "water bottle"
+      ],
+      "description": "This comprehensive routine is designed to detox your body and mind after a long day at the desk. It includes exercises that target your upper body, lower body, core, and a cardio session to boost your energy levels and improve your overall health.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Circles",
+              "duration": "30 seconds",
+              "description": "Gently rotate your head in a circular motion, ensuring to stretch all the muscles in your neck and head."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position, lower your body until your chest touches the ground, then push back up to the starting position."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot, lowering your body until your front knee is bent at a 90-degree angle. Push back up and repeat with the other foot."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and your arms at your sides. Jump up, raising your arms above your head and spreading your legs apart. Jump back to the starting position."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health by improving blood circulation, reducing stress, and increasing energy levels.",
+      "gamerBenefits": "Specific benefits for gamers including improved focus, reduced fatigue, better posture, and increased endurance.",
+      "generatedAt": "2025-11-29T13:00:21.582Z",
+      "id": "1764421221582",
+      "isAIGenerated": true,
+      "responseTimeMs": 20263
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers detox from their sedentary lifestyle by breaking it down into multiple parts throughout the day. It focuses on posture, flexibility, strength, and cardio, making it suitable for those with irregular schedules and minimal equipment.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Circles",
+              "duration": "30 seconds",
+              "description": "Slowly rotate your head in a circle, then switch directions."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders forward and backward in a controlled movement, keeping your neck and upper back relaxed."
+            },
+            {
+              "name": "Cat-Cow Stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Move onto your hands and knees, arching your back and lifting your head (cat), then rounding your spine and dropping your head (cow)."
+            },
+            {
+              "name": "Seated Forward Bend",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit on the edge of your chair, extend your legs out in front of you, and try to touch your toes, bending at the hips, not the waist."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Place your hands shoulder-width apart on the ground, keep your body in a straight line, and lower your chest to the ground before pushing back up."
+            },
+            {
+              "name": "Wall Squats",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Stand with your back against a wall, slide down into a seated position, and hold for a few seconds before standing back up."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position, but rest on your elbows instead of your hands, and hold your body in a straight line from head to heels."
+            },
+            {
+              "name": "Bicep Curls",
+              "sets": "3",
+              "reps": "12",
+              "description": "Hold a light dumbbell or water bottle in each hand, bend your elbows, and lift the weight to your shoulders, then lower it back down."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot, lower your body until your front knee is bent at a 90-degree angle, then push back up to standing. Repeat on the other leg."
+            },
+            {
+              "name": "Calf Raises",
+              "sets": "3",
+              "reps": "12",
+              "description": "Stand with your feet shoulder-width apart, raise your heels off the ground, and hold for a few seconds before lowering back down."
+            },
+            {
+              "name": "Russian Twists",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Sit on the ground with your knees bent and your feet flat, lean back slightly, and lift your feet off the ground. Twist your torso from side to side, holding a light dumbbell or water bottle in your hands."
+            },
+            {
+              "name": "Plank Jacks",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a high plank position, then jump your feet to the side, hold for a few seconds, and jump back to the starting position."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your feet out to the sides while raising your arms overhead, then jump your feet back together while lowering your arms to your sides."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Sit in a comfortable position, close your eyes, and take deep breaths, focusing on the inhale and exhale, and imagining yourself relaxing."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps desk workers improve their posture, flexibility, strength, and cardiovascular health. By breaking it down into multiple parts throughout the day, individuals can maintain a consistent exercise routine, which is essential for long-term health benefits. The routine also helps to reduce the risk of developing chronic conditions associated with sedentary lifestyles, such as obesity, diabetes, and cardiovascular disease.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, and better posture. The routine helps to reduce eye strain and neck pain, which are common issues faced by gamers due to prolonged screen time. Additionally, the routine improves overall strength and flexibility, which can help gamers maintain a healthy weight and reduce the risk of developing chronic conditions associated with sedentary lifestyles.",
+      "generatedAt": "2025-12-01T13:00:30.319Z",
+      "id": "1764594030319",
+      "isAIGenerated": true,
+      "responseTimeMs": 30151
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight",
+        "water bottle"
+      ],
+      "description": "This comprehensive routine is designed for desk workers to improve posture, flexibility, strength, and cardiovascular health. It can be split into multiple parts throughout the day, making it easy to fit into a busy schedule. Each section targets different muscle groups and can be done separately, allowing for flexibility in timing and equipment needs.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the side and hold for 30 seconds, then switch sides."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders in a circular motion to loosen up the muscles."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Perform push-ups against the wall or on a low surface to maintain proper form."
+            },
+            {
+              "name": "Tricep Dips",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Place your hands on a chair or countertop for support, bend your elbows, and lower your body until your arms are at a 90-degree angle, then push back up."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Glute Bridges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Lay on your back with knees bent and feet flat on the floor. Lift your hips up towards the ceiling, squeeze your glutes, and hold for a moment before lowering back down."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Hold a forearm plank position, keeping your body in a straight line from head to heels. Engage your core and hold for the specified time."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Perform jumping jacks to get your heart rate up and improve cardiovascular health."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Close your eyes, inhale deeply, and exhale slowly to help calm your mind and body."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture, flexibility, strength, and cardiovascular health by targeting different muscle groups and providing a balanced workout. It also reduces the risk of injuries and promotes overall well-being.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, and better posture. Regular exercise can help improve concentration and reduce the risk of eye strain and neck pain associated with long hours of gaming.",
+      "generatedAt": "2025-12-03T13:00:23.615Z",
+      "id": "1764766823615",
+      "isAIGenerated": true,
+      "responseTimeMs": 23470
+    },
+    {
+      "name": "Desk Worker Detox Routine",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers break up the monotony of their day, improve posture, increase flexibility, build strength, and get some cardio in. It's perfect for those who have irregular schedules or limited time for exercise.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the side and hold. Switch sides after 30 seconds."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Rotate your shoulders forward and backward in a circular motion."
+            },
+            {
+              "name": "Chest Opener",
+              "sets": "2",
+              "reps": "10",
+              "description": "Place your hands behind your back and lift them up and down, keeping your arms straight."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position, bend your elbows, and lower your body towards the ground. Push back up to the starting position."
+            },
+            {
+              "name": "Dumbbell Rows",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Holding a dumbbell in each hand, bend forward at the waist, and lift the weight towards your ribs, squeezing your shoulder blades together."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart, lower your body as if you're sitting back in a chair, and then stand back up."
+            },
+            {
+              "name": "Plank Hold",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position, but instead of lowering your body, hold it steady for the given time."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jump Rope",
+              "duration": "2-3 minutes",
+              "description": "If you have a jump rope, use it. If not, just jump in place with both feet together for two minutes."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture by promoting proper alignment and flexibility, which can reduce the risk of back pain and other issues. It also builds strength, which can improve overall body function and reduce the risk of injury. The cardio component helps to increase heart health, improve circulation, and burn calories. The warm-up and cool-down sections help prevent injury by getting muscles loose and preparing them for exercise and then cooling them down after exercise.",
+      "gamerBenefits": "Improved focus, reduced fatigue, better posture, and increased physical fitness can all help gamers maintain their stamina during long gaming sessions and improve their overall gaming experience.",
+      "generatedAt": "2025-12-04T13:00:27.961Z",
+      "id": "1764853227961",
+      "isAIGenerated": true,
+      "responseTimeMs": 27199
+    },
+    {
+      "name": "Desk Worker Detox Routine",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This routine is designed to help desk workers break up the day, improve posture, increase flexibility, and boost strength in a time-efficient manner. It can be split into sections throughout the day, making it perfect for a busy schedule. Whether you choose to do it all at once or break it up, you'll be on your way to a healthier and more productive day.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Ankle Circles",
+              "duration": "30 seconds",
+              "description": "Sit with your legs extended in front of you. Slowly move your ankles in circles, alternating directions. This will help to increase circulation and loosen up your lower body."
+            },
+            {
+              "name": "Neck Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Gently rotate your head from side to side, making sure to keep your movements smooth and controlled. This will help to loosen up your neck muscles and improve your posture."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders forward and backward in a circular motion. This will help to loosen up your shoulder muscles and improve your posture."
+            },
+            {
+              "name": "Wrist Circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit with your arms extended in front of you. Slowly move your wrists in circles, alternating directions. This will help to increase circulation and loosen up your wrists."
+            },
+            {
+              "name": "Ankle Circles",
+              "duration": "30 seconds",
+              "description": "Repeat the ankle circles on the other side."
+            },
+            {
+              "name": "Neck Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Repeat the neck rolls on the other side."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Repeat the shoulder rolls on the other side."
+            },
+            {
+              "name": "Wrist Circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Repeat the wrist circles on the other side."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands shoulder-width apart. Lower your body until your chest touches the ground, then push back up. This exercise targets your chest, shoulders, and triceps."
+            },
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Stand with your feet shoulder-width apart and your arms at your sides. Lower your body as if you're sitting back into a chair, then stand back up. This exercise targets your legs, glutes, and core."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position, but instead of lowering your body, hold your arms straight and your body in a straight line. This exercise targets your core, arms, and shoulders."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Step forward with one foot, lowering your body until both knees are at a 90-degree angle. Push back up, then switch legs. This exercise targets your legs, glutes, and core."
+            },
+            {
+              "name": "Glute Bridges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Lie on your back with your knees bent and your feet flat on the floor. Push your hips up towards the ceiling, squeezing your glutes at the top. This exercise targets your glutes and core."
+            },
+            {
+              "name": "Mountain Climbers",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Start in a plank position, then bring your right knee towards your chest, then switch to your left knee. This exercise targets your core, arms, and shoulders."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jump Rope",
+              "duration": "2-3 minutes",
+              "description": "If you have access to a jump rope, this is a great way to get your heart rate up and cool down your muscles. If not, you can do jumping jacks or high knees instead."
+            },
+            {
+              "name": "Child's Pose",
+              "duration": "5 minutes",
+              "description": "Come to a seated position, then extend your arms out in front of you and fold forward, resting your forehead on the ground. This pose helps to stretch your spine, hips, and shoulders, and can help to relieve stress and fatigue."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health. By breaking up the day with short workouts, you'll be able to maintain a healthier body and mind, which can lead to increased productivity and better overall health.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, and better posture. By improving your posture and increasing your strength and flexibility, you'll be able to play for longer periods of time without experiencing muscle strain or fatigue. Additionally, regular exercise can help to improve your mental focus and reduce stress, which can make it easier to concentrate on your gaming.",
+      "generatedAt": "2025-12-06T13:00:36.938Z",
+      "id": "1765026036938",
+      "isAIGenerated": true,
+      "responseTimeMs": 36229
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This full-body workout is designed to break down throughout the day, starting with a warm-up and mobility exercises to prepare your body, followed by upper body strength exercises, lower body and core exercises, and finally, cardio and cool-down exercises to wind down. Each section can be done separately and requires minimal equipment.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the right and hold, then to the left. Repeat 3 times."
+            },
+            {
+              "name": "Shoulder circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Stand with your arms at your sides and circle your shoulders forward 10 times, then backward 10 times."
+            },
+            {
+              "name": "Waist twists",
+              "sets": "2",
+              "reps": "10",
+              "description": "Stand with your feet shoulder-width apart, twist your torso to the right, then to the left. Repeat 3 times."
+            },
+            {
+              "name": "Seated leg swings",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit on the edge of your chair and swing your leg forward and backward, then switch to the other leg. Repeat 3 times."
+            },
+            {
+              "name": "Cat-cow stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "Come onto your hands and knees, arch your back like a cat, then round it like a cow. Repeat 3 times."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position, lower your chest to the ground, then push back up. Keep your core engaged and your body in a straight line. If push-ups are too hard, modify by doing them on your knees."
+            },
+            {
+              "name": "Tricep dips",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Find a sturdy chair or table, place your hands on it, and lower your body until your elbows are at a 90-degree angle, then push back up. Keep your body in a straight line and your elbows close to your sides."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart, lower your hips back and down as if sitting in a chair, then push back up. Keep your weight in your heels and your chest lifted. If squats are too hard, modify by doing them with your back against a wall."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Come onto your hands and knees, lift your knees off the ground, and hold your body in a straight line, engaging your core. If a full plank is too difficult, modify by doing a forearm plank or a modified plank on your knees."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together, jump both feet out to the sides while raising your arms overhead, then jump back to the starting position. Keep your movements controlled and your core engaged."
+            },
+            {
+              "name": "Leg swings",
+              "duration": "5 minutes",
+              "description": "Stand on one foot, swing the other leg forward and backward, then switch to the other foot. Keep your movements controlled and your core engaged."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture by strengthening the muscles that support the spine, increases flexibility through the warm-up and cool-down sections, builds strength in the upper and lower body, and improves cardiovascular health through the cardio exercises.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus and reduced fatigue by strengthening the muscles that support the spine and increasing flexibility, better posture by building strength in the upper and lower body, and improved cardiovascular health by performing cardio exercises.",
+      "generatedAt": "2025-12-07T13:00:31.809Z",
+      "id": "1765112431809",
+      "isAIGenerated": true,
+      "responseTimeMs": 31042
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers improve their posture, flexibility, strength, and cardiovascular health. It can be split into multiple parts throughout the day, making it perfect for busy schedules.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the left and hold. Repeat for the right side."
+            },
+            {
+              "name": "Seated Spinal Twist",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sit on the edge of your chair, cross your right leg over your left, and twist your torso to the right. Hold for 10 seconds and then switch sides."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Place your hands on the ground, shoulder-width apart. Keep your body in a straight line and lower your chest towards the ground. Push back up to the starting position."
+            },
+            {
+              "name": "Pull-Ups or Chin-Ups",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Secure yourself under a pull-up bar. Pull your body up until your chin is above the bar, then lower yourself back down."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart. Bend your knees and hips as you lower your body as if you're sitting in a chair. Push back up to the starting position."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Get into a push-up position with your body in a straight line. Hold this position for 30 seconds."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and arms at your sides. Jump up and spread your arms and legs out as far as possible. Land softly and immediately jump up again, alternating your arms and legs."
+            },
+            {
+              "name": "Stretches",
+              "duration": "5 minutes",
+              "description": "Do a few gentle stretches for your arms, legs, and back to cool down your muscles and improve flexibility."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This routine helps improve posture, flexibility, strength, and cardiovascular health. Regular exercise can reduce the risk of chronic diseases and improve overall health.",
+      "gamerBenefits": "Improved focus, reduced fatigue, and better posture can all contribute to a more enjoyable gaming experience.",
+      "generatedAt": "2025-12-08T13:00:26.397Z",
+      "id": "1765198826397",
+      "isAIGenerated": true,
+      "responseTimeMs": 25683
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to help desk workers improve posture, flexibility, strength, and cardiovascular health. It can be split into multiple parts throughout the day, making it perfect for busy schedules.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to one side, hold, then switch sides."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders forward and backward, keeping your neck relaxed."
+            },
+            {
+              "name": "Cat-Cow Stretch",
+              "sets": "2",
+              "reps": "10",
+              "description": "On all fours, arch your back like a cat, then round your spine like a cow, alternating between the two."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Keep your body in a straight line, engage your core, and push through your arms."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Hold a plank position with your arms straight, keeping your body in a straight line."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart, lower your body as if you're sitting back into a chair, then stand back up."
+            },
+            {
+              "name": "Plank with Leg Lifts",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Hold a plank position, lift one leg off the ground, hold for 10 seconds, then switch legs."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your legs out to the side while raising your arms over your head, then jump back to the center."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Sit comfortably, close your eyes, and take slow, deep breaths, focusing on your breath and letting go of any tension."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps improve posture, flexibility, strength, and cardiovascular health. It also reduces the risk of developing desk-related injuries and fatigue.",
+      "gamerBenefits": "Specific benefits for gamers including improved focus, reduced fatigue, better posture, and enhanced hand-eye coordination.",
+      "generatedAt": "2025-12-10T13:00:22.420Z",
+      "id": "1765371622420",
+      "isAIGenerated": true,
+      "responseTimeMs": 21539
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive routine is designed to break up the day, improving posture, flexibility, strength, and cardiovascular health. It can be split into sections throughout the day, making it perfect for busy desk workers.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Rolls",
+              "duration": "30 seconds",
+              "description": "Gently rotate your neck in both directions, keeping your shoulders relaxed."
+            },
+            {
+              "name": "Shoulder Shrugs",
+              "sets": "2",
+              "reps": "10",
+              "description": "While standing or sitting, lift your shoulders towards your ears and hold for a second, then release."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Get into a plank position with your hands shoulder-width apart, lower your body until your chest touches the ground, then push back up."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart, bend your knees, and lower your body as if you're sitting back into a chair, then stand back up."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump your feet apart while raising your arms overhead, then bring them back to your sides as you jump your feet back together."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health. It also helps to reduce stress and improve overall well-being.",
+      "gamerBenefits": "Specific benefits for gamers including improved focus, reduced fatigue, better posture, and improved hand-eye coordination.",
+      "generatedAt": "2025-12-11T13:00:20.911Z",
+      "id": "1765458020911",
+      "isAIGenerated": true,
+      "responseTimeMs": 20724
+    },
+    {
+      "name": "Desk Worker Detox Routine",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This routine is designed to help desk workers improve their posture, flexibility, strength, and cardiovascular health. The exercises are split into four sections that can be done separately, making it easy to fit into a busy schedule. The exercises are progressive in difficulty, building throughout the day.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Stretch",
+              "duration": "30 seconds",
+              "description": "Gently tilt your head to the side and hold, then switch sides."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Roll your shoulders forwards and backwards in a circular motion."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position, lower your body until your chest touches the ground, then push back up."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Lunges",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Step forward with one foot, lowering your body until your front knee is at a 90-degree angle, then switch sides."
+            },
+            {
+              "name": "Plank",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Holding your body in a straight line from head to heels, hold a plank position for 30 seconds."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Jump both feet out to the sides while raising your arms over your head, then jump back to the center."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps with posture, flexibility, strength, and cardiovascular health. It improves blood flow, strengthens muscles, enhances flexibility, and boosts metabolism. By breaking the routine into four sections, it's easy to fit into a busy schedule.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, better posture, and increased endurance. Regular exercise also helps reduce the risk of developing health problems associated with long periods of sitting, such as obesity, diabetes, and heart disease.",
+      "generatedAt": "2025-12-12T13:00:24.789Z",
+      "id": "1765544424789",
+      "isAIGenerated": true,
+      "responseTimeMs": 24423
+    },
+    {
+      "name": "Desk Worker Detox",
+      "type": "morning",
+      "duration": "60-75 minutes total (can be split)",
+      "intensity": "light to moderate",
+      "equipment": [
+        "bodyweight"
+      ],
+      "description": "This comprehensive morning routine is designed to help desk workers break up the monotony of sitting all day. It includes warm-up, mobility, strength, and cardio exercises that can be done separately throughout the day. The routine is designed to be light to moderate in intensity and can be done at home with minimal equipment.",
+      "sections": [
+        {
+          "name": "Warm-Up & Mobility",
+          "duration": "10-15 minutes",
+          "timing": "Start of day or before any section",
+          "exercises": [
+            {
+              "name": "Neck Circles",
+              "duration": "30 seconds",
+              "description": "Gently rotate your head in a circular motion, both clockwise and counterclockwise, to loosen up the neck muscles."
+            },
+            {
+              "name": "Shoulder Rolls",
+              "sets": "2",
+              "reps": "10",
+              "description": "Sitting or standing, roll your shoulders forward and backward to ease tension in your upper back and neck."
+            },
+            {
+              "name": "Arm Circles",
+              "sets": "2",
+              "reps": "10",
+              "description": "Extend your arms out to the sides and draw large circles with your palms facing down, then switch to palms facing up. This helps improve circulation and loosen tight muscles."
+            }
+          ]
+        },
+        {
+          "name": "Upper Body Strength",
+          "duration": "15-20 minutes",
+          "timing": "Morning or lunch break",
+          "exercises": [
+            {
+              "name": "Push-Ups",
+              "sets": "3",
+              "reps": "10-15",
+              "description": "Start in a plank position with your hands slightly wider than shoulder-width apart. Lower your body until your chest touches the ground, then push back up. Keep your core engaged and your body in a straight line throughout the exercise."
+            },
+            {
+              "name": "Plank Rows",
+              "sets": "3",
+              "reps": "8-12",
+              "description": "Start in a high plank position with your forearms on the ground. Keep your body in a straight line and lift your right arm off the ground, squeezing your shoulder blade. Lower it back down and repeat on the other side."
+            }
+          ]
+        },
+        {
+          "name": "Lower Body & Core",
+          "duration": "15-20 minutes",
+          "timing": "Afternoon break",
+          "exercises": [
+            {
+              "name": "Bodyweight Squats",
+              "sets": "3",
+              "reps": "12-15",
+              "description": "Stand with your feet shoulder-width apart and lower your body as if you're sitting back into a chair, keeping your weight on your heels. Push back up through your heels to return to the starting position. Keep your core engaged and your back straight throughout the exercise."
+            },
+            {
+              "name": "Leg Raises",
+              "sets": "3",
+              "reps": "30 seconds",
+              "description": "Lie on your back with your legs extended and lift them straight up towards the ceiling, keeping your arms at your sides. Hold for a few seconds, then lower your legs down slowly. Repeat for the specified number of repetitions."
+            }
+          ]
+        },
+        {
+          "name": "Cardio & Cool-Down",
+          "duration": "15-20 minutes",
+          "timing": "Evening wind-down",
+          "exercises": [
+            {
+              "name": "Jumping Jacks",
+              "duration": "2-3 minutes",
+              "description": "Stand with your feet together and your arms at your sides. Jump up, spreading your legs wide and raising your arms above your head. Land softly and repeat for the specified duration."
+            },
+            {
+              "name": "Deep Breathing",
+              "duration": "5 minutes",
+              "description": "Sit or stand with your back straight and close your eyes. Take slow, deep breaths, inhaling through your nose and exhaling through your mouth. Focus on your breathing and try to clear your mind of any distractions."
+            }
+          ]
+        }
+      ],
+      "healthBenefits": "This comprehensive routine helps desk workers break up the monotony of sitting all day by improving posture, flexibility, strength, and cardiovascular health. The warm-up and mobility exercises help to loosen up tight muscles and improve circulation, while the upper body strength and lower body/core exercises target specific muscle groups. The cardio exercises help to increase heart rate and burn calories, promoting overall health and well-being. The cool-down exercises help to relax the body and mind, reducing stress and promoting better sleep.",
+      "gamerBenefits": "Specific benefits for gamers include improved focus, reduced fatigue, better posture, and increased stamina. Regular exercise can help to improve concentration and reduce mental fatigue, making it easier to focus during gaming sessions. It can also help to maintain a healthy posture and reduce the risk of developing musculoskeletal problems associated with prolonged sitting. Additionally, regular exercise can help to increase stamina and endurance, allowing gamers to play for longer periods without feeling tired or fatigued.",
+      "generatedAt": "2025-12-13T13:00:30.931Z",
+      "id": "1765630830931",
+      "isAIGenerated": true,
+      "responseTimeMs": 30617
+    }
+  ],
+  "lastGenerated": "2025-12-13T13:00:30.931Z"
 }

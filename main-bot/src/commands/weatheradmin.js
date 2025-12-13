@@ -374,11 +374,20 @@ async function showWeatherAdminPanel(interaction, bot) {
                     .setEmoji('📜')
             );
 
+        const toolsRow = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('weatheradmin_locationtest')
+                    .setLabel('Test Location')
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('📍')
+            );
+
         const selectRow = new ActionRowBuilder().addComponents(selectMenu);
 
         await interaction.reply({
             embeds: [embed],
-            components: [selectRow, userManagementRow, serverManagementRow],
+            components: [selectRow, userManagementRow, serverManagementRow, toolsRow],
             ephemeral: true
         });
 
@@ -400,11 +409,14 @@ async function showWeatherAdminPanel(interaction, bot) {
                     // Determine if it's user or server management
                     const userActions = ['adduser', 'removeuser', 'setactive', 'setscore'];
                     const serverActions = ['addserver', 'removeserver', 'configserver', 'alerthistory'];
+                    const toolActions = ['locationtest'];
                     
                     if (userActions.includes(action)) {
                         await handleUserManagementAction(i, bot, action);
                     } else if (serverActions.includes(action)) {
                         await handleServerManagementAction(i, bot, action);
+                    } else if (toolActions.includes(action)) {
+                        await handleToolAction(i, bot, action);
                     }
                 }
             } catch (error) {
@@ -427,13 +439,17 @@ async function showWeatherAdminPanel(interaction, bot) {
             const disabledServerButtons = serverManagementRow.components.map(button => 
                 ButtonBuilder.from(button).setDisabled(true)
             );
+            const disabledToolButtons = toolsRow.components.map(button =>
+                ButtonBuilder.from(button).setDisabled(true)
+            );
             const disabledUserRow = new ActionRowBuilder().addComponents(disabledUserButtons);
             const disabledServerRow = new ActionRowBuilder().addComponents(disabledServerButtons);
+            const disabledToolRow = new ActionRowBuilder().addComponents(disabledToolButtons);
             const disabledSelectRow = new ActionRowBuilder().addComponents(disabledSelectMenu);
 
             interaction.editReply({
                 embeds: [embed.setFooter({ text: '⏰ Admin panel expired - run /weatheradmin again' })],
-                components: [disabledSelectRow, disabledUserRow, disabledServerRow]
+                components: [disabledSelectRow, disabledUserRow, disabledServerRow, disabledToolRow]
             }).catch(() => {}); // Ignore errors if already deleted
         });
 
@@ -474,6 +490,15 @@ async function handleGuiAction(interaction, bot, action) {
             break;
         case 'trigger-alerts':
             await handleTriggerAlerts(interaction, bot);
+            break;
+    }
+}
+
+// Handle tool actions (utility modals/tests)
+async function handleToolAction(interaction, bot, action) {
+    switch (action) {
+        case 'locationtest':
+            await handleLocationTest(interaction, bot);
             break;
     }
 }
@@ -542,6 +567,42 @@ async function handleUserManagementAction(interaction, bot, action) {
         } catch (error) {
             console.log('Modal submission timed out or failed:', error.message);
         }
+    }
+}
+
+// Location test utility (no slash extensions)
+async function handleLocationTest(interaction, bot) {
+    const modal = new ModalBuilder()
+        .setCustomId('weatheradmin_modal_locationtest')
+        .setTitle('Test a Postal/ZIP')
+        .addComponents(
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('postal_code')
+                    .setLabel('Postal/ZIP Code')
+                    .setPlaceholder('e.g., 21014, SW1A 1AA')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(true)
+            ),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('country_code')
+                    .setLabel('Country Code (Optional)')
+                    .setPlaceholder('US, GB, CA, AU, etc. Leave blank to auto-detect')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false)
+            )
+        );
+
+    await interaction.showModal(modal);
+
+    const filter = (i) => i.customId === 'weatheradmin_modal_locationtest' && i.user.id === interaction.user.id;
+
+    try {
+        const submission = await interaction.awaitModalSubmit({ filter, time: 300000 });
+        await handleLocationTestModal(submission, bot);
+    } catch (error) {
+        console.log('[WEATHERADMIN] Location test modal timed out or failed:', error.message);
     }
 }
 
@@ -823,6 +884,61 @@ async function handleModalSubmission(interaction, bot) {
                 content: '❌ An error occurred while processing your request.'
             });
         }
+    }
+}
+
+// Process location test modal submission
+async function handleLocationTestModal(interaction, bot) {
+    const postalCode = interaction.fields.getTextInputValue('postal_code').trim();
+    const countryInput = (interaction.fields.getTextInputValue('country_code') || '').trim();
+    const countryCode = countryInput.length ? countryInput : null;
+
+    await interaction.deferReply({ ephemeral: true });
+
+    const validation = validatePostalCode(postalCode);
+    if (!validation.valid) {
+        await interaction.editReply({ content: `❌ ${validation.message}` });
+        return;
+    }
+
+    const resolvedCountry = countryCode || (validation.country && validation.country !== 'AMBIGUOUS' && validation.country !== 'UNKNOWN' ? validation.country : null);
+
+    try {
+        const result = await bot.serviceManager.checkWeatherByPostal(postalCode, resolvedCountry);
+
+        if (!result || result.success === false) {
+            await interaction.editReply({ content: `❌ No weather data returned for ${postalCode}${resolvedCountry ? ', ' + resolvedCountry : ''}.` });
+            return;
+        }
+
+        const tempF = result.temperature ?? result.main?.temp;
+        const desc = result.weather_description || result.weather?.[0]?.description || 'Unknown';
+        const loc = `${result.city || 'Unknown city'}, ${result.country || resolvedCountry || 'Unknown country'}`;
+        const latRaw = result.latitude ?? result.coord?.lat;
+        const lonRaw = result.longitude ?? result.coord?.lon;
+        const latNum = typeof latRaw === 'string' ? Number(latRaw) : latRaw;
+        const lonNum = typeof lonRaw === 'string' ? Number(lonRaw) : lonRaw;
+        const latLonText = Number.isFinite(latNum) && Number.isFinite(lonNum) ? `${latNum.toFixed(3)}, ${lonNum.toFixed(3)}` : 'N/A';
+
+        const embed = new EmbedBuilder()
+            .setTitle('✅ Postal Check')
+            .setColor('#4CAF50')
+            .addFields(
+                { name: 'Postal', value: postalCode, inline: true },
+                { name: 'Country', value: resolvedCountry || 'Auto/Unknown', inline: true },
+                { name: 'Location', value: loc, inline: false },
+                { name: 'Temp (F)', value: tempF !== undefined ? `${Math.round(tempF)}°F` : 'N/A', inline: true },
+                { name: 'Description', value: desc, inline: true },
+                { name: 'Wind', value: result.wind_speed !== undefined ? `${Math.round(result.wind_speed)} mph` : 'N/A', inline: true },
+                { name: 'Humidity', value: result.humidity !== undefined ? `${result.humidity}%` : 'N/A', inline: true },
+                { name: 'Lat/Lon', value: latLonText, inline: true }
+            )
+            .setTimestamp();
+
+        await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+        console.error('Error in postal check:', error);
+        await interaction.editReply({ content: `❌ Failed to fetch weather: ${error.message}` });
     }
 }
 

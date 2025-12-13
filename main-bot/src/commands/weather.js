@@ -124,10 +124,12 @@ module.exports = {
             });
         }
 
+        const resolvedCountry = countryCode || (isValidPostalCode.country && isValidPostalCode.country !== 'AMBIGUOUS' && isValidPostalCode.country !== 'UNKNOWN' ? isValidPostalCode.country : null);
+
         await interaction.deferReply({ flags: 64 }); // MessageFlags.Ephemeral
 
         try {
-            const response = await serviceManager.joinWeatherTracking(userId, zipCode, displayName, countryCode);
+            const response = await serviceManager.joinWeatherTracking(userId, zipCode, displayName, resolvedCountry);
             
             if (!response.success) {
                 throw new Error(response.message || 'Failed to join weather tracking');

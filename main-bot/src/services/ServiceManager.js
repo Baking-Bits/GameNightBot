@@ -209,6 +209,13 @@ class ServiceManager {
         return this.weatherAdminCommand('setscore', { user, points, adminUser });
     }
 
+    async checkWeatherByPostal(postalCode, countryCode) {
+        return this.makeServiceRequest('weather', '/weather/postal', {
+            method: 'POST',
+            data: { postalCode, countryCode }
+        });
+    }
+
     /**
      * Get system statistics for weather system
      */

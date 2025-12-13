@@ -20,6 +20,22 @@ class DatabaseWeatherSystem {
         this.initialized = false;
     }
 
+    haversineKm(lat1, lon1, lat2, lon2) {
+        if (
+            lat1 === null || lon1 === null || lat2 === null || lon2 === null ||
+            lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined
+        ) {
+            return null;
+        }
+        const toRad = deg => (deg * Math.PI) / 180;
+        const R = 6371; // Earth radius in km
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
     async initialize() {
         if (this.initialized) return;
         
@@ -37,6 +53,31 @@ class DatabaseWeatherSystem {
         await this.initialize();
         
         try {
+            const existing = await getWeatherUser(userData.userId);
+
+            // Default: treat as non-admin unless explicitly flagged
+            const adminOverride = Boolean(userData.adminOverride);
+
+            // Reject large moves unless adminOverride is true
+            if (existing && existing.is_active && !adminOverride) {
+                const samePostal = existing.postal_code === userData.postalCode;
+                const distanceKm = this.haversineKm(
+                    existing.latitude,
+                    existing.longitude,
+                    userData.latitude,
+                    userData.longitude
+                );
+
+                const missingCoords = distanceKm === null;
+                const tooFar = distanceKm !== null && distanceKm > 80; // ~50 miles
+                const countryChanged = existing.country_code && userData.countryCode && existing.country_code !== userData.countryCode;
+
+                if (!samePostal && (countryChanged || tooFar || missingCoords)) {
+                    throw new Error('Location change requires admin approval (move too far or missing location data).');
+                }
+            }
+
+            const now = new Date();
             const dbUserData = {
                 user_id: userData.userId,
                 discord_user_id: userData.discordUserId || userData.userId,
@@ -45,9 +86,14 @@ class DatabaseWeatherSystem {
                 city: userData.city,
                 country: userData.country,
                 region: userData.region,
+                state: userData.state || null,
+                latitude: userData.latitude || null,
+                longitude: userData.longitude || null,
                 admin_added: userData.adminAdded || false,
                 added_by: userData.addedBy || null,
-                country_code: userData.countryCode || null
+                country_code: userData.countryCode || null,
+                last_location_change_at: existing && existing.postal_code === userData.postalCode ? existing.last_location_change_at : now,
+                location_change_reason: adminOverride ? 'admin_override' : 'user_update'
             };
             
             await addWeatherUser(dbUserData);
@@ -76,6 +122,9 @@ class DatabaseWeatherSystem {
                 city: user.city,
                 country: user.country,
                 region: user.region,
+                state: user.state,
+                latitude: user.latitude,
+                longitude: user.longitude,
                 adminAdded: user.admin_added,
                 addedBy: user.added_by,
                 countryCode: user.country_code,

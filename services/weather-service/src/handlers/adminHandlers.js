@@ -17,14 +17,8 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
 
         // Check if user exists in database
         const existingUser = await weatherSystem.getUser(userId);
-        
-        // Check if user exists and is active
-        if (existingUser && existingUser.is_active) {
-            return { success: false, message: 'User is already active in the weather system.' };
-        }
-        
-        // If user exists but is inactive, we'll reactivate them
         const isReactivation = existingUser && !existingUser.is_active;
+        const isUpdate = existingUser && existingUser.is_active;
 
         let locationInfo;
         try {
@@ -32,7 +26,10 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
             locationInfo = {
                 city: testWeather.name || 'Unknown City',
                 country: testWeather.sys?.country || 'Unknown',
-                region: weatherSystem.getPrivacyFriendlyLocation(testWeather) || 'Unknown Region'
+                region: weatherSystem.getPrivacyFriendlyLocation(testWeather) || 'Unknown Region',
+                state: testWeather.sys?.state || null,
+                latitude: testWeather.coord?.lat || null,
+                longitude: testWeather.coord?.lon || null
             };
         } catch (error) {
             const countryText = countryCode ? ` (${countryCode})` : '';
@@ -49,15 +46,26 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
             country: locationInfo.country,
             countryCode: countryCode,
             region: locationInfo.region,
+            state: locationInfo.state,
+            latitude: locationInfo.latitude,
+            longitude: locationInfo.longitude,
             adminAdded: true,
-            addedBy: adminUserId
+            addedBy: adminUserId,
+            adminOverride: true
         };
 
         // Add user to database (handles both new and reactivation)
         await weatherSystem.addUser(userData);
 
-        const responseTitle = isReactivation ? '✅ User Reactivated Successfully' : '✅ User Added Successfully';
-        const actionText = isReactivation ? 'Reactivated By' : 'Added By';
+        let responseTitle = '✅ User Added Successfully';
+        let actionText = 'Added By';
+        if (isReactivation) {
+            responseTitle = '✅ User Reactivated Successfully';
+            actionText = 'Reactivated By';
+        } else if (isUpdate) {
+            responseTitle = '✅ User Location Updated';
+            actionText = 'Updated By';
+        }
 
         return {
             success: true,
@@ -79,7 +87,8 @@ async function handleAddUser(userId, postalCode, countryCode, adminUserId, displ
 
 async function handleRemoveUser(userId, adminUserId) {
     try {
-        const success = await weatherSystem.removeUserLocation(userId);
+        const result = await weatherSystem.removeUser(userId);
+        const success = result?.success !== undefined ? result.success : Boolean(result);
         
         if (success) {
             return {
@@ -160,8 +169,12 @@ async function handleSetActive(userId, active, adminUserId) {
                 country: user.country,
                 countryCode: user.country_code,
                 region: user.region,
+                state: user.state,
+                latitude: user.latitude,
+                longitude: user.longitude,
                 adminAdded: user.admin_added,
-                addedBy: adminUserId
+                addedBy: adminUserId,
+                adminOverride: true
             };
             await weatherSystem.addUser(userData);
         } else {

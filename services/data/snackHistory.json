@@ -1,252 +1,742 @@
 {
   "snacks": [
     {
-      "name": "Chia Seed Pudding Parfait",
+      "name": "Sweet Potato and Black Bean Bites",
       "type": "snack",
       "ingredients": [
-        "2 tablespoons chia seeds",
-        "1/2 cup unsweetened almond milk",
-        "1 tablespoon honey or maple syrup",
-        "1/2 cup mixed berries (fresh or frozen)",
-        "1 tablespoon nuts (almonds, walnuts, or pecans)"
+        "cooked sweet potato cubes",
+        "canned black beans",
+        "avocado",
+        "lime juice",
+        "cumin",
+        "salt"
       ],
-      "prepTime": "5 minutes",
-      "calories": "250",
-      "description": "A creamy, delicious parfait made with chia seeds and mixed berries, perfect for a quick energy boost.",
+      "prepTime": "10 minutes",
+      "calories": "150 per serving",
+      "description": "A quick and nutritious snack combining sweet potatoes, black beans, and avocado for a balanced mix of complex carbs, protein, and healthy fats.",
       "instructions": [
-        "In a small bowl or mason jar, mix chia seeds, almond milk, and honey.",
-        "Stir well to combine and let sit for 5 minutes to thicken.",
-        "Layer with mixed berries and nuts on top.",
-        "Store in the refrigerator until ready to eat."
+        "Heat cooked sweet potato cubes in a microwave or on the stovetop until warm.",
+        "In a bowl, mash black beans with a fork, then mix in diced avocado, a squeeze of lime juice, a pinch of cumin, and salt to taste.",
+        "Scoop the black bean mixture onto the warm sweet potato cubes and serve."
       ],
-      "benefits": "Chia seeds are packed with fiber, protein, and omega-3 fatty acids, providing sustained energy. Berries offer antioxidants, while nuts give healthy fats and additional protein, making this snack balanced and satisfying.",
-      "generatedAt": "2025-09-27T19:01:51.991Z",
-      "id": "1758999711991",
+      "benefits": "This snack provides sustained energy due to the complex carbohydrates from sweet potatoes, protein and fiber from black beans, and healthy fats from avocado. It's easy to prepare and portable, making it perfect for busy schedules.",
+      "generatedAt": "2025-10-26T19:01:56.585Z",
+      "id": "1761505316585",
       "isAIGenerated": true,
-      "responseTimeMs": 111901
+      "responseTimeMs": 115907
     },
     {
-      "name": "Apple Slices with Almond Butter",
+      "name": "Cottage Cheese and Pineapple Bites",
       "type": "snack",
       "ingredients": [
-        "1 medium apple",
-        "2 tablespoons almond butter"
-      ],
-      "prepTime": "5 minutes",
-      "calories": "220",
-      "description": "A simple and delicious snack featuring apple slices paired with almond butter for a satisfying and nutritious treat.",
-      "instructions": [
-        "Wash and core the apple.",
-        "Slice the apple into even pieces.",
-        "Place the almond butter in a small container or wrap it in parchment paper.",
-        "Serve apple slices with almond butter for dipping."
-      ],
-      "benefits": "This snack provides a balanced mix of carbohydrates, protein, and healthy fats, making it ideal for sustained energy. The fiber from the apple helps keep you full, while the almond butter offers protein and healthy fats for a steady energy release. It's quick to prepare, portable, and perfect for busy schedules.",
-      "generatedAt": "2025-09-28T19:01:34.587Z",
-      "id": "1759086094587",
-      "isAIGenerated": true,
-      "responseTimeMs": 94238
-    },
-    {
-      "name": "Roasted Chickpea Trail Mix",
-      "type": "snack",
-      "ingredients": [
-        "1 cup canned chickpeas, drained and rinsed",
-        "1 tablespoon olive oil",
-        "1/2 teaspoon paprika",
-        "1/2 teaspoon garlic powder",
-        "1/4 teaspoon salt",
-        "2 tablespoons mixed nuts (e.g., almonds, walnuts)",
-        "2 tablespoons dried cranberries",
-        "1 tablespoon pumpkin seeds"
-      ],
-      "prepTime": "8 minutes",
-      "calories": "350",
-      "description": "A savory and sweet snack mix that combines roasted chickpeas with nuts, seeds, and dried fruit for a balanced energy boost.",
-      "instructions": [
-        "Preheat oven to 400°F (200°C).",
-        "Spread chickpeas on a baking sheet, drizzle with olive oil, and toss with paprika, garlic powder, and salt.",
-        "Roast for 20-25 minutes, stirring halfway through, until crispy.",
-        "Let chickpeas cool, then mix with nuts, cranberries, and pumpkin seeds."
-      ],
-      "benefits": "This snack is rich in protein, fiber, and healthy fats, providing sustained energy. Chickpeas offer plant-based protein and fiber, while nuts and seeds contribute essential fats and micronutrients. Dried fruit adds a touch of sweetness and quick energy, making it ideal for busy schedules.",
-      "generatedAt": "2025-10-01T19:02:15.955Z",
-      "id": "1759345335955",
-      "isAIGenerated": true,
-      "responseTimeMs": 135615
-    },
-    {
-      "name": "Avocado Toast with Egg",
-      "type": "snack",
-      "ingredients": [
-        "1 slice whole grain bread",
-        "1/2 ripe avocado",
-        "1 egg",
-        "Salt and pepper to taste"
-      ],
-      "prepTime": "8 minutes",
-      "calories": "250",
-      "description": "A quick and portable snack that combines healthy fats, protein, and whole grains for sustained energy.",
-      "instructions": [
-        "Toast the slice of whole grain bread.",
-        "While the bread is toasting, cook the egg to your liking (either scrambled or poached).",
-        "Mash the avocado and spread it on the toasted bread.",
-        "Top the avocado with the cooked egg and season with salt and pepper."
-      ],
-      "benefits": "Avocado provides healthy fats for sustained energy, while the egg offers high-quality protein to keep you full. Whole grain bread adds fiber for digestion and steady energy release, making it ideal for busy schedules.",
-      "generatedAt": "2025-10-02T19:01:38.638Z",
-      "id": "1759431698638",
-      "isAIGenerated": true,
-      "responseTimeMs": 98415
-    },
-    {
-      "name": "Greek Yogurt and Berries with Honey",
-      "type": "snack",
-      "ingredients": [
-        "plain Greek yogurt",
-        "mixed berries (such as blueberries, strawberries, raspberries)",
-        "honey"
+        "cottage cheese",
+        "fresh pineapple",
+        "whole grain crackers"
       ],
       "prepTime": "5 minutes",
       "calories": "150",
-      "description": "A delicious and creamy snack that combines protein-rich Greek yogurt with antioxidant-packed berries and a touch of natural sweetness from honey.",
+      "description": "A refreshing and protein-packed snack that combines creamy cottage cheese with sweet pineapple, served on whole grain crackers for a satisfying crunch.",
       "instructions": [
-        "Scoop a serving of plain Greek yogurt into a small bowl or container.",
-        "Top with a generous handful of mixed berries.",
-        "Drizzle a teaspoon of honey over the top and gently mix to combine."
+        "Slice the fresh pineapple into small, bite-sized chunks.",
+        "Scoop a tablespoon of cottage cheese onto each whole grain cracker.",
+        "Top each cracker with a piece of pineapple chunk.",
+        "Serve immediately or store in an airtight container for later."
       ],
-      "benefits": "This snack is excellent for sustained energy due to its high protein content from Greek yogurt, which keeps you full longer. The berries provide fiber and antioxidants, supporting overall health and energy levels, while honey offers a quick natural energy boost. It's portable and can be prepared in advance for a convenient on-the-go option.",
-      "generatedAt": "2025-10-03T19:01:41.295Z",
-      "id": "1759518101295",
+      "benefits": "This snack is rich in protein from the cottage cheese, providing sustained energy and keeping you full longer. The pineapple adds a natural sweetness and a dose of vitamin C, while the whole grain crackers contribute fiber for digestive health. It's quick to prepare and portable, making it perfect for busy schedules.",
+      "generatedAt": "2025-10-27T19:01:49.701Z",
+      "id": "1761591709701",
       "isAIGenerated": true,
-      "responseTimeMs": 100328
+      "responseTimeMs": 109478
+    },
+    {
+      "name": "Nutty Peanut Butter and Celery Sticks",
+      "type": "snack",
+      "ingredients": [
+        "celery sticks",
+        "natural peanut butter"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A classic and nutritious snack featuring celery sticks filled with natural peanut butter.",
+      "instructions": [
+        "Wash and cut the celery into sticks.",
+        "Spread a generous amount of natural peanut butter onto each celery stick."
+      ],
+      "benefits": "This snack is rich in healthy fats from the peanut butter, providing sustained energy. Celery is low in calories but high in fiber, aiding digestion. The combination is portable and easy to prepare, making it ideal for busy schedules.",
+      "generatedAt": "2025-10-28T19:01:29.005Z",
+      "id": "1761678089005",
+      "isAIGenerated": true,
+      "responseTimeMs": 88556
+    },
+    {
+      "name": "Edamame and Sea Salt Bites",
+      "type": "snack",
+      "ingredients": [
+        "frozen shelled edamame",
+        "sea salt"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A quick and nutritious snack that combines protein-rich edamame with a touch of sea salt for a satisfying crunch.",
+      "instructions": [
+        "Pour a cup of frozen shelled edamame into a microwave-safe bowl.",
+        "Microwave on high for about 4-5 minutes, or until heated through.",
+        "Drain any excess water, sprinkle with sea salt, and enjoy!"
+      ],
+      "benefits": "Edamame is a great source of plant-based protein and fiber, which help sustain energy levels and keep you feeling full. The sea salt adds a flavorful touch, making it a satisfying snack that's perfect for on-the-go.",
+      "generatedAt": "2025-10-29T19:01:41.518Z",
+      "id": "1761764501518",
+      "isAIGenerated": true,
+      "responseTimeMs": 100803
+    },
+    {
+      "name": "Quinoa Power Balls",
+      "type": "snack",
+      "ingredients": [
+        "1/2 cup cooked quinoa",
+        "1/2 banana, mashed",
+        "1 tablespoon honey",
+        "1 tablespoon almond butter",
+        "1/2 teaspoon cinnamon",
+        "1/4 cup rolled oats",
+        "1/4 cup crushed nuts"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "These energy-sustaining balls are packed with protein, fiber, and healthy fats to keep you fueled throughout the day.",
+      "instructions": [
+        "In a bowl, mix together the mashed banana, cooked quinoa, honey, almond butter, and cinnamon.",
+        "Stir in the rolled oats and crushed nuts until well combined.",
+        "Roll the mixture into balls and place them on a baking sheet lined with parchment paper.",
+        "Chill in the refrigerator for at least 30 minutes before enjoying."
+      ],
+      "benefits": "Quinoa is an excellent source of plant-based protein, fiber, and essential amino acids, making it a great choice for a snack that can help keep you feeling full and energized.",
+      "generatedAt": "2025-11-09T20:00:04.826Z",
+      "id": "1762718404826",
+      "isAIGenerated": true,
+      "responseTimeMs": 4310
+    },
+    {
+      "name": "Energy Ball Bites",
+      "type": "snack",
+      "ingredients": [
+        "oats",
+        "almonds",
+        "banana",
+        "maple syrup",
+        "cacao powder",
+        "chia seeds",
+        "flax seeds",
+        "coconut flakes"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "220",
+      "description": "A delicious and nutritious energy ball made with oats, almonds, and banana.",
+      "instructions": [
+        "In a mixing bowl, mash the banana until it's smooth.",
+        "Stir in the oats, almonds, maple syrup, cacao powder, chia seeds, flax seeds, and coconut flakes.",
+        "Mix well until a sticky dough forms.",
+        "Roll the dough into small balls.",
+        "Refrigerate for at least 30 minutes to firm up before eating."
+      ],
+      "benefits": "These energy ball bites are packed with fiber, protein, and healthy fats, which can help keep you full and energized throughout the day. The chia and flax seeds also provide additional nutrients and omega-3 fatty acids for brain function and overall health.",
+      "generatedAt": "2025-11-14T20:00:13.832Z",
+      "id": "1763150413832",
+      "isAIGenerated": true,
+      "responseTimeMs": 13004
+    },
+    {
+      "name": "Mixed Nut Butter and Fruit Spread",
+      "type": "snack",
+      "ingredients": [
+        "almond butter",
+        "peanut butter",
+        "honey",
+        "apple slices",
+        "strawberries"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "200",
+      "description": "A mix of almond and peanut butter with a touch of honey to sweeten, spread on apple slices and topped with fresh strawberries for a balanced and energizing snack.",
+      "instructions": [
+        "In a small bowl, mix together almond butter and peanut butter with a little honey to create a nut butter spread.",
+        "Slice an apple and arrange the slices on a plate.",
+        "Spread the nut butter mixture on the apple slices.",
+        "Place a strawberry on each slice for added flavor and texture."
+      ],
+      "benefits": "This snack provides a mix of healthy fats, protein, and carbohydrates to keep energy levels up throughout the day. The fiber in the apple and strawberries will help keep you feeling full and satisfied.",
+      "generatedAt": "2025-11-16T20:00:16.243Z",
+      "id": "1763323216243",
+      "isAIGenerated": true,
+      "responseTimeMs": 15926
+    },
+    {
+      "name": "Avocado and Hummus Toast",
+      "type": "snack",
+      "ingredients": [
+        "Whole grain bread",
+        "Avocado",
+        "Hummus",
+        "Lemon juice",
+        "Red pepper flakes"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "A delicious and healthy snack that provides sustained energy.",
+      "instructions": [
+        "Toast your bread to your desired level of crispiness.",
+        "Slice your avocado and spread it on the toast.",
+        "Spread a generous amount of hummus on top of the avocado.",
+        "Squeeze a bit of lemon juice over the top and sprinkle with red pepper flakes to taste.",
+        "Enjoy your snack!"
+      ],
+      "benefits": "This snack is packed with healthy fats, fiber, and protein, which can help you stay full and energized for longer periods. The combination of whole grain bread, avocado, and hummus provides a balanced mix of nutrients, making it an ideal choice for busy schedules.",
+      "generatedAt": "2025-11-19T20:00:13.062Z",
+      "id": "1763582413062",
+      "isAIGenerated": true,
+      "responseTimeMs": 13024
+    },
+    {
+      "name": "Roasted Chickpea and Kale Chips",
+      "type": "snack",
+      "ingredients": [
+        "chickpeas",
+        "kale",
+        "olive oil",
+        "salt"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "150",
+      "description": "A crunchy and savory snack that's also packed with protein and fiber.",
+      "instructions": [
+        "Preheat oven to 400°F.",
+        "Rinse and drain chickpeas, then pat dry with a towel.",
+        "Tear kale into bite-sized pieces and remove the stems.",
+        "Toss chickpeas and kale with olive oil and salt, then spread them out on a baking sheet.",
+        "Roast in the oven for 20-25 minutes, until they're crispy and golden brown."
+      ],
+      "benefits": "Roasted chickpea and kale chips provide sustained energy due to their high protein and fiber content, keeping you full and satisfied throughout the day. They're also rich in vitamins and minerals, making them a nutritious and satisfying snack.",
+      "generatedAt": "2025-11-20T20:00:13.353Z",
+      "id": "1763668813353",
+      "isAIGenerated": true,
+      "responseTimeMs": 12898
+    },
+    {
+      "name": "Avocado and Egg Omelette",
+      "type": "snack",
+      "ingredients": [
+        "1 ripe avocado",
+        "2 eggs",
+        "Salt and pepper to taste",
+        "1 tsp olive oil"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "180",
+      "description": "A nutritious and satisfying snack packed with healthy fats, protein, and fiber.",
+      "instructions": [
+        "Slice the avocado and set aside.",
+        "In a non-stick pan, heat the olive oil over medium heat.",
+        "Crack the eggs into the pan and cook until the whites are set but the yolks are still runny.",
+        "Add the sliced avocado to the omelette and season with salt and pepper to taste.",
+        "Fold the omelette in half and serve immediately."
+      ],
+      "benefits": "This snack provides sustained energy due to its balanced mix of fats, protein, and carbohydrates. The combination of avocado and egg will keep you feeling full and satisfied, preventing the need for frequent snacking.",
+      "generatedAt": "2025-11-21T20:00:13.596Z",
+      "id": "1763755213596",
+      "isAIGenerated": true,
+      "responseTimeMs": 13183
+    },
+    {
+      "name": "Protein-Packed Energy Bites",
+      "type": "snack",
+      "ingredients": [
+        "1/2 cup rolled oats",
+        "1/4 cup almond butter",
+        "1/4 cup unsweetened shredded coconut",
+        "1/4 cup pumpkin seeds",
+        "1/4 cup dark chocolate chips",
+        "1/4 cup chia seeds",
+        "1 tsp vanilla extract"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "220",
+      "description": "These energy bites are a nutritious and satisfying snack that provide sustained energy with protein, fiber, and healthy fats.",
+      "instructions": [
+        "In a mixing bowl, combine oats, almond butter, shredded coconut, pumpkin seeds, dark chocolate chips, and chia seeds.",
+        "Stir in vanilla extract.",
+        "Form mixture into small balls and refrigerate for at least 1 hour to set."
+      ],
+      "benefits": "These bites are packed with protein, fiber, and healthy fats to keep you feeling full and energized throughout the day.",
+      "generatedAt": "2025-11-22T20:00:16.983Z",
+      "id": "1763841616983",
+      "isAIGenerated": true,
+      "responseTimeMs": 16314
+    },
+    {
+      "name": "Chia Pudding",
+      "type": "snack",
+      "ingredients": [
+        "chia seeds",
+        "almond milk",
+        "maple syrup",
+        "vanilla extract"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "200",
+      "description": "A healthy, creamy snack made from chia seeds, almond milk, maple syrup, and vanilla extract. It's easy to prepare, nutritious, and provides sustained energy.",
+      "instructions": [
+        "In a mixing bowl, combine chia seeds, almond milk, maple syrup, and vanilla extract.",
+        "Stir the ingredients well to combine and let it sit for 10-15 minutes to thicken."
+      ],
+      "benefits": "Chia pudding is a great source of fiber, protein, and healthy fats, which provide sustained energy and keep you full for longer. It's also gluten-free and low in calories, making it an excellent snack for weight management and overall health.",
+      "generatedAt": "2025-11-23T20:00:21.068Z",
+      "id": "1763928021068",
+      "isAIGenerated": true,
+      "responseTimeMs": 20551
+    },
+    {
+      "name": "Energy Bars",
+      "type": "snack",
+      "ingredients": [
+        "Almond Butter",
+        "Raisins",
+        "Almonds",
+        "Dark Chocolate Chips",
+        "Maple Syrup",
+        "Almond Milk"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "Energy bars are perfect for busy individuals on the go. They provide a quick burst of energy and are packed with protein, fiber, and healthy fats.",
+      "instructions": [
+        "Mix almond butter, raisins, almonds, dark chocolate chips, maple syrup, and almond milk in a bowl.",
+        "Stir until well combined and then transfer the mixture to a mini muffin pan or silicone molds.",
+        "Allow the mixture to set for a few minutes before removing the energy bars.",
+        "Store in an airtight container and refrigerate until ready to eat."
+      ],
+      "benefits": "Energy bars are high in protein, fiber, and healthy fats, which can help to sustain energy levels throughout the day. They are also easy to prepare and store, making them a convenient snack for busy individuals.",
+      "generatedAt": "2025-11-24T20:00:14.173Z",
+      "id": "1764014414173",
+      "isAIGenerated": true,
+      "responseTimeMs": 13534
+    },
+    {
+      "name": "Chia Pudding",
+      "type": "snack",
+      "ingredients": [
+        "2 tablespoons chia seeds",
+        "1 cup unsweetened almond milk",
+        "1 tablespoon honey or maple syrup (optional)",
+        "1/2 teaspoon vanilla extract"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "100 (per serving)",
+      "description": "Chia pudding is a nutritious and energy-sustaining snack that's also high in fiber and protein, making it perfect for busy schedules. It's also easy to prepare in advance and can be left at room temperature until ready to eat.",
+      "instructions": [
+        "In a medium bowl, mix the chia seeds, almond milk, honey or maple syrup (if using), and vanilla extract.",
+        "Stir well and let the mixture sit for 5 minutes to thicken. Stir again and let it sit for another 5-10 minutes to thicken further.",
+        "Mix until the pudding has a smooth consistency and serve."
+      ],
+      "benefits": "Chia pudding is a great source of fiber, protein, and antioxidants, which can help keep you feeling full and energized throughout the day. It's also naturally sweet, so you can skip the added sugar in most commercial snacks.",
+      "generatedAt": "2025-11-26T20:00:13.556Z",
+      "id": "1764187213556",
+      "isAIGenerated": true,
+      "responseTimeMs": 13369
+    },
+    {
+      "name": "Avocado and Edamame Hummus Toast",
+      "type": "snack",
+      "ingredients": [
+        "1 slice whole wheat bread",
+        "1/2 avocado",
+        "1/2 cup edamame",
+        "2 tablespoons hummus",
+        "1 tablespoon olive oil",
+        "1 teaspoon lemon juice",
+        "Salt and pepper to taste"
+      ],
+      "prepTime": "3 minutes",
+      "calories": "250",
+      "description": "A nutritious and energy-sustaining snack that's easy to make and perfect for busy schedules. It's packed with fiber, protein, and healthy fats.",
+      "instructions": [
+        "Toast the bread until it's lightly browned.",
+        "While the bread is toasting, mash the avocado in a small bowl with a fork.",
+        "Drain and rinse the edamame, then add it to the mashed avocado.",
+        "Add the hummus, olive oil, lemon juice, salt, and pepper to the bowl, and mix until well combined.",
+        "Spread the hummus mixture on the toasted bread, and serve immediately."
+      ],
+      "benefits": "This snack provides sustained energy due to its combination of fiber, protein, and healthy fats. The whole wheat bread provides complex carbohydrates for energy, while the avocado and hummus offer healthy fats and protein for satiety.",
+      "generatedAt": "2025-11-27T20:00:14.546Z",
+      "id": "1764273614546",
+      "isAIGenerated": true,
+      "responseTimeMs": 14123
+    },
+    {
+      "name": "Greek Yogurt and Granola Bars",
+      "type": "snack",
+      "ingredients": [
+        "greek yogurt",
+        "granola",
+        "honey",
+        "chopped nuts"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "A simple and delicious Greek yogurt and granola bar that provides a good amount of protein and fiber for sustained energy.",
+      "instructions": [
+        "Take a spoonful of Greek yogurt and spread it on a plate or bowl.",
+        "Add a handful of granola and sprinkle with chopped nuts.",
+        "Drizzle a little honey on top for sweetness."
+      ],
+      "benefits": "Greek yogurt is high in protein and calcium, while granola and nuts provide fiber and healthy fats, making this snack a great choice for sustaining energy throughout the day.",
+      "generatedAt": "2025-11-28T20:00:13.498Z",
+      "id": "1764360013498",
+      "isAIGenerated": true,
+      "responseTimeMs": 12850
+    },
+    {
+      "name": "Energy Packed Nut Butter and Fruit Slices",
+      "type": "snack",
+      "ingredients": [
+        "Almond butter",
+        "Banana slices",
+        "Strawberry slices",
+        "Raisins"
+      ],
+      "prepTime": "2 minutes",
+      "calories": "150",
+      "description": "This snack is a great mix of protein, healthy fats, and fiber, providing sustained energy and keeping you full for longer.",
+      "instructions": [
+        "1. Spread almond butter on a banana slice.",
+        "2. Add strawberry slices and raisins on top of the almond butter.",
+        "3. Roll up the banana slice and enjoy!"
+      ],
+      "benefits": "This snack provides a balanced mix of carbohydrates, fats, and proteins, which are essential for sustained energy and maintaining blood sugar levels. The fiber in the fruit slices aids in digestion and keeps you feeling full longer.",
+      "generatedAt": "2025-11-30T20:00:14.114Z",
+      "id": "1764532814114",
+      "isAIGenerated": true,
+      "responseTimeMs": 13003
+    },
+    {
+      "name": "Almond Butter and Dried Berry Clusters",
+      "type": "snack",
+      "ingredients": [
+        "almond butter",
+        "dried berries",
+        "dark chocolate chips"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "200",
+      "description": "A mix of almond butter, dried berries, and dark chocolate chips for a sweet, energy-sustaining snack.",
+      "instructions": [
+        "In a small bowl, spread a thin layer of almond butter.",
+        "Fold in a handful of your favorite dried berries.",
+        "Sprinkle with dark chocolate chips for an extra treat.",
+        "Enjoy!"
+      ],
+      "benefits": "Almond butter provides healthy fats and protein to keep you full, while dried berries offer natural sugars for quick energy. Dark chocolate chips add a touch of sweetness and antioxidants.",
+      "generatedAt": "2025-12-01T20:00:14.559Z",
+      "id": "1764619214559",
+      "isAIGenerated": true,
+      "responseTimeMs": 14172
+    },
+    {
+      "name": "Peanut Butter and Jelly Energy Balls",
+      "type": "snack",
+      "ingredients": [
+        "1/4 cup creamy peanut butter",
+        "1/2 cup natural peanut butter",
+        "1/4 cup honey",
+        "1/4 cup rolled oats",
+        "1/4 cup mixed seeds (sunflower, pumpkin, sesame)",
+        "1/4 cup dried fruit (apricots, cranberries, blueberries)",
+        "1/4 cup unsweetened shredded coconut"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "These energy balls are a quick and easy way to satisfy a sweet tooth and provide a boost of energy with a combination of healthy fats, protein, and carbohydrates.",
+      "instructions": [
+        "Combine all ingredients in a bowl and mix well.",
+        "Shape mixture into small balls and refrigerate for at least 30 minutes before serving."
+      ],
+      "benefits": "These energy balls provide sustained energy due to their combination of healthy fats, protein, and carbohydrates. They are also high in fiber and antioxidants, making them a nutritious snack option.",
+      "generatedAt": "2025-12-02T20:00:16.741Z",
+      "id": "1764705616741",
+      "isAIGenerated": true,
+      "responseTimeMs": 15912
+    },
+    {
+      "name": "Sweet Potato and Kale Chips",
+      "type": "snack",
+      "ingredients": [
+        "sweet potato",
+        "kale",
+        "olive oil",
+        "salt"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "100",
+      "description": "A healthier alternative to traditional potato chips, sweet potato and kale chips offer a satisfying crunch with added nutrients.",
+      "instructions": [
+        "Preheat the oven to 375°F (190°C).",
+        "Peel the sweet potato and slice into thin rounds. Place on a baking sheet.",
+        "Rinse and dry the kale leaves, then tear them into bite-sized pieces. Add to the baking sheet.",
+        "Drizzle with olive oil and sprinkle with salt. Toss to coat evenly.",
+        "Bake for 15-20 minutes, or until crispy. Flip halfway through cooking."
+      ],
+      "benefits": "Sweet potatoes and kale are rich in vitamins and minerals, providing sustained energy without the added calories of processed snacks.",
+      "generatedAt": "2025-12-03T20:00:14.352Z",
+      "id": "1764792014352",
+      "isAIGenerated": true,
+      "responseTimeMs": 13593
+    },
+    {
+      "name": "Vegan Energy Balls",
+      "type": "snack",
+      "ingredients": [
+        "1 cup rolled oats",
+        "1/2 cup peanut butter",
+        "1/2 cup dates, pitted",
+        "1/2 cup almond butter",
+        "1/2 cup ground flaxseed",
+        "1/4 cup chia seeds",
+        "1/2 cup unsweetened shredded coconut",
+        "1 tsp vanilla extract",
+        "optional: 1/2 cup chocolate chips"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "220",
+      "description": "These energy balls are a nutritious and tasty way to boost your energy levels during a busy day. They're packed with fiber, protein, and healthy fats, making them a great snack to keep you going.",
+      "instructions": [
+        "Mix all ingredients in a food processor until well combined.",
+        "Form mixture into balls and chill in the fridge for 30 minutes before serving."
+      ],
+      "benefits": "The high fiber and protein content in these energy balls will provide sustained energy, while the healthy fats will keep you full and satisfied between meals.",
+      "generatedAt": "2025-12-04T20:00:13.692Z",
+      "id": "1764878413692",
+      "isAIGenerated": true,
+      "responseTimeMs": 13189
+    },
+    {
+      "name": "Energy-Packed Nut Butter and Nut Clusters",
+      "type": "snack",
+      "ingredients": [
+        "almonds",
+        "peanut butter",
+        "cacao nibs",
+        "honey"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "210",
+      "description": "A delicious and satisfying snack that provides sustained energy with a mix of healthy fats, protein, and carbs.",
+      "instructions": [
+        "Toast 1/2 cup of almonds until golden brown in a 350°F oven for 10-12 minutes.",
+        "In a food processor, combine the toasted almonds, 2 tablespoons of peanut butter, 1 tablespoon of cacao nibs, and 1 tablespoon of honey. Process until a dough forms.",
+        "Shape into small balls and chill in the refrigerator for at least 30 minutes. Enjoy as a snack or sprinkle over yogurt or oatmeal."
+      ],
+      "benefits": "This snack offers a mix of healthy fats, protein, and carbs to sustain energy levels, making it perfect for busy individuals with desk jobs or irregular schedules.",
+      "generatedAt": "2025-12-05T20:00:13.780Z",
+      "id": "1764964813780",
+      "isAIGenerated": true,
+      "responseTimeMs": 13215
+    },
+    {
+      "name": "Quinoa and Black Bean Salad",
+      "type": "snack",
+      "ingredients": [
+        "1 cup cooked quinoa",
+        "1/2 cup canned black beans, drained and rinsed",
+        "1/4 cup diced bell pepper",
+        "1/4 cup diced cucumber",
+        "1 tbsp olive oil",
+        "1 tbsp lime juice",
+        "1 tsp ground cumin",
+        "salt and pepper to taste",
+        "1 avocado, diced (optional)"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "250",
+      "description": "This salad is a nutritious and protein-packed snack that will keep you full and energized throughout the day.",
+      "instructions": [
+        "In a large bowl, combine cooked quinoa, black beans, bell pepper, and cucumber.",
+        "In a small bowl, whisk together olive oil, lime juice, cumin, salt, and pepper. Pour the dressing over the salad and toss to coat.",
+        "Top with diced avocado and serve immediately."
+      ],
+      "benefits": "This snack is high in protein and fiber, which will help keep you full and energized throughout the day. The healthy fats in the avocado will also help to stabilize blood sugar levels, preventing energy crashes.",
+      "generatedAt": "2025-12-06T20:00:14.461Z",
+      "id": "1765051214461",
+      "isAIGenerated": true,
+      "responseTimeMs": 13571
+    },
+    {
+      "name": "Smoothie Bowl",
+      "type": "snack",
+      "ingredients": [
+        "1 cup frozen mixed berries",
+        "1 cup spinach",
+        "1/2 banana",
+        "1/2 cup unsweetened almond milk",
+        "1 tablespoon chia seeds",
+        "1 tablespoon hemp seeds",
+        "1 tablespoon granola",
+        "1 tablespoon sliced almonds",
+        "1 tablespoon sliced strawberries"
+      ],
+      "prepTime": "3 minutes",
+      "calories": "250",
+      "description": "A nutritious, portable, and visually appealing snack that provides a mix of fruits, vegetables, and healthy fats for sustained energy.",
+      "instructions": [
+        "Blend all ingredients in a blender until smooth.",
+        "Pour into a bowl.",
+        "Top with granola, sliced almonds, and strawberries."
+      ],
+      "benefits": "This smoothie bowl is packed with antioxidants from the berries and spinach, fiber from the chia and hemp seeds, and protein from the banana. It's a great way to start the day or provide a mid-morning energy boost.",
+      "generatedAt": "2025-12-07T20:00:15.979Z",
+      "id": "1765137615979",
+      "isAIGenerated": true,
+      "responseTimeMs": 15179
+    },
+    {
+      "name": "Avocado and Roasted Red Pepper Hummus Toast",
+      "type": "snack",
+      "ingredients": [
+        "avocado",
+        "roasted red peppers",
+        "hummus",
+        "whole grain bread"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "200",
+      "description": "This snack is a perfect balance of fats, protein, and fiber to keep you full and energized throughout the day.",
+      "instructions": [
+        "Toast your bread to your desired level of doneness.",
+        "Spread hummus on the toast.",
+        "Scoop half of an avocado onto the toast.",
+        "Spoon in some roasted red peppers on top of the avocado.",
+        "Gently fold the other half of the avocado and serve."
+      ],
+      "benefits": "High in healthy fats, fiber, and antioxidants, this snack will keep you energized and satisfied without weighing you down.",
+      "generatedAt": "2025-12-08T20:00:12.435Z",
+      "id": "1765224012435",
+      "isAIGenerated": true,
+      "responseTimeMs": 12394
+    },
+    {
+      "name": "Energy-Rich Nut and Seed Mix",
+      "type": "snack",
+      "ingredients": [
+        "Almonds",
+        "Pumpkin Seeds",
+        "Sunflower Seeds",
+        "Hemp Seeds",
+        "Pine Nuts",
+        "Mixed Berries",
+        "Honey"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "350",
+      "description": "A mix of nuts and seeds that are high in protein, healthy fats, and fiber, which can help sustain energy levels throughout the day.",
+      "instructions": [
+        "1. In a bowl, mix all the nuts and seeds together.",
+        "2. Add mixed berries on top for extra flavor and moisture.",
+        "3. Drizzle with honey for a touch of sweetness and natural energy boost."
+      ],
+      "benefits": "This snack provides a balanced mix of nutrients that can help keep energy levels stable, and its natural sweetness from honey can provide a quick energy boost when needed.",
+      "generatedAt": "2025-12-09T20:00:16.192Z",
+      "id": "1765310416192",
+      "isAIGenerated": true,
+      "responseTimeMs": 15871
+    },
+    {
+      "name": "Apple and Almond Butter Slice",
+      "type": "snack",
+      "ingredients": [
+        "1 apple",
+        "2 tbsp almond butter"
+      ],
+      "prepTime": "2 minutes",
+      "calories": "150",
+      "description": "A simple, nutritious snack that's perfect for busy individuals. The apple provides fiber, which helps keep you full longer, while almond butter offers healthy fats that provide sustained energy.",
+      "instructions": [
+        "Slice the apple and spread almond butter on each slice.",
+        "Enjoy your snack!"
+      ],
+      "benefits": "This snack is good for sustained energy due to the combination of fiber from the apple and healthy fats from the almond butter. It's also a great source of protein and vitamins.",
+      "generatedAt": "2025-12-10T20:00:13.873Z",
+      "id": "1765396813874",
+      "isAIGenerated": true,
+      "responseTimeMs": 13289
+    },
+    {
+      "name": "Energy-Rich Nut and Seed Mix",
+      "type": "snack",
+      "ingredients": [
+        "1/4 cup raw almonds",
+        "1/4 cup sunflower seeds",
+        "1/4 cup pumpkin seeds",
+        "1 tablespoon honey",
+        "1/2 teaspoon ground cinnamon"
+      ],
+      "prepTime": "3 minutes",
+      "calories": "250",
+      "description": "This mix is packed with healthy fats, protein, and fiber, making it an excellent snack to keep your energy levels up throughout the day.",
+      "instructions": [
+        "Combine all ingredients in a bowl and mix well.",
+        "Store in an airtight container and eat as needed."
+      ],
+      "benefits": "This snack provides sustained energy, supports immune function, and aids in weight management due to its high protein and fiber content. It's also easy to make and perfect for busy days.",
+      "generatedAt": "2025-12-11T20:00:18.092Z",
+      "id": "1765483218092",
+      "isAIGenerated": true,
+      "responseTimeMs": 17643
+    },
+    {
+      "name": "Cucumber and Carrot Energy Slices",
+      "type": "snack",
+      "ingredients": [
+        "1 English cucumber",
+        "1 medium carrot",
+        "1 tablespoon hummus",
+        "1 tablespoon sesame seeds"
+      ],
+      "prepTime": "5 minutes",
+      "calories": "100",
+      "description": "A refreshing and crunchy snack that provides sustained energy with the help of hummus and sesame seeds.",
+      "instructions": [
+        "Peel the cucumber and carrot, then cut them into thin slices.",
+        "Spread a tablespoon of hummus on the cucumber slices.",
+        "Top with a tablespoon of sesame seeds and enjoy!"
+      ],
+      "benefits": "This snack is a great way to stay hydrated and energized throughout the day as cucumbers and carrots are rich in water and vitamins, while hummus provides protein and healthy fats.",
+      "generatedAt": "2025-12-12T20:00:13.590Z",
+      "id": "1765569613590",
+      "isAIGenerated": true,
+      "responseTimeMs": 13303
     },
     {
       "name": "Hummus and Veggie Sticks",
       "type": "snack",
       "ingredients": [
-        "hummus",
-        "carrot sticks",
-        "celery sticks",
-        "cucumber slices"
+        "1 small container hummus",
+        "1 small container sliced veggies (carrot sticks, cucumber sticks, celery sticks, bell pepper strips)",
+        "1 tablespoon tahini sauce (optional)"
       ],
-      "prepTime": "5 minutes",
-      "calories": "150",
-      "description": "A refreshing and satisfying snack combining creamy hummus with crunchy vegetable sticks.",
+      "prepTime": "2 minutes",
+      "calories": "200-250",
+      "description": "A nutritious and energy-sustaining snack that is also easy to eat and portable. The tahini sauce can be added for some extra flavor and nutrition.",
       "instructions": [
-        "Wash and peel the carrot, celery, and cucumber.",
-        "Cut them into sticks or slices.",
-        "Serve with a small portion of hummus."
+        "1. Open the container of hummus and pour it into a small bowl or directly into a reusable container.",
+        "2. Open the container of sliced veggies and transfer them to a separate bowl or directly into a small container.",
+        "3. If desired, add 1 tablespoon of tahini sauce to the hummus for some extra flavor.",
+        "4. Enjoy your snack with the veggies!",
+        "5. If you prefer to eat them separately, you can add a tablespoon of tahini sauce to the veggies as well."
       ],
-      "benefits": "This snack provides a balanced mix of protein, fiber, and healthy fats from the hummus, while the vegetables offer vitamins and hydration. The combination helps sustain energy levels and keeps you feeling full longer, making it ideal for busy schedules.",
-      "generatedAt": "2025-10-04T19:01:44.525Z",
-      "id": "1759604504525",
+      "benefits": "This snack is good for sustained energy because it contains protein from the hummus and fiber from the veggies, which help keep you full and provide a steady release of energy. The tahini sauce adds some extra nutrients and can help you feel more satisfied.",
+      "generatedAt": "2025-12-13T20:00:13.845Z",
+      "id": "1765656013845",
       "isAIGenerated": true,
-      "responseTimeMs": 104255
-    },
-    {
-      "name": "Banana Nut Oatmeal Bites",
-      "type": "snack",
-      "ingredients": [
-        "1 ripe banana",
-        "1/2 cup rolled oats",
-        "2 tablespoons chopped walnuts",
-        "1 tablespoon honey",
-        "1 teaspoon cinnamon"
-      ],
-      "prepTime": "10 minutes",
-      "calories": "150 per bite",
-      "description": "These no-bake banana nut oatmeal bites are a delicious, portable snack that provides sustained energy with the perfect balance of sweetness and crunch.",
-      "instructions": [
-        "Mash the banana in a bowl until smooth.",
-        "Add rolled oats, chopped walnuts, honey, and cinnamon to the mashed banana. Mix until well combined.",
-        "Scoop a tablespoon of the mixture and roll it into a ball with your hands.",
-        "Place the bites on a parchment-lined tray and refrigerate for at least 30 minutes to set."
-      ],
-      "benefits": "Banana provides natural sugars and potassium for quick energy and muscle function. Rolled oats offer complex carbohydrates and fiber for sustained energy release. Walnuts add healthy fats and protein, supporting brain health and satiety. This snack is easy to prepare, portable, and ideal for busy schedules.",
-      "generatedAt": "2025-10-06T19:02:07.796Z",
-      "id": "1759777327796",
-      "isAIGenerated": true,
-      "responseTimeMs": 127533
-    },
-    {
-      "name": "Nutty Quinoa Energy Balls",
-      "type": "snack",
-      "ingredients": [
-        "quinoa (cooked and cooled)",
-        "honey",
-        "rolled oats",
-        "peanut butter",
-        "dark chocolate chips",
-        "chia seeds"
-      ],
-      "prepTime": "10 minutes",
-      "calories": "150 per ball",
-      "description": "These Nutty Quinoa Energy Balls are a portable and nutritious snack, perfect for busy schedules. They combine the protein-rich quinoa with the satisfying crunch of oats and the sweetness of honey and dark chocolate.",
-      "instructions": [
-        "In a large bowl, mix together 1 cup cooked and cooled quinoa, 2 tablespoons honey, 1/2 cup rolled oats, 1/4 cup peanut butter, 1/4 cup dark chocolate chips, and 1 tablespoon chia seeds.",
-        "Using your hands or a spoon, form the mixture into small, bite-sized balls.",
-        "Place the balls on a plate and refrigerate for at least 30 minutes to set."
-      ],
-      "benefits": "These energy balls are packed with protein, fiber, and healthy fats, providing sustained energy throughout the day. The quinoa offers essential amino acids, while the oats and chia seeds contribute to satiety. The honey and dark chocolate add a touch of sweetness, making this snack both delicious and energizing.",
-      "generatedAt": "2025-10-07T19:02:11.063Z",
-      "id": "1759863731063",
-      "isAIGenerated": true,
-      "responseTimeMs": 130837
-    },
-    {
-      "name": "Cucumber and Cottage Cheese Bites",
-      "type": "snack",
-      "ingredients": [
-        "cucumber",
-        "cottage cheese",
-        "sunflower seeds",
-        "fresh dill"
-      ],
-      "prepTime": "5 minutes",
-      "calories": "60 per bite",
-      "description": "Crunchy cucumber rounds topped with creamy cottage cheese and a sprinkle of sunflower seeds and dill.",
-      "instructions": [
-        "Wash and slice the cucumber into 1/4 inch thick rounds.",
-        "Top each cucumber slice with a small spoonful of cottage cheese.",
-        "Sprinkle sunflower seeds and a little dill on top for added flavor and crunch.",
-        "Serve immediately or pack for on-the-go snacking."
-      ],
-      "benefits": "This snack is rich in protein and healthy fats from the cottage cheese and sunflower seeds, providing sustained energy. Cucumbers add hydration and fiber, while dill offers a refreshing flavor. It's quick to prepare, portable, and perfect for busy schedules.",
-      "generatedAt": "2025-10-08T19:03:21.265Z",
-      "id": "1759950201265",
-      "isAIGenerated": true,
-      "responseTimeMs": 201121
-    },
-    {
-      "name": "Sweet Potato and Black Bean Bites",
-      "type": "snack",
-      "ingredients": [
-        "sweet potato",
-        "canned black beans",
-        "olive oil",
-        "cumin",
-        "chili powder",
-        "salt"
-      ],
-      "prepTime": "10 minutes",
-      "calories": "150 per serving",
-      "description": "A flavorful and filling snack that combines sweet potatoes with black beans, seasoned with spices and baked until crispy.",
-      "instructions": [
-        "Preheat your oven to 400°F (200°C).",
-        "Peel and dice one small sweet potato into small cubes.",
-        "Rinse and drain one can of black beans.",
-        "In a bowl, mix the sweet potato cubes, black beans, 1 tablespoon of olive oil, 1/2 teaspoon of cumin, 1/2 teaspoon of chili powder, and a pinch of salt.",
-        "Spread the mixture on a baking sheet lined with parchment paper.",
-        "Bake for about 20 minutes, or until the sweet potatoes are tender and the edges are crispy.",
-        "Let cool slightly before serving."
-      ],
-      "benefits": "Sweet potatoes are a great source of complex carbohydrates and fiber, providing sustained energy release. Black beans add protein and fiber, keeping you full longer. The spices add flavor without extra calories, making this a nutritious and satisfying snack for busy schedules.",
-      "generatedAt": "2025-10-09T19:02:17.701Z",
-      "id": "1760036537701",
-      "isAIGenerated": true,
-      "responseTimeMs": 137287
+      "responseTimeMs": 13659
     }
   ],
-  "lastGenerated": "2025-10-09T19:02:17.701Z"
+  "lastGenerated": "2025-12-13T20:00:13.845Z"
 }
