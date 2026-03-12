@@ -241,11 +241,6 @@ class JellyfinMonitor {
 
         const buttons = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('jellyfin_refresh')
-                .setLabel('Refresh')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('🔃'),
-            new ButtonBuilder()
                 .setCustomId('jellyfin_start')
                 .setLabel('Start')
                 .setStyle(canStart ? ButtonStyle.Success : ButtonStyle.Secondary)
@@ -291,12 +286,7 @@ class JellyfinMonitor {
         this.client.on('interactionCreate', async (interaction) => {
             if (!interaction.isButton()) return;
 
-            if (interaction.customId === 'jellyfin_refresh') {
-                await interaction.deferReply({ ephemeral: true });
-                await this.updateStatusMessage();
-                await interaction.editReply('✅ Jellyfin status refreshed.');
-
-            } else if (interaction.customId === 'jellyfin_start') {
+            if (interaction.customId === 'jellyfin_start') {
                 if (!this._isAdmin(interaction)) {
                     await interaction.reply({
                         content: '❌ You need admin permissions to start Jellyfin.',

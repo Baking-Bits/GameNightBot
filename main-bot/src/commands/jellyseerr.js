@@ -50,18 +50,13 @@ module.exports = {
                         { name: 'Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
                         { name: 'Version', value: server.info?.version || 'N/A', inline: true },
                         {
-                            name: 'Requested (Not Approved/Denied)',
-                            value: monitor.formatMovieTvCounts(summary.requestedPending),
+                            name: 'Movies',
+                            value: monitor.formatCompactTypeBreakdown(summary.summary.movies),
                             inline: true
                         },
                         {
-                            name: 'Approved (Content Not There Yet)',
-                            value: monitor.formatMovieTvCounts(summary.approvedNotAvailable),
-                            inline: true
-                        },
-                        {
-                            name: 'Total Content',
-                            value: monitor.formatMovieTvCounts(summary.totalContent),
+                            name: 'TV',
+                            value: monitor.formatCompactTypeBreakdown(summary.summary.tv),
                             inline: true
                         }
                     );

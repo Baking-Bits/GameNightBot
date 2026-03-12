@@ -206,6 +206,10 @@ class JellyseerrMonitor {
         return `🎬 Movies: **${counts.movies}**\n📺 TV: **${counts.tv}**\n📦 Total: **${counts.total}**`;
     }
 
+    formatCompactTypeBreakdown(typeCounts) {
+        return `Pending **${typeCounts.pendingApproval}**\nQueue **${typeCounts.pendingDownload}**\nDone **${typeCounts.totalDownloaded}**`;
+    }
+
     async getPendingSummary() {
         try {
             const requestRes = await axios.get(`${this.jellyseerrUrl}/api/v1/request`, {
@@ -222,30 +226,38 @@ class JellyseerrMonitor {
                 ? requestRes.data.results
                 : [];
 
-            const requestedPending = requests.filter(r => r.status === 1);
+            const summary = {
+                movies: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 },
+                tv: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 }
+            };
 
-            const approvedNotAvailable = requests.filter(r => {
-                if (r.status !== 2) return false;
-                const mediaStatus = r?.media?.status;
-                return mediaStatus !== 5;
-            });
+            for (const request of requests) {
+                const mediaType = this.getRequestMediaType(request);
+                if (!mediaType || !summary[mediaType]) continue;
 
-            const totalContent = requests.filter(r => {
-                const mediaType = this.getRequestMediaType(r);
-                return mediaType === 'movie' || mediaType === 'tv';
-            });
+                if (request.status === 1) {
+                    summary[mediaType].pendingApproval += 1;
+                }
+
+                if (request.status === 2 && request?.media?.status !== 5) {
+                    summary[mediaType].pendingDownload += 1;
+                }
+
+                if (request?.media?.status === 5) {
+                    summary[mediaType].totalDownloaded += 1;
+                }
+            }
 
             return {
-                requestedPending: this.getMovieTvCounts(requestedPending),
-                approvedNotAvailable: this.getMovieTvCounts(approvedNotAvailable),
-                totalContent: this.getMovieTvCounts(totalContent),
+                summary,
                 error: null
             };
         } catch (error) {
             return {
-                requestedPending: { movies: 0, tv: 0, total: 0 },
-                approvedNotAvailable: { movies: 0, tv: 0, total: 0 },
-                totalContent: { movies: 0, tv: 0, total: 0 },
+                summary: {
+                    movies: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 },
+                    tv: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 }
+                },
                 error: error.message
             };
         }
@@ -260,7 +272,7 @@ class JellyseerrMonitor {
         const statusText = online ? '🟢 **Online**' : '🔴 **Offline**';
 
         const embed = new EmbedBuilder()
-            .setTitle('🎞️ Jellyseerr Requests')
+            .setTitle('🎞️ Jellyseerr')
             .setColor(color)
             .setTimestamp()
             .setFooter({ text: `Auto re-poll: ${this.formatIntervalText()} • Last checked` });
@@ -269,20 +281,14 @@ class JellyseerrMonitor {
             embed.addFields(
                 { name: 'Status', value: statusText, inline: true },
                 { name: 'Version', value: info?.version || 'Unknown', inline: true },
-                { name: 'Open', value: `[Jellyseerr](${this.jellyseerrUrl})`, inline: true },
                 {
-                    name: 'Requested (Not Approved/Denied)',
-                    value: this.formatMovieTvCounts(summary.requestedPending),
+                    name: 'Movies',
+                    value: this.formatCompactTypeBreakdown(summary.summary.movies),
                     inline: true
                 },
                 {
-                    name: 'Approved (Content Not There Yet)',
-                    value: this.formatMovieTvCounts(summary.approvedNotAvailable),
-                    inline: true
-                },
-                {
-                    name: 'Total Content',
-                    value: this.formatMovieTvCounts(summary.totalContent),
+                    name: 'TV',
+                    value: this.formatCompactTypeBreakdown(summary.summary.tv),
                     inline: true
                 }
             );
