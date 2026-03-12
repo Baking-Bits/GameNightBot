@@ -57,14 +57,11 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle('🎬 Jellyfin Status')
                     .setColor(online ? '#00C851' : '#FF4444')
+                    .setDescription(online ? '🟢 Online' : '🔴 Offline')
                     .setTimestamp()
                     .addFields(
-                        { name: 'Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
-                        {
-                            name: '🎬 Playback',
-                            value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,
-                            inline: true
-                        }
+                        { name: '▶️ Active Streams', value: `**${activeSessions}**`, inline: true },
+                        { name: '👥 Sessions', value: `**${totalSessions}**`, inline: true }
                     );
 
                 await interaction.editReply({ embeds: [embed] });

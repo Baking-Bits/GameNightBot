@@ -321,12 +321,11 @@ class JellyseerrMonitor {
         const embed = new EmbedBuilder()
             .setTitle('🎞️ Jellyseerr')
             .setColor(color)
-            .setDescription(`⏱️ Updated <t:${checkedAtUnix}:R>`);
+            .setDescription(`${online ? '🟢 Online' : '🔴 Offline'} • ⏱️ Updated <t:${checkedAtUnix}:R>`);
 
         if (online) {
             const all = this.getCombinedTypeSummary(summary.summary);
             embed.addFields(
-                { name: 'Status', value: statusText, inline: true },
                 {
                     name: '🎬 Movies',
                     value: this.formatCompactTypeBreakdown(summary.summary.movies, libCounts.movies),
@@ -348,10 +347,6 @@ class JellyseerrMonitor {
                 }
             );
         } else {
-            embed.addFields(
-                { name: 'Status', value: statusText, inline: true }
-            );
-
             if (error) {
                 embed.addFields({ name: 'Last Error', value: `\`${error.slice(0, 512)}\``, inline: false });
             }

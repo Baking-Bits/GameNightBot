@@ -215,24 +215,14 @@ class JellyfinMonitor {
         const embed = new EmbedBuilder()
             .setTitle('🎬 Jellyfin Media Server')
             .setColor(color)
-            .setDescription(`⏱️ Updated <t:${checkedAtUnix}:R>`);
+            .setDescription(`${online ? '🟢 Online' : '🔴 Offline'} • ⏱️ Updated <t:${checkedAtUnix}:R>`);
 
         if (online && info) {
-            const fields = [
-                { name: 'Status', value: statusText, inline: true },
-                {
-                    name: '🎬 Playback',
-                    value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,
-                    inline: true
-                }
-            ];
-
-            embed.addFields(...fields);
-        } else {
             embed.addFields(
-                { name: 'Status', value: statusText, inline: true }
+                { name: '▶️ Active Streams', value: `**${activeSessions}**`, inline: true },
+                { name: '👥 Sessions', value: `**${totalSessions}**`, inline: true }
             );
-
+        } else {
             if (error) {
                 embed.addFields({ name: 'Last Error', value: `\`${error.slice(0, 512)}\``, inline: false });
             }
