@@ -3,6 +3,10 @@ const axios = require('axios');
 const { NodeSSH } = require('node-ssh');
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
 
 /**
  * JellyfinMonitor - Posts and maintains a live Jellyfin status embed in a dedicated channel.
@@ -68,6 +72,37 @@ class JellyfinMonitor {
             throw new Error('Unraid Docker SSH is not configured');
         }
 
+        const keyPath = this.unraidDocker.privateKeyPath
+            ? this.resolvePrivateKeyPath(this.unraidDocker.privateKeyPath)
+            : null;
+
+        try {
+            return await this.runDockerCommandWithNodeSsh(command, keyPath);
+        } catch (error) {
+            const isKeyFormatError = String(error.message || '').includes('Cannot parse privateKey: Unsupported key format');
+
+            if (isKeyFormatError && keyPath) {
+                console.warn('[JELLYFIN MONITOR] node-ssh could not parse key format; falling back to system ssh client');
+                return await this.runDockerCommandWithCliSsh(command, keyPath);
+            }
+
+            throw error;
+        }
+    }
+
+    resolvePrivateKeyPath(rawPath) {
+        const keyPath = path.isAbsolute(rawPath)
+            ? rawPath
+            : path.join(__dirname, '../../../', rawPath);
+
+        if (!fs.existsSync(keyPath)) {
+            throw new Error(`SSH private key not found: ${keyPath}`);
+        }
+
+        return keyPath;
+    }
+
+    async runDockerCommandWithNodeSsh(command, keyPath) {
         const ssh = new NodeSSH();
         const connectOptions = {
             host: this.unraidDocker.host,
@@ -76,13 +111,7 @@ class JellyfinMonitor {
             readyTimeout: 10000
         };
 
-        if (this.unraidDocker.privateKeyPath) {
-            const keyPath = path.isAbsolute(this.unraidDocker.privateKeyPath)
-                ? this.unraidDocker.privateKeyPath
-                : path.join(__dirname, '../../../', this.unraidDocker.privateKeyPath);
-            if (!fs.existsSync(keyPath)) {
-                throw new Error(`SSH private key not found: ${keyPath}`);
-            }
+        if (keyPath) {
             connectOptions.privateKey = keyPath;
             if (this.unraidDocker.passphrase) {
                 connectOptions.passphrase = this.unraidDocker.passphrase;
@@ -100,6 +129,33 @@ class JellyfinMonitor {
             return (result.stdout || '').trim();
         } finally {
             ssh.dispose();
+        }
+    }
+
+    async runDockerCommandWithCliSsh(command, keyPath) {
+        const sshArgs = [
+            '-i', keyPath,
+            '-o', 'BatchMode=yes',
+            '-o', 'StrictHostKeyChecking=accept-new',
+            '-o', 'ConnectTimeout=10',
+            '-p', String(this.unraidDocker.port || 22),
+            `${this.unraidDocker.username}@${this.unraidDocker.host}`,
+            command
+        ];
+
+        try {
+            const { stdout } = await execFileAsync('ssh', sshArgs, {
+                timeout: 20000,
+                maxBuffer: 1024 * 1024
+            });
+            return (stdout || '').trim();
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                throw new Error('System ssh client is not available in this runtime environment');
+            }
+
+            const detail = (error.stderr || error.stdout || error.message || 'Unknown SSH CLI error').trim();
+            throw new Error(detail);
         }
     }
 

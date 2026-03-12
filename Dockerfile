@@ -2,6 +2,10 @@
 # This ensures the image is using the current long-term support (LTS) version
 FROM node:lts-slim
 
+# Install OpenSSH client for SSH-based Docker control fallback
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-client \
+	&& rm -rf /var/lib/apt/lists/*
+
 # Set the working directory inside the container
 WORKDIR /app
 
