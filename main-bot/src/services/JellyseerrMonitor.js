@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
+const JellyActionHistoryStore = require('./JellyActionHistoryStore');
 
 const execFileAsync = promisify(execFile);
 
@@ -31,6 +32,7 @@ class JellyseerrMonitor {
         const rawJellyfinUrl = config.services?.find(s => s.name === 'Jellyfin')?.url || '';
         this.jellyfinUrl = rawJellyfinUrl.replace(/\/+$/, '');
         this.jellyfinApiKey = config.jellyfinApiKey || null;
+        this.actionHistoryStore = new JellyActionHistoryStore('jellyseerr', 'jellyseerrActionHistory.json');
     }
 
     get headers() {
@@ -169,6 +171,29 @@ class JellyseerrMonitor {
 
     async restartFromDocker() {
         await this.runDockerCommand(`docker restart ${this.containerName}`);
+    }
+
+    getActionHistory(options = {}) {
+        return this.actionHistoryStore.getHistory(options);
+    }
+
+    async recordUserAction(action, userId) {
+        return this.actionHistoryStore.recordAction({ action, userId, source: 'button' });
+    }
+
+    async sendActionAuditMessage(channel, action, userId, timestamp) {
+        if (!channel || typeof channel.send !== 'function') {
+            return;
+        }
+
+        const actionLabel = action === 'restart' ? 'restarted' : 'started';
+        const message = await channel.send({
+            content: `🛠️ Jellyseerr was ${actionLabel} by <@${userId}> <t:${timestamp}:R>. If another restart is needed, please reach out to an admin first.`
+        });
+
+        setTimeout(async () => {
+            await message.delete().catch(() => null);
+        }, 60 * 60 * 1000);
     }
 
     async getJellyfinLibraryCounts() {
@@ -404,14 +429,12 @@ class JellyseerrMonitor {
             if (!interaction.isButton()) return;
 
             if (interaction.customId === 'jellyseerr_start') {
-                if (!this._isAdmin(interaction)) {
-                    await interaction.reply({ content: '❌ You need admin permissions to start Jellyseerr.', ephemeral: true });
-                    return;
-                }
-
                 await interaction.deferReply({ ephemeral: true });
                 try {
                     await this.startFromCrash();
+                    const timestamp = await this.recordUserAction('start', interaction.user.id);
+                    await this.sendActionAuditMessage(interaction.channel, 'start', interaction.user.id, timestamp)
+                        .catch(err => console.warn('[JELLYSEERR MONITOR] Failed to send action audit message:', err.message));
                     await interaction.editReply('✅ Start command sent to the Jellyseerr Docker container. Checking status shortly...');
                     setTimeout(() => this.updateStatusMessage(), 8000);
                     setTimeout(() => this.updateStatusMessage(), 20000);
@@ -419,11 +442,6 @@ class JellyseerrMonitor {
                     await interaction.editReply(`❌ Failed to start Jellyseerr container: \`${error.message}\``);
                 }
             } else if (interaction.customId === 'jellyseerr_restart') {
-                if (!this._isAdmin(interaction)) {
-                    await interaction.reply({ content: '❌ You need admin permissions to restart Jellyseerr.', ephemeral: true });
-                    return;
-                }
-
                 await interaction.deferReply({ ephemeral: true });
                 try {
                     const { online } = await this.getServerInfo();
@@ -439,6 +457,10 @@ class JellyseerrMonitor {
                     } else if (!online) {
                         throw new Error('Jellyseerr is offline and Unraid Docker control is not configured');
                     }
+
+                    const timestamp = await this.recordUserAction('restart', interaction.user.id);
+                    await this.sendActionAuditMessage(interaction.channel, 'restart', interaction.user.id, timestamp)
+                        .catch(err => console.warn('[JELLYSEERR MONITOR] Failed to send action audit message:', err.message));
 
                     await interaction.editReply('✅ Restart command sent to Jellyseerr. Status will auto-refresh shortly.');
                     setTimeout(() => this.updateStatusMessage(), 15000);
@@ -466,6 +488,7 @@ class JellyseerrMonitor {
         }
 
         try {
+            await this.actionHistoryStore.initialize();
             const channel = await this.client.channels.fetch(this.channelId);
             if (!channel) {
                 console.error('[JELLYSEERR MONITOR] Channel not found:', this.channelId);

@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
+const JellyActionHistoryStore = require('./JellyActionHistoryStore');
 
 const execFileAsync = promisify(execFile);
 
@@ -38,6 +39,7 @@ class JellyfinMonitor {
         // Optional Unraid Docker control for start/restart states
         this.unraidDocker = config.unraidDocker || {};
         this.containerName = this.unraidDocker.jellyfinContainerName || 'jellyfin';
+        this.actionHistoryStore = new JellyActionHistoryStore('jellyfin', 'jellyfinActionHistory.json');
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -180,6 +182,29 @@ class JellyfinMonitor {
         await this.runDockerCommand(`docker restart ${this.containerName}`);
     }
 
+    getActionHistory(options = {}) {
+        return this.actionHistoryStore.getHistory(options);
+    }
+
+    async recordUserAction(action, userId) {
+        return this.actionHistoryStore.recordAction({ action, userId, source: 'button' });
+    }
+
+    async sendActionAuditMessage(channel, action, userId, timestamp) {
+        if (!channel || typeof channel.send !== 'function') {
+            return;
+        }
+
+        const actionLabel = action === 'restart' ? 'restarted' : 'started';
+        const message = await channel.send({
+            content: `🛠️ Jellyfin was ${actionLabel} by <@${userId}> <t:${timestamp}:R>. If another restart is needed, please reach out to an admin first.`
+        });
+
+        setTimeout(async () => {
+            await message.delete().catch(() => null);
+        }, 60 * 60 * 1000);
+    }
+
     // ─── API Calls ────────────────────────────────────────────────────────────
 
     async getServerInfo() {
@@ -278,18 +303,13 @@ class JellyfinMonitor {
             if (!interaction.isButton()) return;
 
             if (interaction.customId === 'jellyfin_start') {
-                if (!this._isAdmin(interaction)) {
-                    await interaction.reply({
-                        content: '❌ You need admin permissions to start Jellyfin.',
-                        ephemeral: true
-                    });
-                    return;
-                }
-
                 await interaction.deferReply({ ephemeral: true });
 
                 try {
                     await this.startFromCrash();
+                    const timestamp = await this.recordUserAction('start', interaction.user.id);
+                    await this.sendActionAuditMessage(interaction.channel, 'start', interaction.user.id, timestamp)
+                        .catch(err => console.warn('[JELLYFIN MONITOR] Failed to send action audit message:', err.message));
                     await interaction.editReply('✅ Start command sent to the Jellyfin Docker container. Checking status shortly...');
                     setTimeout(() => this.updateStatusMessage(), 8000);
                     setTimeout(() => this.updateStatusMessage(), 20000);
@@ -298,14 +318,6 @@ class JellyfinMonitor {
                 }
 
             } else if (interaction.customId === 'jellyfin_restart') {
-                if (!this._isAdmin(interaction)) {
-                    await interaction.reply({
-                        content: '❌ You need admin permissions to restart Jellyfin.',
-                        ephemeral: true
-                    });
-                    return;
-                }
-
                 await interaction.deferReply({ ephemeral: true });
                 try {
                     const { online } = await this.getServerInfo();
@@ -320,6 +332,10 @@ class JellyfinMonitor {
                     } else {
                         throw new Error('Jellyfin is offline and Unraid Docker control is not configured');
                     }
+
+                    const timestamp = await this.recordUserAction('restart', interaction.user.id);
+                    await this.sendActionAuditMessage(interaction.channel, 'restart', interaction.user.id, timestamp)
+                        .catch(err => console.warn('[JELLYFIN MONITOR] Failed to send action audit message:', err.message));
 
                     await interaction.editReply(
                         '✅ Restart command sent to Jellyfin. ' +
@@ -357,6 +373,7 @@ class JellyfinMonitor {
         }
 
         try {
+            await this.actionHistoryStore.initialize();
             const channel = await this.client.channels.fetch(this.channelId);
             if (!channel) {
                 console.error('[JELLYFIN MONITOR] Channel not found:', this.channelId);
