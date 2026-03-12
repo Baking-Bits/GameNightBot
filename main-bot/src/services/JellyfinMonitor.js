@@ -219,9 +219,7 @@ class JellyfinMonitor {
 
         if (online && info) {
             const fields = [
-                { name: '🟢 Status', value: statusText, inline: true },
-                { name: '🧩 Version', value: `v${info.Version || 'Unknown'}`, inline: true },
-                { name: '🔗 Open', value: `[Jellyfin](${this.jellyfinUrl})`, inline: true },
+                { name: 'Status', value: statusText, inline: true },
                 {
                     name: '🎬 Playback',
                     value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,
@@ -377,16 +375,23 @@ class JellyfinMonitor {
                 return;
             }
 
-            // Look for an existing status message from the bot so we reuse it across restarts
-            const messages = await channel.messages.fetch({ limit: 30 });
-            const existing = messages.find(msg =>
+            // Find all bot-owned Jellyfin embeds, keep newest, delete duplicates
+            const messages = await channel.messages.fetch({ limit: 50 });
+            const allOwn = messages.filter(msg =>
                 msg.author.id === this.client.user.id &&
                 msg.embeds.length > 0 &&
-                msg.embeds[0].title === '🎬 Jellyfin Media Server'
-            );
+                (msg.embeds[0].title || '').includes('Jellyfin')
+            ).sort((a, b) => b.createdTimestamp - a.createdTimestamp);
 
-            if (existing) {
-                this.statusMessage = existing;
+            const [keep, ...stale] = allOwn.values();
+
+            // Delete any duplicates silently
+            for (const dup of stale) {
+                await dup.delete().catch(() => null);
+            }
+
+            if (keep) {
+                this.statusMessage = keep;
                 console.log('[JELLYFIN MONITOR] Reusing existing status message');
             } else {
                 const { embed, components } = await this.buildEmbed();

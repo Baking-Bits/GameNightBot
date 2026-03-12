@@ -59,9 +59,7 @@ module.exports = {
                     .setColor(online ? '#00C851' : '#FF4444')
                     .setTimestamp()
                     .addFields(
-                        { name: '🟢 Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
-                        { name: '🧩 Version', value: `v${info?.Version || 'N/A'}`, inline: true },
-                        { name: '🔗 Open', value: `[Jellyfin](${jellyfinUrl})`, inline: true },
+                        { name: 'Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
                         {
                             name: '🎬 Playback',
                             value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,

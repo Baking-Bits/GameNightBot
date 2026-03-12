@@ -27,6 +27,10 @@ class JellyseerrMonitor {
 
         this.unraidDocker = config.unraidDocker || {};
         this.containerName = this.unraidDocker.jellyseerrContainerName || 'jellyseerr';
+
+        const rawJellyfinUrl = config.services?.find(s => s.name === 'Jellyfin')?.url || '';
+        this.jellyfinUrl = rawJellyfinUrl.replace(/\/+$/, '');
+        this.jellyfinApiKey = config.jellyfinApiKey || null;
     }
 
     get headers() {
@@ -167,6 +171,22 @@ class JellyseerrMonitor {
         await this.runDockerCommand(`docker restart ${this.containerName}`);
     }
 
+    async getJellyfinLibraryCounts() {
+        if (!this.jellyfinUrl || !this.jellyfinApiKey) return { movies: null, series: null };
+        try {
+            const res = await axios.get(`${this.jellyfinUrl}/Items/Counts`, {
+                headers: { 'X-Emby-Token': this.jellyfinApiKey },
+                timeout: 8000
+            });
+            return {
+                movies: res.data?.MovieCount ?? null,
+                series: res.data?.SeriesCount ?? null
+            };
+        } catch {
+            return { movies: null, series: null };
+        }
+    }
+
     async getServerInfo() {
         try {
             const statusRes = await axios.get(`${this.jellyseerrUrl}/api/v1/status`, {
@@ -206,15 +226,25 @@ class JellyseerrMonitor {
         return `🎬 Movies: **${counts.movies}**\n📺 TV: **${counts.tv}**\n📦 Total: **${counts.total}**`;
     }
 
-    formatCompactTypeBreakdown(typeCounts) {
-        return `⏳ Pending: **${typeCounts.pendingApproval}**\n📥 Queue: **${typeCounts.pendingDownload}**\n✅ Done: **${typeCounts.totalDownloaded}**`;
+    formatCompactTypeBreakdown(typeCounts, libraryCount = null) {
+        const doneLine = libraryCount !== null
+            ? `✅ In Library: **${libraryCount}**`
+            : `✅ Done: **${typeCounts.totalDownloaded}**`;
+        return [
+            `⏳ Pending: **${typeCounts.pendingApproval}**`,
+            `📥 Queue <10d: **${typeCounts.queueUnder10d}**`,
+            `⚠️ Queue >10d: **${typeCounts.queueOver10d}**`,
+            doneLine
+        ].join('\n');
     }
 
     getCombinedTypeSummary(summary) {
         return {
-            pendingApproval: (summary.movies?.pendingApproval || 0) + (summary.tv?.pendingApproval || 0),
-            pendingDownload: (summary.movies?.pendingDownload || 0) + (summary.tv?.pendingDownload || 0),
-            totalDownloaded: (summary.movies?.totalDownloaded || 0) + (summary.tv?.totalDownloaded || 0)
+            pendingApproval:  (summary.movies?.pendingApproval  || 0) + (summary.tv?.pendingApproval  || 0),
+            queueUnder10d:    (summary.movies?.queueUnder10d    || 0) + (summary.tv?.queueUnder10d    || 0),
+            queueOver10d:     (summary.movies?.queueOver10d     || 0) + (summary.tv?.queueOver10d     || 0),
+            pendingDownload:  (summary.movies?.pendingDownload  || 0) + (summary.tv?.pendingDownload  || 0),
+            totalDownloaded:  (summary.movies?.totalDownloaded  || 0) + (summary.tv?.totalDownloaded  || 0)
         };
     }
 
@@ -234,9 +264,11 @@ class JellyseerrMonitor {
                 ? requestRes.data.results
                 : [];
 
+            const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
             const summary = {
-                movies: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 },
-                tv: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 }
+                movies: { pendingApproval: 0, queueUnder10d: 0, queueOver10d: 0, pendingDownload: 0, totalDownloaded: 0 },
+                tv:     { pendingApproval: 0, queueUnder10d: 0, queueOver10d: 0, pendingDownload: 0, totalDownloaded: 0 }
             };
 
             for (const request of requests) {
@@ -249,6 +281,9 @@ class JellyseerrMonitor {
 
                 if (request.status === 2 && request?.media?.status !== 5) {
                     summary[mediaType].pendingDownload += 1;
+                    const age = request.createdAt ? now - new Date(request.createdAt).getTime() : 0;
+                    if (age > TEN_DAYS) summary[mediaType].queueOver10d += 1;
+                    else summary[mediaType].queueUnder10d += 1;
                 }
 
                 if (request?.media?.status === 5) {
@@ -263,8 +298,8 @@ class JellyseerrMonitor {
         } catch (error) {
             return {
                 summary: {
-                    movies: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 },
-                    tv: { pendingApproval: 0, pendingDownload: 0, totalDownloaded: 0 }
+                    movies: { pendingApproval: 0, queueUnder10d: 0, queueOver10d: 0, pendingDownload: 0, totalDownloaded: 0 },
+                    tv:     { pendingApproval: 0, queueUnder10d: 0, queueOver10d: 0, pendingDownload: 0, totalDownloaded: 0 }
                 },
                 error: error.message
             };
@@ -272,9 +307,12 @@ class JellyseerrMonitor {
     }
 
     async buildEmbed() {
-        const { online, info, error } = await this.getServerInfo();
-        const summary = await this.getPendingSummary();
-        const dockerState = await this.getDockerContainerState();
+        const [{ online, info, error }, summary, libCounts, dockerState] = await Promise.all([
+            this.getServerInfo(),
+            this.getPendingSummary(),
+            this.getJellyfinLibraryCounts(),
+            this.getDockerContainerState()
+        ]);
         const checkedAtUnix = Math.floor(Date.now() / 1000);
 
         const color = online ? '#00C851' : '#FF4444';
@@ -288,22 +326,24 @@ class JellyseerrMonitor {
         if (online) {
             const all = this.getCombinedTypeSummary(summary.summary);
             embed.addFields(
-                { name: '🟢 Status', value: statusText, inline: true },
-                { name: '🧩 Version', value: `v${info?.version || 'Unknown'}`, inline: true },
-                { name: '🔗 Open', value: `[Jellyseerr](${this.jellyseerrUrl})`, inline: true },
+                { name: 'Status', value: statusText, inline: true },
                 {
                     name: '🎬 Movies',
-                    value: this.formatCompactTypeBreakdown(summary.summary.movies),
+                    value: this.formatCompactTypeBreakdown(summary.summary.movies, libCounts.movies),
                     inline: true
                 },
                 {
                     name: '📺 TV',
-                    value: this.formatCompactTypeBreakdown(summary.summary.tv),
+                    value: this.formatCompactTypeBreakdown(summary.summary.tv, libCounts.series),
                     inline: true
                 },
                 {
                     name: '📦 All',
-                    value: this.formatCompactTypeBreakdown(all),
+                    value: this.formatCompactTypeBreakdown(all,
+                        libCounts.movies !== null && libCounts.series !== null
+                            ? libCounts.movies + libCounts.series
+                            : null
+                    ),
                     inline: true
                 }
             );
@@ -438,18 +478,27 @@ class JellyseerrMonitor {
                 return;
             }
 
-            const messages = await channel.messages.fetch({ limit: 30 });
-            const existing = messages.find(msg =>
+            const messages = await channel.messages.fetch({ limit: 50 });
+            const allOwn = messages.filter(msg =>
                 msg.author.id === this.client.user.id &&
                 msg.embeds.length > 0 &&
-                msg.embeds[0].title === '🎞️ Jellyseerr Requests'
-            );
+                (msg.embeds[0].title || '').includes('Jellyseerr')
+            ).sort((a, b) => b.createdTimestamp - a.createdTimestamp);
 
-            if (existing) {
-                this.statusMessage = existing;
+            const [keep, ...stale] = allOwn.values();
+
+            // Delete any duplicates silently
+            for (const dup of stale) {
+                await dup.delete().catch(() => null);
+            }
+
+            if (keep) {
+                this.statusMessage = keep;
+                console.log('[JELLYSEERR MONITOR] Reusing existing status message');
             } else {
                 const { embed, components } = await this.buildEmbed();
                 this.statusMessage = await channel.send({ embeds: [embed], components });
+                console.log('[JELLYSEERR MONITOR] Posted new status message');
             }
 
             this.setupButtonHandler();

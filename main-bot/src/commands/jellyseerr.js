@@ -37,32 +37,38 @@ module.exports = {
             await interaction.deferReply({ ephemeral: true });
 
             try {
-                const server = await monitor.getServerInfo();
-                const summary = await monitor.getPendingSummary();
+                const [server, summary, libCounts] = await Promise.all([
+                    monitor.getServerInfo(),
+                    monitor.getPendingSummary(),
+                    monitor.getJellyfinLibraryCounts()
+                ]);
 
                 const online = !!server.online;
+                const all = monitor.getCombinedTypeSummary(summary.summary);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🎞️ Jellyseerr Status')
                     .setColor(online ? '#00C851' : '#FF4444')
                     .setTimestamp()
                     .addFields(
-                        { name: '🟢 Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
-                        { name: '🧩 Version', value: `v${server.info?.version || 'N/A'}`, inline: true },
-                        { name: '🔗 Open', value: `[Jellyseerr](${monitor.jellyseerrUrl})`, inline: true },
+                        { name: 'Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
                         {
                             name: '🎬 Movies',
-                            value: monitor.formatCompactTypeBreakdown(summary.summary.movies),
+                            value: monitor.formatCompactTypeBreakdown(summary.summary.movies, libCounts.movies),
                             inline: true
                         },
                         {
                             name: '📺 TV',
-                            value: monitor.formatCompactTypeBreakdown(summary.summary.tv),
+                            value: monitor.formatCompactTypeBreakdown(summary.summary.tv, libCounts.series),
                             inline: true
                         },
                         {
                             name: '📦 All',
-                            value: monitor.formatCompactTypeBreakdown(monitor.getCombinedTypeSummary(summary.summary)),
+                            value: monitor.formatCompactTypeBreakdown(all,
+                                libCounts.movies !== null && libCounts.series !== null
+                                    ? libCounts.movies + libCounts.series
+                                    : null
+                            ),
                             inline: true
                         }
                     );
