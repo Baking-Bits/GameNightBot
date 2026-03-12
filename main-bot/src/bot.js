@@ -9,6 +9,7 @@ const WellnessSystem = require('../../services/shared/features/wellnessSystem');
 // WeatherSystem import removed - now using database system via ServiceManager
 const ServiceManager = require('./services/ServiceManager');
 const StatusMonitor = require('./services/StatusMonitor');
+const JellyfinMonitor = require('./services/JellyfinMonitor');
 const config = require('../../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
@@ -32,6 +33,7 @@ class VoiceTimeTracker {
         // Weather system now handled by ServiceManager and database
         this.serviceManager = new ServiceManager(); // Initialize service manager
         this.statusMonitor = new StatusMonitor(this, this.config); // Pass bot instance instead of client
+        this.jellyfinMonitor = null; // Initialized after client is ready
         console.log('[BOT] ServiceManager attached to bot instance:', !!this.serviceManager);
     }
 
@@ -108,6 +110,20 @@ class VoiceTimeTracker {
                 } catch (error) {
                     console.error('[STATUS MONITOR] Failed to initialize status monitoring:', error);
                 }
+            }
+
+            // Initialize Jellyfin Monitor
+            if (this.config.jellyfinApiKey && this.config.jellyfinApiKey !== 'YOUR_JELLYFIN_API_KEY_HERE' &&
+                this.config.jellyfinStatusChannelId && this.config.jellyfinStatusChannelId !== 'CHANNEL_ID_HERE') {
+                try {
+                    this.jellyfinMonitor = new JellyfinMonitor(this, this.config);
+                    await this.jellyfinMonitor.initialize();
+                    console.log('[JELLYFIN MONITOR] Initialized successfully');
+                } catch (error) {
+                    console.error('[JELLYFIN MONITOR] Failed to initialize:', error);
+                }
+            } else {
+                console.log('[JELLYFIN MONITOR] Skipping — jellyfinApiKey or jellyfinStatusChannelId not configured');
             }
 
             // Load event-role associations from DB and set up eventRoleMap
@@ -296,6 +312,11 @@ class VoiceTimeTracker {
         // Shutdown status monitor first to update final status
         if (this.statusMonitor) {
             await this.statusMonitor.shutdown();
+        }
+
+        // Shutdown Jellyfin monitor
+        if (this.jellyfinMonitor) {
+            await this.jellyfinMonitor.shutdown();
         }
         
         // Destroy Discord client

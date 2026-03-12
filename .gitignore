@@ -33,6 +33,9 @@ yarn-error.log*
 .env.production
 .env.development
 
+# SSH keys and local server access files
+.ssh/*
+
 # OS generated files
 .DS_Store
 .DS_Store?
