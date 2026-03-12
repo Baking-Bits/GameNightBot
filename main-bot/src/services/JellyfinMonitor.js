@@ -194,18 +194,20 @@ class JellyfinMonitor {
             const activeSessions = Array.isArray(sessions)
                 ? sessions.filter(s => s.NowPlayingItem).length
                 : 0;
+            const totalSessions = Array.isArray(sessions) ? sessions.length : 0;
 
-            return { online: !!info, info, activeSessions, error: null };
+            return { online: !!info, info, activeSessions, totalSessions, error: null };
         } catch (error) {
-            return { online: false, info: null, activeSessions: 0, error: error.message };
+            return { online: false, info: null, activeSessions: 0, totalSessions: 0, error: error.message };
         }
     }
 
     // ─── Embed Builder ────────────────────────────────────────────────────────
 
     async buildEmbed() {
-        const { online, info, activeSessions, error } = await this.getServerInfo();
+        const { online, info, activeSessions, totalSessions, error } = await this.getServerInfo();
         const dockerState = await this.getDockerContainerState();
+        const checkedAtUnix = Math.floor(Date.now() / 1000);
 
         const color = online ? '#00C851' : '#FF4444';
         const statusText = online ? '🟢 **Online**' : '🔴 **Offline**';
@@ -213,15 +215,18 @@ class JellyfinMonitor {
         const embed = new EmbedBuilder()
             .setTitle('🎬 Jellyfin Media Server')
             .setColor(color)
-            .setTimestamp()
-            .setFooter({ text: `Auto re-poll: ${this.formatIntervalText()} • Last checked` });
+            .setDescription(`⏱️ Updated <t:${checkedAtUnix}:R>`);
 
         if (online && info) {
             const fields = [
-                { name: 'Status',         value: statusText,                       inline: true },
-                { name: 'Version',        value: info.Version || 'Unknown',         inline: true },
-                { name: 'Active Streams', value: `${activeSessions}`,               inline: true },
-                { name: 'Open',           value: `[Jellyfin](${this.jellyfinUrl})`, inline: true }
+                { name: '🟢 Status', value: statusText, inline: true },
+                { name: '🧩 Version', value: `v${info.Version || 'Unknown'}`, inline: true },
+                { name: '🔗 Open', value: `[Jellyfin](${this.jellyfinUrl})`, inline: true },
+                {
+                    name: '🎬 Playback',
+                    value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,
+                    inline: true
+                }
             ];
 
             embed.addFields(...fields);

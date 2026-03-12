@@ -51,6 +51,7 @@ module.exports = {
                 const activeSessions = Array.isArray(sessions)
                     ? sessions.filter(s => s.NowPlayingItem).length
                     : 0;
+                const totalSessions = Array.isArray(sessions) ? sessions.length : 0;
                 const online = !!info;
 
                 const embed = new EmbedBuilder()
@@ -58,16 +59,15 @@ module.exports = {
                     .setColor(online ? '#00C851' : '#FF4444')
                     .setTimestamp()
                     .addFields(
-                        { name: 'Status',         value: online ? '🟢 Online'  : '🔴 Offline', inline: true },
-                        { name: 'Version',        value: info?.Version || 'N/A',               inline: true },
-                        { name: 'Active Streams', value: `${activeSessions}`,                  inline: true }
+                        { name: '🟢 Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
+                        { name: '🧩 Version', value: `v${info?.Version || 'N/A'}`, inline: true },
+                        { name: '🔗 Open', value: `[Jellyfin](${jellyfinUrl})`, inline: true },
+                        {
+                            name: '🎬 Playback',
+                            value: `▶️ Active: **${activeSessions}**\n👥 Sessions: **${totalSessions}**`,
+                            inline: true
+                        }
                     );
-
-                if (online && info) {
-                    embed.addFields(
-                        { name: 'OS',          value: info.OperatingSystem || 'Unknown', inline: true }
-                    );
-                }
 
                 await interaction.editReply({ embeds: [embed] });
 

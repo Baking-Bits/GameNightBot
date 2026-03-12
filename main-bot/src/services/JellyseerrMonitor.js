@@ -207,7 +207,15 @@ class JellyseerrMonitor {
     }
 
     formatCompactTypeBreakdown(typeCounts) {
-        return `Pending **${typeCounts.pendingApproval}**\nQueue **${typeCounts.pendingDownload}**\nDone **${typeCounts.totalDownloaded}**`;
+        return `⏳ Pending: **${typeCounts.pendingApproval}**\n📥 Queue: **${typeCounts.pendingDownload}**\n✅ Done: **${typeCounts.totalDownloaded}**`;
+    }
+
+    getCombinedTypeSummary(summary) {
+        return {
+            pendingApproval: (summary.movies?.pendingApproval || 0) + (summary.tv?.pendingApproval || 0),
+            pendingDownload: (summary.movies?.pendingDownload || 0) + (summary.tv?.pendingDownload || 0),
+            totalDownloaded: (summary.movies?.totalDownloaded || 0) + (summary.tv?.totalDownloaded || 0)
+        };
     }
 
     async getPendingSummary() {
@@ -267,6 +275,7 @@ class JellyseerrMonitor {
         const { online, info, error } = await this.getServerInfo();
         const summary = await this.getPendingSummary();
         const dockerState = await this.getDockerContainerState();
+        const checkedAtUnix = Math.floor(Date.now() / 1000);
 
         const color = online ? '#00C851' : '#FF4444';
         const statusText = online ? '🟢 **Online**' : '🔴 **Offline**';
@@ -274,21 +283,27 @@ class JellyseerrMonitor {
         const embed = new EmbedBuilder()
             .setTitle('🎞️ Jellyseerr')
             .setColor(color)
-            .setTimestamp()
-            .setFooter({ text: `Auto re-poll: ${this.formatIntervalText()} • Last checked` });
+            .setDescription(`⏱️ Updated <t:${checkedAtUnix}:R>`);
 
         if (online) {
+            const all = this.getCombinedTypeSummary(summary.summary);
             embed.addFields(
-                { name: 'Status', value: statusText, inline: true },
-                { name: 'Version', value: info?.version || 'Unknown', inline: true },
+                { name: '🟢 Status', value: statusText, inline: true },
+                { name: '🧩 Version', value: `v${info?.version || 'Unknown'}`, inline: true },
+                { name: '🔗 Open', value: `[Jellyseerr](${this.jellyseerrUrl})`, inline: true },
                 {
-                    name: 'Movies',
+                    name: '🎬 Movies',
                     value: this.formatCompactTypeBreakdown(summary.summary.movies),
                     inline: true
                 },
                 {
-                    name: 'TV',
+                    name: '📺 TV',
                     value: this.formatCompactTypeBreakdown(summary.summary.tv),
+                    inline: true
+                },
+                {
+                    name: '📦 All',
+                    value: this.formatCompactTypeBreakdown(all),
                     inline: true
                 }
             );

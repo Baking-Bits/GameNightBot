@@ -47,16 +47,22 @@ module.exports = {
                     .setColor(online ? '#00C851' : '#FF4444')
                     .setTimestamp()
                     .addFields(
-                        { name: 'Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
-                        { name: 'Version', value: server.info?.version || 'N/A', inline: true },
+                        { name: '🟢 Status', value: online ? '🟢 Online' : '🔴 Offline', inline: true },
+                        { name: '🧩 Version', value: `v${server.info?.version || 'N/A'}`, inline: true },
+                        { name: '🔗 Open', value: `[Jellyseerr](${monitor.jellyseerrUrl})`, inline: true },
                         {
-                            name: 'Movies',
+                            name: '🎬 Movies',
                             value: monitor.formatCompactTypeBreakdown(summary.summary.movies),
                             inline: true
                         },
                         {
-                            name: 'TV',
+                            name: '📺 TV',
                             value: monitor.formatCompactTypeBreakdown(summary.summary.tv),
+                            inline: true
+                        },
+                        {
+                            name: '📦 All',
+                            value: monitor.formatCompactTypeBreakdown(monitor.getCombinedTypeSummary(summary.summary)),
                             inline: true
                         }
                     );
