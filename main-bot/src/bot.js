@@ -10,6 +10,7 @@ const WellnessSystem = require('../../services/shared/features/wellnessSystem');
 const ServiceManager = require('./services/ServiceManager');
 const StatusMonitor = require('./services/StatusMonitor');
 const JellyfinMonitor = require('./services/JellyfinMonitor');
+const JellyseerrMonitor = require('./services/JellyseerrMonitor');
 const config = require('../../config.json');
 // const { updateServiceStatus } = require('./events/serviceStatus');
 
@@ -34,6 +35,7 @@ class VoiceTimeTracker {
         this.serviceManager = new ServiceManager(); // Initialize service manager
         this.statusMonitor = new StatusMonitor(this, this.config); // Pass bot instance instead of client
         this.jellyfinMonitor = null; // Initialized after client is ready
+        this.jellyseerrMonitor = null; // Initialized after client is ready
         console.log('[BOT] ServiceManager attached to bot instance:', !!this.serviceManager);
     }
 
@@ -124,6 +126,20 @@ class VoiceTimeTracker {
                 }
             } else {
                 console.log('[JELLYFIN MONITOR] Skipping — jellyfinApiKey or jellyfinStatusChannelId not configured');
+            }
+
+            // Initialize Jellyseerr Monitor
+            if (this.config.jellyseerrApiKey && this.config.jellyseerrApiKey !== 'YOUR_JELLYSEERR_API_KEY_HERE' &&
+                this.config.jellyseerrStatusChannelId && this.config.jellyseerrStatusChannelId !== 'CHANNEL_ID_HERE') {
+                try {
+                    this.jellyseerrMonitor = new JellyseerrMonitor(this, this.config);
+                    await this.jellyseerrMonitor.initialize();
+                    console.log('[JELLYSEERR MONITOR] Initialized successfully');
+                } catch (error) {
+                    console.error('[JELLYSEERR MONITOR] Failed to initialize:', error);
+                }
+            } else {
+                console.log('[JELLYSEERR MONITOR] Skipping — jellyseerrApiKey or jellyseerrStatusChannelId not configured');
             }
 
             // Load event-role associations from DB and set up eventRoleMap
@@ -317,6 +333,11 @@ class VoiceTimeTracker {
         // Shutdown Jellyfin monitor
         if (this.jellyfinMonitor) {
             await this.jellyfinMonitor.shutdown();
+        }
+
+        // Shutdown Jellyseerr monitor
+        if (this.jellyseerrMonitor) {
+            await this.jellyseerrMonitor.shutdown();
         }
         
         // Destroy Discord client

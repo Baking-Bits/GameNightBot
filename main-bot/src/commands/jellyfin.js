@@ -16,7 +16,7 @@ module.exports = {
         .addSubcommand(sub =>
             sub
                 .setName('start')
-                .setDescription('Start Jellyfin from crash/offline state (Admin only)')),
+                .setDescription('Start Jellyfin (Admin only)')),
 
     async execute(interaction, bot) {
         const sub = interaction.options.getSubcommand();
@@ -137,7 +137,7 @@ module.exports = {
 
             if (!bot.jellyfinMonitor || !bot.jellyfinMonitor.isDockerControlConfigured()) {
                 return interaction.reply({
-                    content: '❌ Start-from-crash is not configured. Add `unraidDocker` settings in config.json.',
+                    content: '❌ Start is not configured. Add `unraidDocker` settings in config.json.',
                     ephemeral: true
                 });
             }

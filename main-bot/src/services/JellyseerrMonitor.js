@@ -8,43 +8,30 @@ const { promisify } = require('util');
 
 const execFileAsync = promisify(execFile);
 
-/**
- * JellyfinMonitor - Posts and maintains a live Jellyfin status embed in a dedicated channel.
- * Uses the Jellyfin HTTP API (no Docker access required).
- *
- * Buttons:
- *   🔃 Refresh  — manually re-polls the server and edits the embed (anyone)
- *   🔄 Restart  — calls POST /System/Restart via the Jellyfin API (admin only)
- */
-class JellyfinMonitor {
+class JellyseerrMonitor {
     constructor(bot, config) {
         this.bot = bot;
         this.client = bot.client;
         this.config = config;
         this.statusMessage = null;
         this.updateInterval = null;
-
-        // Strip any trailing slash from the Jellyfin URL
-        const rawUrl = config.services?.find(s => s.name === 'Jellyfin')?.url || '';
-        this.jellyfinUrl = rawUrl.replace(/\/+$/, '');
-
-        this.apiKey = config.jellyfinApiKey;
-        this.channelId = config.jellyfinStatusChannelId;
         this.buttonHandlerRegistered = false;
 
-        // How often to auto-refresh the embed (default 1 min)
-        this.intervalMs = config.jellyfinMonitorInterval || 60 * 1000;
+        const rawUrl = config.services?.find(s => s.name === 'Jellyseer')?.url ||
+            config.services?.find(s => s.name === 'Jellyseerr')?.url || '';
+        this.jellyseerrUrl = rawUrl.replace(/\/+$/, '');
 
-        // Optional Unraid Docker control for start/restart states
+        this.apiKey = config.jellyseerrApiKey;
+        this.channelId = config.jellyseerrStatusChannelId;
+        this.intervalMs = config.jellyseerrMonitorInterval || 60 * 1000;
+
         this.unraidDocker = config.unraidDocker || {};
-        this.containerName = this.unraidDocker.jellyfinContainerName || 'jellyfin';
+        this.containerName = this.unraidDocker.jellyseerrContainerName || 'jellyseerr';
     }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     get headers() {
         return {
-            'X-Emby-Token': this.apiKey,
+            'X-Api-Key': this.apiKey,
             'Content-Type': 'application/json'
         };
     }
@@ -67,6 +54,18 @@ class JellyfinMonitor {
         return `${Math.round(this.intervalMs / 60000)} min`;
     }
 
+    resolvePrivateKeyPath(rawPath) {
+        const keyPath = path.isAbsolute(rawPath)
+            ? rawPath
+            : path.join(__dirname, '../../../', rawPath);
+
+        if (!fs.existsSync(keyPath)) {
+            throw new Error(`SSH private key not found: ${keyPath}`);
+        }
+
+        return keyPath;
+    }
+
     async runDockerCommand(command) {
         if (!this.isDockerControlConfigured()) {
             throw new Error('Unraid Docker SSH is not configured');
@@ -82,24 +81,12 @@ class JellyfinMonitor {
             const isKeyFormatError = String(error.message || '').includes('Cannot parse privateKey: Unsupported key format');
 
             if (isKeyFormatError && keyPath) {
-                console.warn('[JELLYFIN MONITOR] node-ssh could not parse key format; falling back to system ssh client');
+                console.warn('[JELLYSEERR MONITOR] node-ssh could not parse key format; falling back to system ssh client');
                 return await this.runDockerCommandWithCliSsh(command, keyPath);
             }
 
             throw error;
         }
-    }
-
-    resolvePrivateKeyPath(rawPath) {
-        const keyPath = path.isAbsolute(rawPath)
-            ? rawPath
-            : path.join(__dirname, '../../../', rawPath);
-
-        if (!fs.existsSync(keyPath)) {
-            throw new Error(`SSH private key not found: ${keyPath}`);
-        }
-
-        return keyPath;
     }
 
     async runDockerCommandWithNodeSsh(command, keyPath) {
@@ -180,80 +167,156 @@ class JellyfinMonitor {
         await this.runDockerCommand(`docker restart ${this.containerName}`);
     }
 
-    // ─── API Calls ────────────────────────────────────────────────────────────
-
     async getServerInfo() {
         try {
-            const [infoRes, sessionsRes] = await Promise.allSettled([
-                axios.get(`${this.jellyfinUrl}/System/Info`, { headers: this.headers, timeout: 8000 }),
-                axios.get(`${this.jellyfinUrl}/Sessions`, { headers: this.headers, timeout: 8000 })
-            ]);
+            const statusRes = await axios.get(`${this.jellyseerrUrl}/api/v1/status`, {
+                headers: this.headers,
+                timeout: 8000
+            });
 
-            const info = infoRes.status === 'fulfilled' ? infoRes.value.data : null;
-            const sessions = sessionsRes.status === 'fulfilled' ? sessionsRes.value.data : [];
-            const activeSessions = Array.isArray(sessions)
-                ? sessions.filter(s => s.NowPlayingItem).length
-                : 0;
-
-            return { online: !!info, info, activeSessions, error: null };
+            return { online: statusRes.status === 200, info: statusRes.data || {}, error: null };
         } catch (error) {
-            return { online: false, info: null, activeSessions: 0, error: error.message };
+            return { online: false, info: null, error: error.message };
         }
     }
 
-    // ─── Embed Builder ────────────────────────────────────────────────────────
+    getRequestMediaType(request) {
+        const requestType = String(request?.type || '').toLowerCase();
+        const mediaType = String(request?.media?.mediaType || request?.mediaType || '').toLowerCase();
+
+        if (requestType === 'movie' || mediaType === 'movie') return 'movie';
+        if (requestType === 'tv' || requestType === 'show' || mediaType === 'tv' || mediaType === 'show') return 'tv';
+        return null;
+    }
+
+    getMovieTvCounts(requests) {
+        let movies = 0;
+        let tv = 0;
+
+        for (const request of requests) {
+            const mediaType = this.getRequestMediaType(request);
+            if (mediaType === 'movie') movies += 1;
+            else if (mediaType === 'tv') tv += 1;
+        }
+
+        return { movies, tv, total: movies + tv };
+    }
+
+    formatMovieTvCounts(counts) {
+        return `🎬 Movies: **${counts.movies}**\n📺 TV: **${counts.tv}**\n📦 Total: **${counts.total}**`;
+    }
+
+    async getPendingSummary() {
+        try {
+            const requestRes = await axios.get(`${this.jellyseerrUrl}/api/v1/request`, {
+                headers: this.headers,
+                timeout: 10000,
+                params: {
+                    take: 200,
+                    skip: 0,
+                    sort: 'added'
+                }
+            });
+
+            const requests = Array.isArray(requestRes.data?.results)
+                ? requestRes.data.results
+                : [];
+
+            const requestedPending = requests.filter(r => r.status === 1);
+
+            const approvedNotAvailable = requests.filter(r => {
+                if (r.status !== 2) return false;
+                const mediaStatus = r?.media?.status;
+                return mediaStatus !== 5;
+            });
+
+            const totalContent = requests.filter(r => {
+                const mediaType = this.getRequestMediaType(r);
+                return mediaType === 'movie' || mediaType === 'tv';
+            });
+
+            return {
+                requestedPending: this.getMovieTvCounts(requestedPending),
+                approvedNotAvailable: this.getMovieTvCounts(approvedNotAvailable),
+                totalContent: this.getMovieTvCounts(totalContent),
+                error: null
+            };
+        } catch (error) {
+            return {
+                requestedPending: { movies: 0, tv: 0, total: 0 },
+                approvedNotAvailable: { movies: 0, tv: 0, total: 0 },
+                totalContent: { movies: 0, tv: 0, total: 0 },
+                error: error.message
+            };
+        }
+    }
 
     async buildEmbed() {
-        const { online, info, activeSessions, error } = await this.getServerInfo();
+        const { online, info, error } = await this.getServerInfo();
+        const summary = await this.getPendingSummary();
         const dockerState = await this.getDockerContainerState();
 
         const color = online ? '#00C851' : '#FF4444';
         const statusText = online ? '🟢 **Online**' : '🔴 **Offline**';
 
         const embed = new EmbedBuilder()
-            .setTitle('🎬 Jellyfin Media Server')
+            .setTitle('🎞️ Jellyseerr Requests')
             .setColor(color)
             .setTimestamp()
             .setFooter({ text: `Auto re-poll: ${this.formatIntervalText()} • Last checked` });
 
-        if (online && info) {
-            const fields = [
-                { name: 'Status',         value: statusText,                       inline: true },
-                { name: 'Version',        value: info.Version || 'Unknown',         inline: true },
-                { name: 'Active Streams', value: `${activeSessions}`,               inline: true },
-                { name: 'Open',           value: `[Jellyfin](${this.jellyfinUrl})`, inline: true }
-            ];
-
-            embed.addFields(...fields);
-        } else {
-            const fields = [
+        if (online) {
+            embed.addFields(
                 { name: 'Status', value: statusText, inline: true },
-                { name: 'URL',    value: `[${this.jellyfinUrl}](${this.jellyfinUrl})`, inline: true }
-            ];
+                { name: 'Version', value: info?.version || 'Unknown', inline: true },
+                { name: 'Open', value: `[Jellyseerr](${this.jellyseerrUrl})`, inline: true },
+                {
+                    name: 'Requested (Not Approved/Denied)',
+                    value: this.formatMovieTvCounts(summary.requestedPending),
+                    inline: true
+                },
+                {
+                    name: 'Approved (Content Not There Yet)',
+                    value: this.formatMovieTvCounts(summary.approvedNotAvailable),
+                    inline: true
+                },
+                {
+                    name: 'Total Content',
+                    value: this.formatMovieTvCounts(summary.totalContent),
+                    inline: true
+                }
+            );
+        } else {
+            embed.addFields(
+                { name: 'Status', value: statusText, inline: true },
+                { name: 'URL', value: `[${this.jellyseerrUrl}](${this.jellyseerrUrl})`, inline: true }
+            );
 
-            embed.addFields(...fields);
             if (error) {
                 embed.addFields({ name: 'Last Error', value: `\`${error.slice(0, 512)}\``, inline: false });
             }
+        }
+
+        if (summary.error) {
+            embed.addFields({
+                name: 'Request API Warning',
+                value: `\`${summary.error.slice(0, 512)}\``,
+                inline: false
+            });
         }
 
         const canStart = !!dockerState && (dockerState === 'exited' || dockerState === 'dead' || dockerState === 'created');
 
         const buttons = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('jellyfin_refresh')
-                .setLabel('Refresh')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('🔃'),
-            new ButtonBuilder()
-                .setCustomId('jellyfin_start')
+                .setCustomId('jellyseerr_start')
                 .setLabel('Start')
                 .setStyle(canStart ? ButtonStyle.Success : ButtonStyle.Secondary)
                 .setEmoji('🚀')
                 .setDisabled(!canStart),
             new ButtonBuilder()
-                .setCustomId('jellyfin_restart')
-                .setLabel('Restart Jellyfin')
+                .setCustomId('jellyseerr_restart')
+                .setLabel('Restart Jellyseerr')
                 .setStyle(online ? ButtonStyle.Danger : ButtonStyle.Secondary)
                 .setEmoji('🔄')
                 .setDisabled(!online && !this.isDockerControlConfigured())
@@ -262,25 +325,19 @@ class JellyfinMonitor {
         return { embed, components: [buttons] };
     }
 
-    // ─── Message Management ───────────────────────────────────────────────────
-
     async updateStatusMessage() {
         try {
             if (!this.statusMessage) return;
             const { embed, components } = await this.buildEmbed();
             await this.statusMessage.edit({ embeds: [embed], components });
         } catch (error) {
-            console.error('[JELLYFIN MONITOR] Failed to update status message:', error);
-            // If message was deleted, recreate it
+            console.error('[JELLYSEERR MONITOR] Failed to update status message:', error);
             if (error.code === 10008) {
-                console.log('[JELLYFIN MONITOR] Status message deleted — recreating...');
                 this.statusMessage = null;
                 await this.initialize();
             }
         }
     }
-
-    // ─── Button Handler ───────────────────────────────────────────────────────
 
     setupButtonHandler() {
         if (this.buttonHandlerRegistered) {
@@ -291,37 +348,24 @@ class JellyfinMonitor {
         this.client.on('interactionCreate', async (interaction) => {
             if (!interaction.isButton()) return;
 
-            if (interaction.customId === 'jellyfin_refresh') {
-                await interaction.deferReply({ ephemeral: true });
-                await this.updateStatusMessage();
-                await interaction.editReply('✅ Jellyfin status refreshed.');
-
-            } else if (interaction.customId === 'jellyfin_start') {
+            if (interaction.customId === 'jellyseerr_start') {
                 if (!this._isAdmin(interaction)) {
-                    await interaction.reply({
-                        content: '❌ You need admin permissions to start Jellyfin.',
-                        ephemeral: true
-                    });
+                    await interaction.reply({ content: '❌ You need admin permissions to start Jellyseerr.', ephemeral: true });
                     return;
                 }
 
                 await interaction.deferReply({ ephemeral: true });
-
                 try {
                     await this.startFromCrash();
-                    await interaction.editReply('✅ Start command sent to the Jellyfin Docker container. Checking status shortly...');
+                    await interaction.editReply('✅ Start command sent to the Jellyseerr Docker container. Checking status shortly...');
                     setTimeout(() => this.updateStatusMessage(), 8000);
                     setTimeout(() => this.updateStatusMessage(), 20000);
                 } catch (error) {
-                    await interaction.editReply(`❌ Failed to start Jellyfin container: \`${error.message}\``);
+                    await interaction.editReply(`❌ Failed to start Jellyseerr container: \`${error.message}\``);
                 }
-
-            } else if (interaction.customId === 'jellyfin_restart') {
+            } else if (interaction.customId === 'jellyseerr_restart') {
                 if (!this._isAdmin(interaction)) {
-                    await interaction.reply({
-                        content: '❌ You need admin permissions to restart Jellyfin.',
-                        ephemeral: true
-                    });
+                    await interaction.reply({ content: '❌ You need admin permissions to restart Jellyseerr.', ephemeral: true });
                     return;
                 }
 
@@ -329,82 +373,69 @@ class JellyfinMonitor {
                 try {
                     const { online } = await this.getServerInfo();
                     if (online) {
-                        await axios.post(
-                            `${this.jellyfinUrl}/System/Restart`,
-                            {},
-                            { headers: this.headers, timeout: 10000 }
-                        );
-                    } else if (this.isDockerControlConfigured()) {
-                        await this.restartFromDocker();
-                    } else {
-                        throw new Error('Jellyfin is offline and Unraid Docker control is not configured');
+                        await axios.post(`${this.jellyseerrUrl}/api/v1/settings/main/regenerate`, {}, {
+                            headers: this.headers,
+                            timeout: 10000
+                        }).catch(() => null);
                     }
 
-                    await interaction.editReply(
-                        '✅ Restart command sent to Jellyfin. ' +
-                        'The server will go offline briefly and come back up.\n' +
-                        '⏳ Status will auto-refresh in ~20 seconds.'
-                    );
-                    // Give Jellyfin time to go down and come back, then update
-                    setTimeout(() => this.updateStatusMessage(), 20000);
-                    setTimeout(() => this.updateStatusMessage(), 45000);
+                    if (this.isDockerControlConfigured()) {
+                        await this.restartFromDocker();
+                    } else if (!online) {
+                        throw new Error('Jellyseerr is offline and Unraid Docker control is not configured');
+                    }
+
+                    await interaction.editReply('✅ Restart command sent to Jellyseerr. Status will auto-refresh shortly.');
+                    setTimeout(() => this.updateStatusMessage(), 15000);
+                    setTimeout(() => this.updateStatusMessage(), 35000);
                 } catch (error) {
-                    await interaction.editReply(`❌ Failed to send restart command: \`${error.message}\``);
+                    await interaction.editReply(`❌ Failed to restart Jellyseerr: \`${error.message}\``);
                 }
             }
         });
     }
 
-    // ─── Lifecycle ────────────────────────────────────────────────────────────
-
     startMonitoring() {
-        // Immediate first check
         this.updateStatusMessage();
-
-        // Periodic auto-refresh
         this.updateInterval = setInterval(() => {
             this.updateStatusMessage();
         }, this.intervalMs);
 
-        console.log(`[JELLYFIN MONITOR] Auto-refresh every ${this.intervalMs / 1000}s`);
+        console.log(`[JELLYSEERR MONITOR] Auto-refresh every ${this.intervalMs / 1000}s`);
     }
 
     async initialize() {
-        if (!this.channelId || !this.apiKey) {
-            console.log('[JELLYFIN MONITOR] Skipping — jellyfinStatusChannelId or jellyfinApiKey not set in config.json');
+        if (!this.channelId || !this.apiKey || !this.jellyseerrUrl) {
+            console.log('[JELLYSEERR MONITOR] Skipping — jellyseerrStatusChannelId, jellyseerrApiKey, or Jellyseer service URL not set');
             return;
         }
 
         try {
             const channel = await this.client.channels.fetch(this.channelId);
             if (!channel) {
-                console.error('[JELLYFIN MONITOR] Channel not found:', this.channelId);
+                console.error('[JELLYSEERR MONITOR] Channel not found:', this.channelId);
                 return;
             }
 
-            // Look for an existing status message from the bot so we reuse it across restarts
             const messages = await channel.messages.fetch({ limit: 30 });
             const existing = messages.find(msg =>
                 msg.author.id === this.client.user.id &&
                 msg.embeds.length > 0 &&
-                msg.embeds[0].title === '🎬 Jellyfin Media Server'
+                msg.embeds[0].title === '🎞️ Jellyseerr Requests'
             );
 
             if (existing) {
                 this.statusMessage = existing;
-                console.log('[JELLYFIN MONITOR] Reusing existing status message');
             } else {
                 const { embed, components } = await this.buildEmbed();
                 this.statusMessage = await channel.send({ embeds: [embed], components });
-                console.log('[JELLYFIN MONITOR] Posted new status message');
             }
 
             this.setupButtonHandler();
             this.startMonitoring();
-            console.log('[JELLYFIN MONITOR] Initialized successfully');
-
+            console.log('[JELLYSEERR MONITOR] Initialized successfully');
         } catch (error) {
-            console.error('[JELLYFIN MONITOR] Failed to initialize:', error);
+            console.error('[JELLYSEERR MONITOR] Failed to initialize:', error);
         }
     }
 
@@ -413,8 +444,8 @@ class JellyfinMonitor {
             clearInterval(this.updateInterval);
             this.updateInterval = null;
         }
-        console.log('[JELLYFIN MONITOR] Shut down');
+        console.log('[JELLYSEERR MONITOR] Shut down');
     }
 }
 
-module.exports = JellyfinMonitor;
+module.exports = JellyseerrMonitor;
