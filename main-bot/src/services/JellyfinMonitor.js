@@ -229,12 +229,10 @@ class JellyfinMonitor {
 
             embed.addFields(...fields);
         } else {
-            const fields = [
-                { name: 'Status', value: statusText, inline: true },
-                { name: 'URL',    value: `[${this.jellyfinUrl}](${this.jellyfinUrl})`, inline: true }
-            ];
+            embed.addFields(
+                { name: 'Status', value: statusText, inline: true }
+            );
 
-            embed.addFields(...fields);
             if (error) {
                 embed.addFields({ name: 'Last Error', value: `\`${error.slice(0, 512)}\``, inline: false });
             }

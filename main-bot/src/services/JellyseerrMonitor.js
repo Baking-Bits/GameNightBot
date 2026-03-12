@@ -349,8 +349,7 @@ class JellyseerrMonitor {
             );
         } else {
             embed.addFields(
-                { name: 'Status', value: statusText, inline: true },
-                { name: 'URL', value: `[${this.jellyseerrUrl}](${this.jellyseerrUrl})`, inline: true }
+                { name: 'Status', value: statusText, inline: true }
             );
 
             if (error) {
