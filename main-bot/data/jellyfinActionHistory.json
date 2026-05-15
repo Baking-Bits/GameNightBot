@@ -1,0 +1,62 @@
+{
+  "service": "jellyfin",
+  "updatedAt": "2026-05-05T00:04:47.967Z",
+  "history": [
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1775397563
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1775483716
+    },
+    {
+      "service": "jellyfin",
+      "action": "start",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1775483718
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1775529553
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1775529577
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "97133775074390016",
+      "source": "button",
+      "timestamp": 1776131445
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "97133775074390016",
+      "source": "button",
+      "timestamp": 1777777406
+    },
+    {
+      "service": "jellyfin",
+      "action": "restart",
+      "userId": "97133775074390016",
+      "source": "button",
+      "timestamp": 1777939487
+    }
+  ]
+}

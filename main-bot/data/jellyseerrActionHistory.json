@@ -1,0 +1,27 @@
+{
+  "service": "jellyseerr",
+  "updatedAt": "2026-03-30T11:27:01.621Z",
+  "history": [
+    {
+      "service": "jellyseerr",
+      "action": "start",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1773359747
+    },
+    {
+      "service": "jellyseerr",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1774870020
+    },
+    {
+      "service": "jellyseerr",
+      "action": "restart",
+      "userId": "401166282486972428",
+      "source": "button",
+      "timestamp": 1774870021
+    }
+  ]
+}

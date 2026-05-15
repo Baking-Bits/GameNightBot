@@ -1,6 +1,40 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
+const SESSION_ACTIVITY_WINDOW_MS = 10 * 60 * 1000;
+
+function getSessionLastActivityMs(session) {
+    const timestampCandidates = [
+        session?.LastActivityDate,
+        session?.LastPlaybackCheckIn,
+        session?.LastPlaybackCheckInUtc,
+        session?.LastPlaybackCheckInDate,
+        session?.LastInteractionDate
+    ];
+
+    for (const timestamp of timestampCandidates) {
+        if (!timestamp) continue;
+        const parsed = Date.parse(timestamp);
+        if (!Number.isNaN(parsed)) {
+            return parsed;
+        }
+    }
+
+    return null;
+}
+
+function countRecentlyActiveSessions(sessions) {
+    if (!Array.isArray(sessions)) {
+        return 0;
+    }
+
+    const nowMs = Date.now();
+    return sessions.filter(session => {
+        const lastActivityMs = getSessionLastActivityMs(session);
+        return Number.isFinite(lastActivityMs) && (nowMs - lastActivityMs) <= SESSION_ACTIVITY_WINDOW_MS;
+    }).length;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('jellyfin')
@@ -51,7 +85,7 @@ module.exports = {
                 const activeSessions = Array.isArray(sessions)
                     ? sessions.filter(s => s.NowPlayingItem).length
                     : 0;
-                const totalSessions = Array.isArray(sessions) ? sessions.length : 0;
+                const totalSessions = countRecentlyActiveSessions(sessions);
                 const online = !!info;
 
                 const embed = new EmbedBuilder()
@@ -61,7 +95,7 @@ module.exports = {
                     .setTimestamp()
                     .addFields(
                         { name: '▶️ Active Streams', value: `**${activeSessions}**`, inline: true },
-                        { name: '👥 Sessions', value: `**${totalSessions}**`, inline: true }
+                        { name: '👥 Sessions (10m)', value: `**${totalSessions}**`, inline: true }
                     );
 
                 await interaction.editReply({ embeds: [embed] });

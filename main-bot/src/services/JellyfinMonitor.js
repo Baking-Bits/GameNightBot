@@ -8,6 +8,7 @@ const { promisify } = require('util');
 const JellyActionHistoryStore = require('./JellyActionHistoryStore');
 
 const execFileAsync = promisify(execFile);
+const SESSION_ACTIVITY_WINDOW_MS = 10 * 60 * 1000;
 
 /**
  * JellyfinMonitor - Posts and maintains a live Jellyfin status embed in a dedicated channel.
@@ -205,6 +206,38 @@ class JellyfinMonitor {
         }, 60 * 60 * 1000);
     }
 
+    getSessionLastActivityMs(session) {
+        const timestampCandidates = [
+            session?.LastActivityDate,
+            session?.LastPlaybackCheckIn,
+            session?.LastPlaybackCheckInUtc,
+            session?.LastPlaybackCheckInDate,
+            session?.LastInteractionDate
+        ];
+
+        for (const timestamp of timestampCandidates) {
+            if (!timestamp) continue;
+            const parsed = Date.parse(timestamp);
+            if (!Number.isNaN(parsed)) {
+                return parsed;
+            }
+        }
+
+        return null;
+    }
+
+    countRecentlyActiveSessions(sessions) {
+        if (!Array.isArray(sessions)) {
+            return 0;
+        }
+
+        const nowMs = Date.now();
+        return sessions.filter(session => {
+            const lastActivityMs = this.getSessionLastActivityMs(session);
+            return Number.isFinite(lastActivityMs) && (nowMs - lastActivityMs) <= SESSION_ACTIVITY_WINDOW_MS;
+        }).length;
+    }
+
     // ─── API Calls ────────────────────────────────────────────────────────────
 
     async getServerInfo() {
@@ -219,7 +252,7 @@ class JellyfinMonitor {
             const activeSessions = Array.isArray(sessions)
                 ? sessions.filter(s => s.NowPlayingItem).length
                 : 0;
-            const totalSessions = Array.isArray(sessions) ? sessions.length : 0;
+            const totalSessions = this.countRecentlyActiveSessions(sessions);
 
             return { online: !!info, info, activeSessions, totalSessions, error: null };
         } catch (error) {
@@ -245,7 +278,7 @@ class JellyfinMonitor {
         if (online && info) {
             embed.addFields(
                 { name: '▶️ Active Streams', value: `**${activeSessions}**`, inline: true },
-                { name: '👥 Sessions', value: `**${totalSessions}**`, inline: true }
+                { name: '👥 Sessions (10m)', value: `**${totalSessions}**`, inline: true }
             );
         } else {
             if (error) {

@@ -8,8 +8,14 @@ async function registerCommands(client, bot, token) {
         return;
     }
 
-    // Extract command data from the loaded commands
-    const commands = Array.from(bot.commands.values()).map(command => command.data);
+    // Extract command data from loaded commands and normalize to raw JSON payloads.
+    const commands = Array.from(bot.commands.values()).map(command => {
+        if (command.data && typeof command.data.toJSON === 'function') {
+            return command.data.toJSON();
+        }
+
+        return command.data;
+    });
     
     console.log(`Registering ${commands.length} commands...`);
     commands.forEach(cmd => console.log(`- ${cmd.name}`));
